@@ -1,8 +1,13 @@
 import { AppBar, Container, Toolbar, Typography, Box, IconButton, Button } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import AdbIcon from '@mui/icons-material/Adb';
+import {useRouter} from 'next/navigation'
+import { usePathname } from 'next/navigation'
+
 
 const PublicHeader = () => {
+  const router = useRouter()
+  const pathname = usePathname()
   const pages = ['Features', 'About', 'Feedback'];
     return (
         <AppBar position="static" style={{background: 'transparent', boxShadow: 'none'}}>
@@ -20,17 +25,13 @@ const PublicHeader = () => {
                 TOWER CONNECT
               </Typography>
               <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                {pages.map((page) => (
-                  <Button key={page} onClick={()=>{}} sx={{ my: 2, color: 'white', display: 'block', ml: 4 }}>
-                    {page}
-                  </Button>
-                ))}
               </Box>
+              
               <Box sx={{ flexGrow: 0 }}>
                 <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                  <Button style={{color: 'white'}} variant="text" size="large" onClick={()=>{}}>Tenant Login</Button>
+                  <Button style={{ borderRadius: 0, color: 'white', borderBottom: pathname === '/login/tenant' ? '4px solid white' : ''}} variant="text" size="large" onClick={()=>{router.push('/login/tenant')}}>Tenant Login</Button>
                     &nbsp; &nbsp;
-                  <Button style={{backgroundColor: 'white', color: 'black'}} variant="contained" size="large" onClick={()=>{}}>Owner Login</Button>
+                  <Button style={{borderRadius: 0, color: 'white', borderBottom: pathname === '/login/owner' ? '4px solid white' : ''}} variant="text" size="large" onClick={()=>{router.push('/login/owner')}}>Owner Login</Button>
                 </Box>
               </Box>
             </Toolbar>

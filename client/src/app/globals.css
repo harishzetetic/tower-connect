@@ -8,9 +8,7 @@ html, body {
   max-width: 100vw;
   overflow-x: hidden;
 }
-.full_viewport_height{
-  height: 100vh;
-}
+.full_viewport_height{height: auto;}
 .feature_box_wrapper{
   color: white;
   display: flex;
@@ -23,9 +21,14 @@ html, body {
   background-repeat: no-repeat;
 }
 .highlight{
-  color: blue;
+  color: #d15a00;
   font-weight: 800;
 }
 .app_title{
   font-weight: 800 !important;
+}
+.center_items{
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
