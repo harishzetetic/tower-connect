@@ -5,6 +5,7 @@ State Management: Redux ToolKit
 API Calls: Axios
 Frontend UI: Material UI
 Forms: React Forms
+Validation: Yup
 Scrolling Library: React Virtualized
 Animation: React Spring
 

@@ -10,3 +10,10 @@ export interface ISociety{
     addressline2:string;
     addressline1:string;
 }
+
+export interface IOwnerSignupInitialValues {
+        allSocieties: ISociety,
+        towerNumber: string,
+        flatNumber: string
+    
+}
