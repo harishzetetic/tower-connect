@@ -1,48 +1,27 @@
-import { ISociety } from "@/Types";
-import { getAllSocieties } from "@/api/societiesApis";
-import { AutocompleteOption, ListItemDecorator, ListItemContent } from "@mui/joy";
-import Autocomplete from '@mui/joy/Autocomplete';
-import { useState, useEffect } from "react";
-import TypographyMuiJoy from '@mui/joy/Typography';
+import { IOwnerSignupInitialValues, ISociety } from "@/Types";
+import Autocomplete from '@mui/material/Autocomplete';
+import {useSelector} from "react-redux"
+import { TextField } from "@mui/material";
+import { FormikErrors } from "formik";
 
 
 interface ISocietyAutoCompletorProps  {
     name:string;
-    value:string;
-    onChange:(e: React.ChangeEvent<any>)=> void;
-    onBlur:(e: React.ChangeEvent<any>)=> void;
-    errors:any
+    value:ISociety | null;
+    setFieldValue: (field: string, value: any, shouldValidate?: boolean | undefined) => Promise<void | FormikErrors<IOwnerSignupInitialValues>>
 }
 const AllSocietyAutoCompletor = (props:ISocietyAutoCompletorProps) => {
-    const {name} = props;
-    const [allSocieties, setAllSocieties] = useState<ISociety[]>([]);
-    useEffect(()=>{
-      const getAllSocietiesInfo = async() => {
-        const result = await getAllSocieties();
-        if(result){
-          setAllSocieties(result.data as ISociety[]);
-        }
-      }
-      getAllSocietiesInfo()
-    }, []);
-
+    const allSocieties  = useSelector(reduxStore => (reduxStore as any)?.societies);
     return <>
     <Autocomplete
-        placeholder="Choose your society"
-        name={name}
-        onChange={props.onChange}
-        onBlur={props.onBlur}
-        // value={props.value}
+        id={props.name}
         options={allSocieties}
+        value={props.value}
         getOptionLabel={(option) => `${option.builderName} ${option.societyName}`}
-        renderOption={(props, option) => (
-        <AutocompleteOption {...props}>
-            <ListItemContent sx={{ fontSize: 'sm' }}>
-            {option.builderName} {option.societyName}
-            <TypographyMuiJoy level="body-xs">{option.city}</TypographyMuiJoy>
-            </ListItemContent>
-        </AutocompleteOption>
-        )}
+        renderInput={(params) => <TextField {...params} label="Choose your society" onChange={(e)=>{
+            const target:ISociety = allSocieties.find((i:ISociety) => i._id === e.target.value);
+            props.setFieldValue("society", target)
+        }} onBlur={(e)=> {e.preventDefault();}} value={props.value} name={props.name}/>}
     />
     </>
 }

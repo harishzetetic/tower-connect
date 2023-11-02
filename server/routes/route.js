@@ -1,12 +1,19 @@
 import express from 'express';
 import { addSociety, getAllSocieties } from '../controller/societyController.js';
+import { addOwner } from '../controller/ownerController.js';
+import multer from 'multer';
 
+const userDocs = multer({dest: 'userdocs/'})
 const Route = express.Router();
-// var jwt = require('jsonwebtoken');
+// REMEMBER: WE NEED TO MAINTAIN JWT TOKEN AT THE TIME OF LOGIN var jwt = require('jsonwebtoken');
 
 // Society Apis
 Route.post('/addSociety', addSociety);
 Route.get('/getAllSocieties', getAllSocieties);
+
+// Owner Signup Apis
+Route.post('/newOwner', userDocs.single('proofDocument'), addOwner)
+
 // Owner Collection
 // societyObject, flatNumber, towerNumber, Owner name, ownerDOB, 
 // ownerOccupation, ownerPhoneNumner, ownerEmail, accountStatus['ACTIVE', 'SUSPENDED', 'HOLD'],

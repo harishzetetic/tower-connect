@@ -5,19 +5,13 @@ import { App } from "@/constants"
 import { Box, Button, Container, Grid, Link, TextField, Typography } from "@mui/material";
 import owner from '../../../images/owner.png';
 import Image from "next/image";
-import Autocomplete from '@mui/joy/Autocomplete';
-import AutocompleteOption from '@mui/joy/AutocompleteOption';
-import ListItemDecorator from '@mui/joy/ListItemDecorator';
-import ListItemContent from '@mui/joy/ListItemContent';
-import TypographyMuiJoy from '@mui/joy/Typography';
-import { useEffect, useState } from "react";
-import { ISociety } from "@/Types";
-import { getAllSocieties } from "@/api/societiesApis";
 import AllSocietyAutoCompletor from "@/components/common/AllSocietyAutoCompletor";
+import {useRouter} from 'next/navigation'
+  
 
 
 const OwnerLogin = () => {
-
+  const router = useRouter()
     return <>
         <Box className='full_viewport_height' style={{ background: App.Background }}>
           <PublicHeader />
@@ -62,7 +56,7 @@ const OwnerLogin = () => {
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link component="button" variant="body2" onClick={(e)=>{e.preventDefault(); router.push('/signup/owner')}}>
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
