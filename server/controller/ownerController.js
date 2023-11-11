@@ -1,15 +1,20 @@
 
 import OwnerModal from "../model/OwnerModel.js";
 import { AccountStatus } from "../constants.js";
+import jwt from 'jsonwebtoken'
 
 export const addOwner = async (request, response) => {
     try{
         /*
+            // TO DELETE EVERYTHING FROM OWNER MODAL
             await OwnerModal.deleteMany({})
             return response.status(200).json({message: "Deleted everything from owner collection"})
+            return;
         */
+            
         const {destination, filename} = request.file;
         const userProofDocumentFilePath = `${destination}${filename}`;
+       
         let exist = await OwnerModal.findOne({society: request.body.society, towerNumber: request.body.towerNumber, flatNumber: request.body.flatNumber});
         if(exist){
             switch(Number(exist.status)){
@@ -37,11 +42,35 @@ export const addOwner = async (request, response) => {
                 other: {}
             });
             await newOwner.save();
-            return response.status(200).json({message: 'Details has been saved. Team will review and approve your account if mactched correctly with your entered details.'})
+            return response.status(200).json({owner: newOwner})
         }
         
     }catch(e){
         return response.status(500).json(e)
     }
 }
+
+export const verifyToken = (request, response, next) => {
+    jwt.verify(request.params.token, process.env.JWT_SECRETKEY, (err, data) => {
+        if(err){
+            response.send({result: "Invalid Token", loginStatus: false})
+            console.log('Token Invalid')
+        } else {
+            console.log('Token Valid')
+           next()
+        }
+    })
+}
+
+export const deleteOwner = async(request, response) => {
+    try{
+        console.log(request.params)
+        // await OwnerModal.deleteOne({_id: request.params.id})
+        // return response.status(200).json({message: "SUCCESS"})
+    }catch(e){
+        return response.status(500).json(e)
+    }
+}
+
+
 

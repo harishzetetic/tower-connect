@@ -2,23 +2,13 @@ import * as Yup from 'yup';
 const FILE_SIZE = 5242880; //5MB
 const SUPPORTED_FORMATS = ['application/pdf', 'image/jpg', 'image/jpeg', 'image/png']
 export const OwnerSignupValidationSchema = Yup.object({
-    society:Yup.object().shape({
-        builderName:Yup.string().required(),
-        societyName:Yup.string().required(),
-        country:Yup.string().required(),
-        state:Yup.string().required(),
-        city:Yup.string().required(),
-        pin:Yup.number().required(),
-        addressline2:Yup.string().required(),
-        addressline1:Yup.string().required(),
-        _id:Yup.string().required(),
-    }).required("Select any society"),
+    society:Yup.string().required("Select any society"),
     firstName: Yup.string().min(2).max(20).required("First name is mandatory"),
     lastName: Yup.string().min(2).max(20).required("Last name is mandatory"),
-    towerNumber: Yup.string().required('Tower Number is required'),
-    flatNumber:  Yup.string().required('Flat Number is required'),
+    towerNumber: Yup.string().matches(/^[a-zA-Z0-9]*$/, { message: 'Only alpha/numeric characters are allowed'}).required('Tower Number is required'),
+    flatNumber:  Yup.string().matches(/^[0-9]*$/, { message: 'Only numeric characters are allowed'}).required('Flat Number is required'),
     flatType:  Yup.string().required('Flat Type is required'),
-    email: Yup.string().required('Email is required'),
+    email: Yup.string().email().required('Email is required'),
     phone: Yup.string().required('Phone Number is required'),
     dob:  Yup.string().required('DOB is required'),
     // imageUrl:  Yup.string().required('Uploading a proof image is mandatory'),

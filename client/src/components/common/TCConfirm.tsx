@@ -1,19 +1,21 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material"
 import style from "styled-jsx/style"
 
-
-
-interface ITCConfirmProps {
+export interface ITCConfirmProps {
   open: boolean;
   handleClose: ()=>void;
   handleConfirm: () => void;
   title: string;
   description: string;
+  successBtnTitle?:string;
+  fullScreen?:boolean;
+  hideCancel?:boolean;
 }
 
 const TCConfirm = (props: ITCConfirmProps) => {
   return (
     <Dialog
+    fullScreen={props.fullScreen}
     open={props.open}
     onClose={props.handleClose}
     aria-labelledby="confirm-dialog-title"
@@ -27,10 +29,10 @@ const TCConfirm = (props: ITCConfirmProps) => {
     </DialogContentText>
   </DialogContent>
   <DialogActions>
-    <Button autoFocus onClick={props.handleClose}>
+    {!props.hideCancel && <Button autoFocus onClick={props.handleClose}>
       Cancel
-    </Button>
-    <Button onClick={props.handleConfirm}>Go Ahead</Button>
+    </Button>}
+    <Button variant="contained" onClick={props.handleConfirm}>{props.successBtnTitle || 'Go Ahead'}</Button>
   </DialogActions>
 </Dialog>
   )

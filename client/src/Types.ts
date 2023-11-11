@@ -18,8 +18,8 @@ export interface ISociety{
     _id:string,
 }
 
-export interface IOwnerSignupFormData {
-        society: ISociety | null,
+export interface IOwnerData {
+        society: string | null, 
         towerNumber: string | null,
         flatNumber: string | null,
         flatType: string | null,
@@ -31,5 +31,7 @@ export interface IOwnerSignupFormData {
         imageUrl: string | null,
         proofDocument: File | null,
         password: string | null,
-        confirmPassword: string | null
+        confirmPassword: string | null,
+        proofDocumentURL?: string | null,
+        _id?: string
 }

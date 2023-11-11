@@ -1,9 +1,10 @@
 
 import mongoose from "mongoose";
+import { Schema } from "mongoose";
 
 const ownerSchema = new mongoose.Schema({
     society: {
-        type: Object,
+        type: Schema.Types.Mixed,
         required: true
     },
     towerNumber: {
@@ -42,7 +43,7 @@ const ownerSchema = new mongoose.Schema({
         required: true
     },
     status: {
-        type: String, // 'PENDING' | 'APPROVED' | 'HOLD'
+        type: String,
         required: true
     },
     password: {

@@ -1,19 +1,25 @@
 import express from 'express';
 import { addSociety, getAllSocieties } from '../controller/societyController.js';
-import { addOwner } from '../controller/ownerController.js';
+import { addOwner, deleteOwner, verifyToken } from '../controller/ownerController.js';
+import { signInAdmin, getPendingStatusAccounts } from '../controller/adminController.js';
 import multer from 'multer';
 
 const userDocs = multer({dest: 'userdocs/'})
 const Route = express.Router();
 // REMEMBER: WE NEED TO MAINTAIN JWT TOKEN AT THE TIME OF LOGIN var jwt = require('jsonwebtoken');
 
+//admin Apis
+Route.post('/adminSignIn', signInAdmin);
+Route.get('/pendingAccounts', getPendingStatusAccounts);
+
 // Society Apis
 Route.post('/addSociety', addSociety);
 Route.get('/getAllSocieties', getAllSocieties);
 
-// Owner Signup Apis
-Route.post('/newOwner', userDocs.single('proofDocument'), addOwner)
-
+// Owner Apis
+Route.post('/newOwner', userDocs.single('proofDocument'), addOwner); //signup request
+Route.delete('/deleteOwner/:id/:token', verifyToken, deleteOwner);
+Route.put('/approveOwnerAccount/:id', deleteOwner);
 // Owner Collection
 // societyObject, flatNumber, towerNumber, Owner name, ownerDOB, 
 // ownerOccupation, ownerPhoneNumner, ownerEmail, accountStatus['ACTIVE', 'SUSPENDED', 'HOLD'],

@@ -16,7 +16,7 @@ const Featured = () => {
         UNLEASH THE REACH OF RESIDENTIALS
       </Typography>
       <Typography variant="h3" align="center" paragraph>
-        Introducing the web app for <span className='highlight'>Supertech Eco Village 1</span>
+        Introducing the web app for societies <span className='highlight'>100% Broker Free</span>
       </Typography>
       <Typography variant="subtitle1" align="center" paragraph>
       a platform designed exclusively for residents and tenants. With this app, you can easily post buy/sell listings, make announcements, connect with other residents, and even showcase your businesses.

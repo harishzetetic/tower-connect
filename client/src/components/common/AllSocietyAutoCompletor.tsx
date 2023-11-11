@@ -1,4 +1,4 @@
-import { IOwnerSignupInitialValues, ISociety } from "@/Types";
+import { IOwnerSignupFormData, ISociety } from "@/Types";
 import Autocomplete from '@mui/material/Autocomplete';
 import {useSelector} from "react-redux"
 import { TextField } from "@mui/material";
@@ -8,7 +8,7 @@ import { FormikErrors } from "formik";
 interface ISocietyAutoCompletorProps  {
     name:string;
     value:ISociety | null;
-    setFieldValue: (field: string, value: any, shouldValidate?: boolean | undefined) => Promise<void | FormikErrors<IOwnerSignupInitialValues>>
+    setFieldValue: (field: string, value: any, shouldValidate?: boolean | undefined) => Promise<void | FormikErrors<IOwnerSignupFormData>>
 }
 const AllSocietyAutoCompletor = (props:ISocietyAutoCompletorProps) => {
     const allSocieties  = useSelector(reduxStore => (reduxStore as any)?.societies);

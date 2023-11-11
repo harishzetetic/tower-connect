@@ -1,9 +1,9 @@
 "use client"
-import { IGoogleUserData, IOwnerSignupFormData, ISociety } from "@/Types";
+import { IGoogleUserData, IOwnerData, ISociety } from "@/Types";
 import PublicFooter from "@/components/landingpage/PublicFooter"
 import PublicHeader from "@/components/landingpage/PublicHeader"
 import { App } from "@/constants"
-import { Backdrop, Box, Button, CircularProgress, Container, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Paper, Select, TextField, Typography, styled } from "@mui/material";
+import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Paper, Select, TextField, Typography, styled } from "@mui/material";
 import { Formik, FormikErrors } from "formik";
 import { useSelector } from "react-redux";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -19,16 +19,17 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import { VisuallyHiddenInput } from "@/styled";
 import { newOwnerSignupRequest } from "@/api/ownerApis";
-import TCConfirm from "@/components/common/TCConfirm";
+import TCConfirm, { ITCConfirmProps } from "@/components/common/TCConfirm";
+import {useRouter} from 'next/navigation'
 import { useState } from "react";
-import { error } from "console";
-
-;
 
 const OwnerSignup = () => {
+    const router = useRouter()
     const allSocieties = useSelector(reduxStore => (reduxStore as any)?.societies);
     const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
-    const [userFormData, setUserFormData] = useState<null | IOwnerSignupFormData>(null)
+    const [isRequestSubmitConfirmOpen, setIsRequestSubmitConfirmOpen] = useState<boolean>(false);
+    const [requestSubmitConfirmProps, setRequestSubmitConfirmProps] = useState<ITCConfirmProps>();
+    const [userFormData, setUserFormData] = useState<null | IOwnerData>(null)
     const initialValues = {
         society: null,
         towerNumber: null,
@@ -40,10 +41,10 @@ const OwnerSignup = () => {
         phone: null,
         imageUrl: null,
         proofDocument: null,
-    } as IOwnerSignupFormData;
+    } as IOwnerData;
 
 
-
+    /*
     const onGoogleLoginSuccess = async (info: any, setFieldValue: (field: string, value: any, shouldValidate?: boolean | undefined) => Promise<void | FormikErrors<IOwnerSignupFormData>>, values: any) => {
         const { given_name, family_name, email, picture } = jwtDecode(info.credential as string) as IGoogleUserData;
         console.log(given_name, family_name, email, picture)
@@ -57,16 +58,46 @@ const OwnerSignup = () => {
     const onGoogleLoginFailed = () => {
         NotificationManager.error('Error', 'Something went wrong while fetch your information from Google', 3000, () => { });
     }
+    */
+    
 
-    const openConfirm = (data: IOwnerSignupFormData) => {
+    const openConfirm = (data: IOwnerData) => {
         setIsConfirmOpen(true);
         setUserFormData(data)
+    }
+
+    const onConfirmSubmit = async () => {
+        const formData = new FormData();
+        for (let key in userFormData) {
+            formData.append(key, userFormData[key])
+        }
+        try {
+            const apiResponse = await newOwnerSignupRequest(formData);
+            if (apiResponse?.data?.message) {
+                NotificationManager.warning('Warning', apiResponse?.data.message, 15000, () => { });
+            } else if(apiResponse?.data?.owner){
+                NotificationManager.success('New Account Request Submitted', 'Your request for your account creation with Tower Connect has been submitted.', 15000, () => { });
+                setIsRequestSubmitConfirmOpen(true)
+                setRequestSubmitConfirmProps({
+                    open: true,
+                    handleClose: ()=>setIsRequestSubmitConfirmOpen(false),
+                    handleConfirm: ()=>{router.push('/login/owner')},
+                    title: 'Request Submitted',
+                    description: 'We are starting your provided data verification with uploaded document proof. If all good, it will take usually 24-48 hours to approve. In case information found mismatch account request would be reject.You can check your account status by login with your credentials.',
+                    successBtnTitle: 'Login',
+                    fullScreen: true,
+                    hideCancel:true
+                })
+            }
+            setIsConfirmOpen(false)
+        } catch (e) {
+            NotificationManager.error('Error', 'Getting error while register for new owner', 15000, () => { });
+        }
     }
 
     return <>
         <Box className='full_viewport_height' style={{ background: App.Background }}>
             <PublicHeader />
-
             <Box >
                 <GoogleOAuthProvider clientId={"775263055849-bes2gfvlbs5n84pmlp9lh7qfhpjb94kh.apps.googleusercontent.com"}>
                     <Container>
@@ -90,11 +121,11 @@ const OwnerSignup = () => {
                                                         error={!!errors.society}
                                                         labelId="society-name-label"
                                                         id="society-select"
-                                                        value={values.society?._id}
+                                                        value={values.society}
                                                         label="Select Societies"
                                                         onChange={(e) => {
                                                             const target: ISociety = allSocieties.find((i: ISociety) => i._id === e.target.value);
-                                                            setFieldValue("society", target)
+                                                            setFieldValue("society", target._id)
                                                         }}
                                                         name={"society"}
                                                         fullWidth
@@ -166,7 +197,6 @@ const OwnerSignup = () => {
                                                 />
                                                 <FormHelperText sx={{ color: App.ErrorTextColor }}>{errors.dob}</FormHelperText>
                                                 <Grid sx={{ mt: 2 }}>
-
                                                     <Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
                                                         Upload Proof Document
                                                         <VisuallyHiddenInput type="file" onChange={(e) => setFieldValue("proofDocument", e.target.files?.[0])} />
@@ -182,8 +212,6 @@ const OwnerSignup = () => {
                                                         <TextField type="password" error={!!errors.confirmPassword} helperText={errors.confirmPassword} value={values.confirmPassword} onChange={(e) => setFieldValue("confirmPassword", e.target.value)} name="confirmPassword" margin="normal" fullWidth label="Confirm Password" autoFocus />
                                                     </Grid>
                                                 </Grid>
-
-
                                                 <Grid container spacing={2} sx={{ pt: 2 }}>
                                                     <Grid item xs={12} sm={6}>
                                                         <Button size="large" fullWidth variant="outlined" onClick={() => { resetForm() }}>Reset</Button>
@@ -194,32 +222,8 @@ const OwnerSignup = () => {
                                                 </Grid>
 
                                             </Paper>
-                                            <TCConfirm open={isConfirmOpen} handleClose={() => setIsConfirmOpen(false)} handleConfirm={async () => {
-                                                const formData = new FormData();
-                                                for (let key in userFormData) {
-                                                    formData.append(key, userFormData[key])
-                                                }
-                                                try {
-                                                    const apiResponse = await newOwnerSignupRequest(formData);
-                                                    if (apiResponse?.data.message) {
-                                                        NotificationManager.warning('Warning', apiResponse?.data.message, 3000, () => { });
-                                                    }
-                                                    setIsConfirmOpen(false)
-                                                } catch (e) {
-                                                    NotificationManager.error('Error', 'Getting error while register for new owner', 3000, () => { });
-                                                }
-
-                                            }} title={'Confirm'} description={"Are your sure to proceed with entered info. Incorrent information may be reject your account creation."} />
-                                            {/*
-                                            
-                                              <Backdrop
-                                                open={true}
-                                                sx={{ backgroundColor: '#000000e6', overflow: 'hidden', color: "#fff", zIndex: '9'}}
-                                                onClick={() => { }}
-                                            >
-                                                asdfasdfasdfasdf
-                                            </Backdrop>
-                                            */}
+                                            <TCConfirm open={isConfirmOpen} handleClose={() => setIsConfirmOpen(false)} handleConfirm={onConfirmSubmit} title={'Confirm'} description={"Are your sure to proceed with entered info. Incorrent information may be reject your account creation."} />
+                                           
                                           
                                         </Container>
                                     </LocalizationProvider>
@@ -228,7 +232,7 @@ const OwnerSignup = () => {
                         </Formik>
                     </Container>
                 </GoogleOAuthProvider>
-
+                {isRequestSubmitConfirmOpen && requestSubmitConfirmProps && <TCConfirm {...requestSubmitConfirmProps} />}
             </Box>
             <PublicFooter />
         </Box>
