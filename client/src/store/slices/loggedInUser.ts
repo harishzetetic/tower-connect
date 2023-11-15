@@ -6,7 +6,11 @@ const loggedInUser = createSlice({
     initialState: {},
     reducers: {
         assignLoggedInUser: (state, action) => {
-            state = action.payload
+            state = {
+                role: action.payload.role,
+                token: action.payload.data.token,
+                userInfo: action.payload.data.data 
+            }
             return state;
         },
         removeLoggedInUser: (state, action) => {

@@ -1,8 +1,9 @@
+"use client"
 import { useSelector } from "react-redux";
 
 const Dashboard = () => {
-    const allSocieties = useSelector(reduxStore => (reduxStore as any));
-    console.log(allSocieties)
+    const loggedInUser = useSelector(reduxStore => (reduxStore as any).loggedInUser);
+    console.log(loggedInUser)
     return <>I am dashboard</>
 }
 
