@@ -9,9 +9,9 @@ const Connection = async () =>{
     const URL = `mongodb+srv://${USERNAME}:${PASSWORD}@tower-connect.nuxtnmz.mongodb.net/?retryWrites=true&w=majority&appName=AtlasApp`
     try{
         await mongoose.connect(URL, {useUnifiedTopology: true});
-        console.log('Databse connected successfully ❤️');
+        console.log('✅ Databse connected successfully');
     }catch(e){
-        console.log('Error in connected Databse', e)
+        console.log('❌ Error in connected Databse', e)
     }
 }
 

@@ -6,7 +6,7 @@ import { AccountStatus } from "../constants.js";
 export const signInAdmin = async (request, response) => {
     try{
        const {userId, password} = request.body;
-       if(userId === 'towerconnect8@gmail.com' && password === 'Summer@2024'){
+       if(userId === process.env.SUPER_ADMIN_ID && password === process.env.SUPER_ADMIN_PASSWORD){
         return response.status(200).json({message: "SUCCESS", token: jwt.sign({email: userId}, process.env.JWT_SECRETKEY)})
        } else {
         return response.status(200).json({message: "FAIL"})

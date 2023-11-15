@@ -4,6 +4,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import AdbIcon from '@mui/icons-material/Adb';
 import {useRouter} from 'next/navigation'
 import { usePathname } from 'next/navigation'
+import StreamIcon from '@mui/icons-material/Stream';
 
 
 const PublicHeader = () => {
@@ -14,14 +15,14 @@ const PublicHeader = () => {
         <AppBar position="static" style={{background: 'transparent', boxShadow: 'none'}}>
           <Container maxWidth="xl">
             <Toolbar disableGutters >
-              <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+              <StreamIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
               <Typography variant="h6" noWrap component="a" href="/" sx={{ mr: 2, display: { xs: 'none', md: 'flex' }, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'inherit', textDecoration: 'none', }}>
                 TOWER CONNECT
               </Typography>
               <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
                 <IconButton size="large" onClick={()=>{}} color="inherit"> <MenuIcon /></IconButton>
               </Box>
-              <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
+              <StreamIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
               <Typography variant="h5" noWrap component="a" href="/" sx={{ mr: 2, display: { xs: 'flex', md: 'none' }, flexGrow: 1, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'inherit', textDecoration: 'none'}}>
                 TOWER CONNECT
               </Typography>

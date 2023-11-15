@@ -31,9 +31,15 @@ const ownerSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    isEmailVerified: {
+        type: Boolean
+    },
     phone: {
         type: String,
         required: true,
+    },
+    isPhoneVerified: {
+        type: Boolean
     },
     imageUrl: {
         type: String,

@@ -21,7 +21,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
       <Providers> {/*For redux toolkit*/}
         <Suspense fallback={<Loading/>}> {/* To show loading template*/}
         <ReduxFetch>  {/*For load pre required data*/}
-        {children}       
+          {children}       
         </ReduxFetch>  
         </Suspense>
       </Providers>

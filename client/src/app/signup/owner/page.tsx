@@ -3,7 +3,7 @@ import { IGoogleUserData, IOwnerData, ISociety } from "@/Types";
 import PublicFooter from "@/components/landingpage/PublicFooter"
 import PublicHeader from "@/components/landingpage/PublicHeader"
 import { App } from "@/constants"
-import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Paper, Select, TextField, Typography, styled } from "@mui/material";
+import { Alert, Autocomplete, Box, Button, Chip, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Paper, Select, TextField, Typography, styled } from "@mui/material";
 import { Formik, FormikErrors } from "formik";
 import { useSelector } from "react-redux";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -25,7 +25,7 @@ import { useState } from "react";
 
 const OwnerSignup = () => {
     const router = useRouter()
-    const allSocieties = useSelector(reduxStore => (reduxStore as any)?.societies);
+    const allSocieties: Array<ISociety> = useSelector(reduxStore => (reduxStore as any)?.societies);
     const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
     const [isRequestSubmitConfirmOpen, setIsRequestSubmitConfirmOpen] = useState<boolean>(false);
     const [requestSubmitConfirmProps, setRequestSubmitConfirmProps] = useState<ITCConfirmProps>();
@@ -69,10 +69,15 @@ const OwnerSignup = () => {
     const onConfirmSubmit = async () => {
         const formData = new FormData();
         for (let key in userFormData) {
+            if(key === 'society'){
+                formData.append(key, JSON.stringify(userFormData[key]))
+                continue;
+            }
             formData.append(key, userFormData[key])
         }
         try {
             const apiResponse = await newOwnerSignupRequest(formData);
+            console.log(apiResponse)
             if (apiResponse?.data?.message) {
                 NotificationManager.warning('Warning', apiResponse?.data.message, 15000, () => { });
             } else if(apiResponse?.data?.owner){
@@ -85,7 +90,7 @@ const OwnerSignup = () => {
                     title: 'Request Submitted',
                     description: 'We are starting your provided data verification with uploaded document proof. If all good, it will take usually 24-48 hours to approve. In case information found mismatch account request would be reject.You can check your account status by login with your credentials.',
                     successBtnTitle: 'Login',
-                    fullScreen: true,
+                    fullScreen: false,
                     hideCancel:true
                 })
             }
@@ -116,32 +121,36 @@ const OwnerSignup = () => {
                                                 */}
 
                                                 <FormControl fullWidth>
-                                                    <InputLabel id="society-name-label">Society Name</InputLabel>
-                                                    <Select
-                                                        error={!!errors.society}
-                                                        labelId="society-name-label"
+                                                    <Autocomplete
+
+                                                        disablePortal
                                                         id="society-select"
-                                                        value={values.society}
-                                                        label="Select Societies"
-                                                        onChange={(e) => {
-                                                            const target: ISociety = allSocieties.find((i: ISociety) => i._id === e.target.value);
-                                                            setFieldValue("society", target._id)
+                                                        options={allSocieties.map(society => {
+                                                            return {
+                                                                label: `${society.builderName} ${society.societyName} | ${society.city}, ${society.country}`,
+                                                                value: society
+                                                            }
+                                                        })}
+                                                        onChange={(_, value) => {
+                                                            if(value){
+                                                                setFieldValue("society", value?.value)
+                                                            } else {
+                                                                setFieldValue("society", null)
+                                                            }
                                                         }}
-                                                        name={"society"}
-                                                        fullWidth
-                                                    >
-                                                        {allSocieties.map((item: ISociety, index: number) => (
-                                                            <MenuItem key={index} value={item._id}>{item.builderName} {item.societyName} | {item.city}</MenuItem>
-                                                        ))}
-                                                    </Select>
-                                                    <FormHelperText sx={{ color: App.ErrorTextColor }}>{errors.society}</FormHelperText>
+                                                        // renderOption={(props, option) => (<></>)}
+                                                        renderInput={(params) => <TextField {...params} label="Society Name" name={"society"} error={!!errors.society}/>}                                                        
+                                                    />
+                                                        <FormHelperText sx={{ color: App.ErrorTextColor }}>{errors.society}</FormHelperText>
+
+        
                                                 </FormControl>
                                                 <Grid container spacing={2}>
                                                     <Grid item xs={12} sm={6}>
-                                                        <TextField error={!!errors.towerNumber} helperText={errors.towerNumber} value={values.towerNumber} onChange={(e) => setFieldValue("towerNumber", e.target.value)} name="towerNumber" margin="normal" fullWidth label="Tower Number" autoFocus />
+                                                        <TextField error={!!errors.towerNumber} helperText={errors.towerNumber} value={values.towerNumber} onChange={(e) => setFieldValue("towerNumber", e.target.value.toUpperCase())} name="towerNumber" margin="normal" fullWidth label="Tower Number" autoFocus />
                                                     </Grid>
                                                     <Grid item xs={12} sm={6}>
-                                                        <TextField error={!!errors.flatNumber} helperText={errors.flatNumber} value={values.flatNumber} onChange={(e) => setFieldValue("flatNumber", e.target.value)} name="flatNumber" margin="normal" fullWidth label="Flat Number" autoFocus />
+                                                        <TextField type="number" error={!!errors.flatNumber} helperText={errors.flatNumber} value={values.flatNumber} onChange={(e) => setFieldValue("flatNumber", e.target.value)} name="flatNumber" margin="normal" fullWidth label="Flat Number" autoFocus />
                                                     </Grid>
                                                 </Grid>
                                                 <FormControl fullWidth sx={{ mt: 2, mb: 1 }}>
@@ -182,6 +191,7 @@ const OwnerSignup = () => {
                                                 </Grid>
                                                 <DatePicker
                                                     label="DOB"
+                                                    format="DD/MM/YYYY"
                                                     value={values.dob}
                                                     onChange={(date) => {
                                                         setFieldValue("dob", dayjs(date).format('YYYY-MM-DD'))

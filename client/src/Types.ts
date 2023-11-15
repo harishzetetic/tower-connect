@@ -1,3 +1,5 @@
+import * as Yup from 'yup';
+
 
 export interface IGoogleUserData {
     given_name:string;
@@ -7,6 +9,7 @@ export interface IGoogleUserData {
 }
 
 export interface ISociety{
+    _id:string,
     builderName:string;
     societyName:string;
     country:string;
@@ -15,11 +18,10 @@ export interface ISociety{
     pin:number;
     addressline2:string;
     addressline1:string;
-    _id:string,
 }
 
 export interface IOwnerData {
-        society: string | null, 
+        society: ISociety | null, 
         towerNumber: string | null,
         flatNumber: string | null,
         flatType: string | null,
@@ -35,3 +37,21 @@ export interface IOwnerData {
         proofDocumentURL?: string | null,
         _id?: string
 }
+export interface IOwnerLoginData {
+    society: ISociety | null, 
+    towerNumber: string | null,
+    flatNumber: string | null,
+    password: string | null
+  }
+
+export const SocietyValidationSchema = Yup.object().shape({
+    _id:Yup.string(),
+    builderName:Yup.string(),
+    societyName:Yup.string(),
+    country:Yup.string(),
+    state:Yup.string(),
+    city:Yup.string(),
+    pin:Yup.number(),
+    addressline2:Yup.string(),
+    addressline1:Yup.string(),
+}).required("Select any society")

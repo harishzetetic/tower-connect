@@ -1,5 +1,5 @@
 
-import { ISociety } from "@/Types";
+import { IOwnerData, IOwnerLoginData, ISociety } from "@/Types";
 import { BACKEND_URL } from "@/constants";
 import axios from "axios";
 
@@ -16,3 +16,10 @@ export const newOwnerSignupRequest = async(formData: FormData) => {
     }
 }
 
+export const ownerLoginRequest = async(formData: IOwnerLoginData) => {
+    try{
+        return await axios.post(`${BACKEND_URL}/ownerLogin`, formData);
+    }catch(e){
+        console.log('Getting Error while creating new Owner')
+    }
+}
