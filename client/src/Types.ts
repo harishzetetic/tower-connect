@@ -44,6 +44,11 @@ export interface IOwnerLoginData {
     password: string | null
   }
 
+export interface ILoggedInUser {
+    user: IOwnerData,
+    token: string,
+    role: string
+}
 export const SocietyValidationSchema = Yup.object().shape({
     _id:Yup.string(),
     builderName:Yup.string(),
@@ -55,3 +60,4 @@ export const SocietyValidationSchema = Yup.object().shape({
     addressline2:Yup.string(),
     addressline1:Yup.string(),
 }).required("Select any society")
+

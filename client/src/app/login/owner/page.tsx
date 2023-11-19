@@ -8,13 +8,13 @@ import owner from '../../../images/owner.png';
 import Image from "next/image";
 import { useRouter } from 'next/navigation'
 import { Formik } from "formik";
-import { IOwnerLoginData, ISociety, SocietyValidationSchema } from "@/Types";
+import { ILoggedInUser, IOwnerLoginData, ISociety, SocietyValidationSchema } from "@/Types";
 import { useSelector } from "react-redux";
 import {  ownerLoginRequest } from "@/api/ownerApis";
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 import { useDispatch } from "react-redux";
-import { assignLoggedInUser } from "@/store/slices/loggedInUser";
 import jwtDecode from "jwt-decode";
+import {default as NextLink} from "next/link";
 
 export const OwnerLoginSchema = Yup.object({
   society: SocietyValidationSchema,
@@ -38,7 +38,7 @@ const OwnerLogin = () => {
     try{
       const response = await ownerLoginRequest(formData);
       if(response?.data.token){
-        dispatch(assignLoggedInUser({...response, role: 'OWNER'}))
+        sessionStorage.setItem('loggedInUserInfo', JSON.stringify({user: response.data.data, role: 'OWNER', token: response.data.token } as ILoggedInUser))
         NotificationManager.success('Login Success', 'Redirecting to dashboard', 15000, () => { });
         router.push('/dashboard')
       } else {
@@ -115,14 +115,10 @@ const OwnerLogin = () => {
                 </Button>
                 <Grid container>
                   <Grid item xs>
-                    <Link href="#" variant="body2">
-                      Forgot password?
-                    </Link>
+                  <NextLink href={'../not-available'}>{"Forgot Password"}</NextLink>
                   </Grid>
                   <Grid item>
-                    <Link component="button" variant="body2" onClick={(e) => { e.preventDefault(); router.push('/signup/owner') }}>
-                      {"Don't have an account? Sign Up"}
-                    </Link>
+                    <NextLink href={'../signup/owner'}>{"Don't have an account? Sign Up"}</NextLink>
                   </Grid>
                 </Grid>
               </Box>
