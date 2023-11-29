@@ -1,15 +1,17 @@
 import { Grid, Card, CardActionArea, CardMedia, CardContent, Typography, Avatar, CardHeader, IconButton } from "@mui/material"
 import { red } from "@mui/material/colors"
 import bullet from '../../images/bullet.jpeg';
+import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
+import { App } from "@/constants";
 
-
+// Figma: https://www.figma.com/file/3YshaQtivDp7lf7G1DwaGd/Real-estate-dashboard-design-(Community)?type=design&node-id=701-10&mode=design&t=f9SpyRzgldCb8QMx-0
 
 const BuySellInfoCard = () => {
-    console.log(bullet)
     return <Grid item xs={2} sm={4} md={3}>
-    <Card sx={{ maxWidth: 345 }}>
+    <Card sx={{ maxWidth: 345, color: 'white', backgroundColor: App.DarkBlue }}>
         <CardActionArea>
         <CardHeader
+        subheaderTypographyProps={{sx:{color: 'white'}}}
         avatar={
           <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
             HS
@@ -21,7 +23,7 @@ const BuySellInfoCard = () => {
       />
             <CardMedia
                 component="img"
-                height="150"
+                height="250"
                 image={bullet.src}
                 alt="green iguana"
             />
@@ -29,8 +31,8 @@ const BuySellInfoCard = () => {
                 <Typography gutterBottom variant="h6">
                     Bullet 350 Classic
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    INR 34000.00
+                <Typography variant="body2" sx={{color: 'white'}}>
+                    <CurrencyRupeeIcon sx={{verticalAlign: 'bottom'}}/> 34000.00
                 </Typography>
                
             </CardContent>

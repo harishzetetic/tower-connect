@@ -3,18 +3,19 @@ import PublicFooter from "@/components/landingpage/PublicFooter"
 import PublicHeader from "@/components/landingpage/PublicHeader"
 import { App } from "@/constants"
 import * as Yup from 'yup';
-import { Autocomplete, Box, Button, Container, FormHelperText, Grid, Link, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Container, FormHelperText, Grid, Link, TextField, ThemeProvider, Typography } from "@mui/material";
 import owner from '../../../images/owner.png';
 import Image from "next/image";
 import { useRouter } from 'next/navigation'
 import { Formik } from "formik";
-import { ILoggedInUser, IOwnerLoginData, ISociety, SocietyValidationSchema } from "@/Types";
+import { APP_THEME, ILoggedInUser, IOwnerLoginData, ISociety, SocietyValidationSchema } from "@/Types";
 import { useSelector } from "react-redux";
 import {  ownerLoginRequest } from "@/api/ownerApis";
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 import { useDispatch } from "react-redux";
 import jwtDecode from "jwt-decode";
 import {default as NextLink} from "next/link";
+import { TCButton, TCTextField } from "@/styled";
 
 export const OwnerLoginSchema = Yup.object({
   society: SocietyValidationSchema,
@@ -50,11 +51,12 @@ const OwnerLogin = () => {
     }
     
   }
-  return <>
-    <Box className='full_viewport_height' style={{ background: App.Background }}>
+  return <ThemeProvider theme={APP_THEME}>
+    <Box className='full_viewport_height' style={{ backgroundColor: App.DarkBlue }}>
       <PublicHeader />
       <Box
-        sx={{ bgcolor: 'background.paper', pt: 8, pb: 6 }}
+      
+        sx={{ pt: 8, pb: 6 , backgroundColor: 'white'}}
       >
         <Formik initialValues={initialValues} onSubmit={(formData) => {loginHandler(formData) }} enableReinitialize={true} validationSchema={OwnerLoginSchema}>
           {({ values, setFieldValue, errors, resetForm, submitForm }) => (
@@ -64,7 +66,7 @@ const OwnerLogin = () => {
                   <Image src={owner} alt={"owner-logo"} height={100} width={100} />
                 </Box>
                 <Box className='center_items' sx={{ mt: 2 }}>
-                  <Typography align="center" variant="h6" noWrap component="a" href="/" sx={{ mr: 2, display: { xs: 'none', md: 'flex' }, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'inherit', textDecoration: 'none', }}>
+                  <Typography align="center" variant="h6" noWrap component="a" href="/" sx={{ mr: 2, display: { xs: 'none', md: 'flex' }, fontWeight: 700, letterSpacing: '.3rem', textDecoration: 'none', }}>
                     OWNER LOGIN
                   </Typography>
                 </Box>
@@ -87,7 +89,18 @@ const OwnerLogin = () => {
                   renderInput={(params) => <TextField {...params} label="Society Name" name={"society"} error={!!errors.society} />}
                 />
                 <FormHelperText sx={{ color: App.ErrorTextColor }}>{errors.society}</FormHelperText>
-                <TextField error={!!errors.towerNumber} helperText={errors.towerNumber} value={values.towerNumber} onChange={(e) => setFieldValue("towerNumber", e.target.value.toUpperCase())} name="towerNumber" margin="normal" fullWidth label="Tower Number" autoFocus />
+                <TextField 
+                  color="error"
+                  variant="outlined" 
+                  error={!!errors.towerNumber} 
+                  helperText={errors.towerNumber} 
+                  value={values.towerNumber} 
+                  onChange={(e) => setFieldValue("towerNumber", e.target.value.toUpperCase())} 
+                  name="towerNumber" 
+                  margin="normal" 
+                  fullWidth 
+                  label="Tower Number" 
+                  autoFocus />
                 <TextField type="number" error={!!errors.flatNumber} helperText={errors.flatNumber} value={values.flatNumber} onChange={(e) => setFieldValue("flatNumber", e.target.value)} name="flatNumber" margin="normal" fullWidth label="Flat Number" autoFocus />
 
                 <TextField
@@ -104,7 +117,7 @@ const OwnerLogin = () => {
                   autoComplete="current-password"
                 />
 
-                <Button
+                <TCButton
                   type="submit"
                   fullWidth
                   variant="contained"
@@ -112,7 +125,7 @@ const OwnerLogin = () => {
                   onClick={(e)=> {e.preventDefault(); submitForm(); }}
                 >
                   Sign In
-                </Button>
+                </TCButton>
                 <Grid container>
                   <Grid item xs>
                   <NextLink href={'../not-available'}>{"Forgot Password"}</NextLink>
@@ -133,7 +146,7 @@ const OwnerLogin = () => {
 
     </Box>
     <NotificationContainer />
-  </>
+  </ThemeProvider>
 }
 
 export default OwnerLogin

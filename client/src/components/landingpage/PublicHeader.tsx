@@ -1,17 +1,19 @@
 "use client"
-import { AppBar, Container, Toolbar, Typography, Box, IconButton, Button } from "@mui/material";
+import { AppBar, Container, Toolbar, Typography, Box, IconButton, Button, createTheme, ThemeProvider } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import AdbIcon from '@mui/icons-material/Adb';
 import {useRouter} from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import StreamIcon from '@mui/icons-material/Stream';
 import {default as NextLink} from "next/link";
+import { TCButton } from "@/styled";
 
 
 
 const PublicHeader = () => {
   const router = useRouter()
   const pathname = usePathname()
+  
   const pages = ['Features', 'About', 'Feedback'];
     return (
         <AppBar position="static" style={{background: 'transparent', boxShadow: 'none'}}>
@@ -37,10 +39,10 @@ const PublicHeader = () => {
                     <Button style={{ borderRadius: 0, color: 'white', borderBottom: pathname === '/login/tenant' ? '4px solid white' : ''}} variant="text" size="large" onClick={()=>{router.push('/login/tenant')}}>Tenant Login</Button>
                     &nbsp; &nbsp;
                   */}
-                  <Button style={{borderRadius: 0, color: 'white', borderBottom: pathname === '/login/owner' ? '4px solid white' : ''}} variant="contained" size="large">
+                  <TCButton style={{color: 'white'}} variant="contained" size="large">
                   <NextLink href="/login/owner" style={{color: 'white', textDecoration: 'none'}}>Login</NextLink> 
-                  </Button>
-                  <Button style={{ borderRadius: 0, color: 'white', borderBottom: pathname === '/signup/owner' ? '4px solid white' : ''}} variant="text" size="large">
+                  </TCButton>
+                  <Button style={{ borderRadius: 0, color: 'white'}} variant="text" size="large">
                   <NextLink href="/signup/owner" style={{color: 'white', textDecoration: 'none'}}>Signup</NextLink> 
                   </Button>
                     &nbsp; &nbsp;
@@ -50,6 +52,7 @@ const PublicHeader = () => {
             </Toolbar>
           </Container>
         </AppBar>
+      
       );
 }
 export default PublicHeader;

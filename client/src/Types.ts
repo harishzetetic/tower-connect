@@ -1,4 +1,6 @@
 import * as Yup from 'yup';
+import { App } from './constants';
+import { createTheme } from '@mui/material';
 
 
 export interface IGoogleUserData {
@@ -61,3 +63,39 @@ export const SocietyValidationSchema = Yup.object().shape({
     addressline1:Yup.string(),
 }).required("Select any society")
 
+
+export const APP_THEME = createTheme({
+  
+    typography: {
+      fontFamily: [
+        'General Sans',
+        '-apple-system',
+        'BlinkMacSystemFont',
+        '"Segoe UI"',
+        'Roboto',
+        '"Helvetica Neue"',
+        'Arial',
+        'sans-serif',
+        '"Apple Color Emoji"',
+        '"Segoe UI Emoji"',
+        '"Segoe UI Symbol"',
+      ].join(','),
+    },
+  });
+
+  export interface IBuySell {
+    _id?: string,
+    image1: File | null,
+    image2: File | null,
+    image3: File | null,
+    image4: File | null,
+    title:string | null,
+    price: string | null,
+    category: string | null,
+    condition: string | null,
+    description: string | null,
+    ownerid?: string | null,
+    societyid?: string | null,
+    postedon?: string | null,
+    
+}

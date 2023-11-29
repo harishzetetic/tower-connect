@@ -19,6 +19,7 @@ const TCConfirm = (props: ITCConfirmProps) => {
     open={props.open}
     onClose={props.handleClose}
     aria-labelledby="confirm-dialog-title"
+    fullWidth
 >
   <DialogTitle id="confirm-dialog-title">
     {props.title}

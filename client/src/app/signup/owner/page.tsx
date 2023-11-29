@@ -1,9 +1,9 @@
 "use client"
-import { IGoogleUserData, IOwnerData, ISociety } from "@/Types";
+import { APP_THEME, IGoogleUserData, IOwnerData, ISociety } from "@/Types";
 import PublicFooter from "@/components/landingpage/PublicFooter"
 import PublicHeader from "@/components/landingpage/PublicHeader"
 import { App } from "@/constants"
-import { Alert, Autocomplete, Box, Button, Chip, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Paper, Select, TextField, Typography, styled } from "@mui/material";
+import { Alert, Autocomplete, Box, Button, Chip, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Paper, Select, TextField, ThemeProvider, Typography, styled } from "@mui/material";
 import { Formik, FormikErrors } from "formik";
 import { useSelector } from "react-redux";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -12,12 +12,12 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import jwtDecode from "jwt-decode";
-import { OwnerSignupValidationSchema } from "./ownerSignupValidationSchema";
+import { OwnerSignupValidationSchema } from "../../yupvalidationschema/ownerSignupValidationSchema";
 import 'react-dropzone-uploader/dist/styles.css'
 import dayjs from "dayjs";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-import { VisuallyHiddenInput } from "@/styled";
+import { TCButton, TCButtonOulined, VisuallyHiddenInput } from "@/styled";
 import { newOwnerSignupRequest } from "@/api/ownerApis";
 import TCConfirm, { ITCConfirmProps } from "@/components/common/TCConfirm";
 import {useRouter} from 'next/navigation'
@@ -100,12 +100,12 @@ const OwnerSignup = () => {
         }
     }
 
-    return <>
-        <Box className='full_viewport_height' style={{ background: App.Background }}>
+    return <ThemeProvider theme={APP_THEME}>
+        <Box className='full_viewport_height' style={{ background: App.DarkBlue }}>
             <PublicHeader />
-            <Box >
+            <Box>
                 <GoogleOAuthProvider clientId={"775263055849-bes2gfvlbs5n84pmlp9lh7qfhpjb94kh.apps.googleusercontent.com"}>
-                    <Container>
+                    <Container maxWidth="xl">
                         <Formik initialValues={initialValues} onSubmit={(formData) => { openConfirm(formData) }} enableReinitialize={true} validationSchema={OwnerSignupValidationSchema}>
                             {({ values, setFieldValue, errors, resetForm, submitForm }) => (
                                 <>
@@ -207,10 +207,13 @@ const OwnerSignup = () => {
                                                 />
                                                 <FormHelperText sx={{ color: App.ErrorTextColor }}>{errors.dob}</FormHelperText>
                                                 <Grid sx={{ mt: 2 }}>
-                                                    <Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
+                                                    <TCButton 
+                                                        {...{component: "label"}} 
+                                                        variant="contained" 
+                                                        startIcon={<CloudUploadIcon />}>
                                                         Upload Proof Document
                                                         <VisuallyHiddenInput type="file" onChange={(e) => setFieldValue("proofDocument", e.target.files?.[0])} />
-                                                    </Button> {values?.proofDocument?.name ? <Box sx={{ verticalAlign: 'sub', display: 'inline' }}><AttachFileIcon />{values?.proofDocument?.name}</Box> : 'No Document Selected'}
+                                                    </TCButton> {values?.proofDocument?.name ? <Box sx={{ verticalAlign: 'sub', display: 'inline' }}><AttachFileIcon />{values?.proofDocument?.name}</Box> : 'No Document Selected'}
 
                                                     <FormHelperText sx={{ color: App.ErrorTextColor }}>{errors.proofDocument}</FormHelperText>
                                                 </Grid>
@@ -224,10 +227,10 @@ const OwnerSignup = () => {
                                                 </Grid>
                                                 <Grid container spacing={2} sx={{ pt: 2 }}>
                                                     <Grid item xs={12} sm={6}>
-                                                        <Button size="large" fullWidth variant="outlined" onClick={() => { resetForm() }}>Reset</Button>
+                                                        <TCButtonOulined size="large" fullWidth variant="outlined" onClick={() => { resetForm() }}>Reset</TCButtonOulined>
                                                     </Grid>
                                                     <Grid item xs={12} sm={6}>
-                                                        <Button size="large" fullWidth variant="contained" onClick={submitForm}>Submit</Button>
+                                                        <TCButton size="large" fullWidth variant="contained" onClick={submitForm}>Submit</TCButton>
                                                     </Grid>
                                                 </Grid>
 
@@ -247,7 +250,7 @@ const OwnerSignup = () => {
             <PublicFooter />
         </Box>
         <NotificationContainer />
-    </>
+        </ThemeProvider>
 }
 
 export default OwnerSignup

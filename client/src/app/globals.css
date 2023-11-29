@@ -10,7 +10,7 @@ html, body {
 }
 .full_viewport_height{height: auto;}
 .feature_box_wrapper{
-  color: white;
+ 
   display: flex;
   align-items: center;
   justify-content: center;
