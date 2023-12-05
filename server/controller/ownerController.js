@@ -4,6 +4,14 @@ import { AccountStatus } from "../constants.js";
 import jwt from 'jsonwebtoken'
 import _ from "lodash";
 
+export const addListening = async(request, response) => {
+    try{
+        console.log(request.file)
+    }catch(e){
+        return response.status(500).json(e)
+    }
+}
+
 export const addOwner = async (request, response) => {
     try{ 
         //await OwnerModal.deleteMany({}); return;

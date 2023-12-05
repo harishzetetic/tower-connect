@@ -95,7 +95,5 @@ export const APP_THEME = createTheme({
     condition: string | null,
     description: string | null,
     ownerid?: string | null,
-    societyid?: string | null,
-    postedon?: string | null,
-    
+    societyid?: string | null    
 }

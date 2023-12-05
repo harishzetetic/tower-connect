@@ -23,3 +23,11 @@ export const ownerLoginRequest = async(formData: IOwnerLoginData) => {
         console.log('Getting Error while creating new Owner')
     }
 }
+
+export const addListening = async(formData: FormData) => {
+    try{
+        return await axios.post(`${BACKEND_URL}/addListening`, formData);
+    }catch(e){
+        console.log('Getting Error while add your listening')
+    }
+}
