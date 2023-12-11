@@ -12,13 +12,13 @@ const Featured = () => {
       <Typography align="center" gutterBottom>
       <Image src={featuredLogo} alt={"featuredLogo"} height={250} width={250} style={{justifyContent: 'center'}}/>
       </Typography>
-      <Typography align="center" gutterBottom>
+      <Typography align="center" gutterBottom sx={{color: '#fff'}}>
         UNLEASH THE REACH OF RESIDENTIALS
       </Typography>
-      <Typography variant="h2" align="center" paragraph>
+      <Typography variant="h2" align="center" paragraph sx={{color: '#fff'}}>
         Introducing the web app for societies <span className='highlight'>100% Broker Free</span>
       </Typography>
-      <Typography variant="h6" align="center" paragraph>
+      <Typography variant="h6" align="center" paragraph sx={{color: '#fff'}}>
       a platform designed exclusively for residents and tenants. With this app, you can easily post buy/sell listings, make announcements, connect with other residents, and even showcase your businesses.
       </Typography>
 

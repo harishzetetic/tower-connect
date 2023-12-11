@@ -13,6 +13,7 @@ app.use(bodyParser.urlencoded({extended: true}))
 app.use('/', Route);
 
 app.use('/userdocs', express.static('userdocs'))
+app.use('/itemImages', express.static('itemImages'))
 
 Connection();
 const PORT = 9000

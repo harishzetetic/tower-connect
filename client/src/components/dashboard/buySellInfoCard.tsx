@@ -1,45 +1,70 @@
-import { Grid, Card, CardActionArea, CardMedia, CardContent, Typography, Avatar, CardHeader, IconButton } from "@mui/material"
+import { Grid, Card, CardActionArea, CardMedia, CardContent, Typography, Avatar, CardHeader, Skeleton, Stack } from "@mui/material"
 import { red } from "@mui/material/colors"
-import bullet from '../../images/bullet.jpeg';
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
-import { App } from "@/constants";
+import { App, BACKEND_URL } from "@/constants";
+import { IBuySell } from "@/Types";
+import {default as NextLink} from "next/link";
+import dayjs from 'dayjs';
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime)
 
-// Figma: https://www.figma.com/file/3YshaQtivDp7lf7G1DwaGd/Real-estate-dashboard-design-(Community)?type=design&node-id=701-10&mode=design&t=f9SpyRzgldCb8QMx-0
-
-const BuySellInfoCard = () => {
+interface IBuySellInfoCard {
+    data: IBuySell
+}
+const BuySellInfoCard = (props: IBuySellInfoCard) => {
+    const {images, title, price, owner, _id, created_at} = props.data;
     return <Grid item xs={2} sm={4} md={3}>
+    <NextLink href={{pathname: `/dashboard/listing/${_id}`}}>
     <Card sx={{ maxWidth: 345, color: 'white', backgroundColor: App.DarkBlue }}>
         <CardActionArea>
         <CardHeader
         subheaderTypographyProps={{sx:{color: 'white'}}}
         avatar={
           <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-            HS
+            {owner?.firstName?.charAt(0)} {owner?.lastName?.charAt(0)}
           </Avatar>
         }
         action={<></>}
-        title="Harish Sharma from A3-1001"
-        subheader="Posted 3 days ago"
+        title={`${owner?.firstName} ${owner?.lastName} from ${owner?.towerNumber}-${owner?.flatNumber}`}
+        subheader={`Posted on ${dayjs(created_at).fromNow()}`}
       />
             <CardMedia
                 component="img"
                 height="250"
-                image={bullet.src}
+                image={`${BACKEND_URL}${(images[0] as string)?.substr(1)}`}
                 alt="green iguana"
             />
             <CardContent>
-                <Typography gutterBottom variant="h6">
-                    Bullet 350 Classic
+                <Typography gutterBottom variant="h6" sx={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis'}}>
+                    {title}
                 </Typography>
                 <Typography variant="body2" sx={{color: 'white'}}>
-                    <CurrencyRupeeIcon sx={{verticalAlign: 'bottom'}}/> 34000.00
+                    <CurrencyRupeeIcon sx={{verticalAlign: 'bottom'}}/> {price}
                 </Typography>
-               
             </CardContent>
         </CardActionArea>
     </Card>
+    </NextLink>
 </Grid>
 }
 
+export const SkeletonCard = () => {
+    return <Grid item xs={2} sm={4} md={3}> <Card >
+        <CardActionArea>
+            <CardContent>
+                <Stack spacing={1}>
+                    <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
+                    <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
+                    <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
+                    <Skeleton variant="rectangular" height={60} />
+                    <Skeleton variant="rounded" height={60} />
+                    <Skeleton variant="rounded" height={60} />
+                    <Skeleton variant="rounded" height={60} />
+                    <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
+                </Stack>
+            </CardContent>
+        </CardActionArea>
+    </Card> </Grid>
+}
 
 export default BuySellInfoCard

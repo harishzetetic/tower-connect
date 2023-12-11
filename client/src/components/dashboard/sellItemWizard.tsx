@@ -2,22 +2,24 @@
 import { App, Categories, Condition } from "@/constants";
 import { Dialog, AppBar, Toolbar, IconButton, Typography, Slide, Grid, Container, TextField, FormControl, InputAdornment, InputLabel, OutlinedInput, Autocomplete, Box, FormHelperText, Fab } from "@mui/material"
 import { TransitionProps } from "@mui/material/transitions";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import { TCButton, VisuallyHiddenInput } from "@/styled";
 import { Formik, FormikErrors } from "formik";
 import { IBuySell } from "@/Types";
 import { BuySellValidationSchema } from "@/app/yupvalidationschema/buySellPostSchema";
 import { NotificationContainer, NotificationManager } from 'react-notifications';
-
+import _ from 'lodash'
 import CloseIcon from '@mui/icons-material/Close';
 import { addListening } from "@/api/ownerApis";
 import { getLoggedInUserData } from "@/util";
+import { useRouter } from 'next/navigation'
 
 
 interface ISellItemWizard {
     openSellWizard: boolean;
-    setOpenSellWizard: React.Dispatch<React.SetStateAction<boolean>>
+    setOpenSellWizard: React.Dispatch<React.SetStateAction<boolean>>;
+    pushNotification: (type: string, title: string, description: string) => void 
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -30,11 +32,9 @@ const Transition = React.forwardRef(function Transition(
 });
 
 const SellItemWizard = (props: ISellItemWizard) => {
+    const router = useRouter();
     const initialValues = {
-        image1: null,
-        image2: null,
-        image3: null,
-        image4: null,
+        images: [],
         title: null,
         price: null,
         category: null,
@@ -43,24 +43,42 @@ const SellItemWizard = (props: ISellItemWizard) => {
     } as IBuySell;
 
     const onSubmit = async (userFormData: IBuySell) => {
-        const loggedInUser = getLoggedInUserData()
-        userFormData.ownerid = loggedInUser?.user._id;
-        userFormData.societyid = loggedInUser?.user.society?._id;
-        const formData = new FormData();
+
+        try {
+            const loggedInUser = getLoggedInUserData()
+            userFormData.owner = loggedInUser?.user;
+            userFormData.societyid = loggedInUser?.user.society?._id;
+            const formData = new FormData();
             for (let key in userFormData) {
-                formData.append(key, userFormData[key])
-            }
-            try {
-                const apiResponse = await addListening(formData);
-                if (apiResponse?.data?.message) {
-                    NotificationManager.warning('Warning', apiResponse?.data.message, 15000, () => { });
-                } else if(apiResponse?.data?.owner){
-                    NotificationManager.success('Congratulations', 'You listening has been live', 15000, () => { });
-                    props.setOpenSellWizard(false);
+                console.log(key)
+                switch(key){
+                    case 'images':
+                        userFormData[key].forEach(file => {
+                            if (file) {
+                                formData.append('images', file)
+                            }
+                        });
+                        continue;
+                    case 'owner':
+                        formData.append(key, JSON.stringify(userFormData[key]));
+                        continue;
+                    default:
+                        formData.append(key, userFormData[key]);
+                        continue;
+
                 }
-            } catch (e) {
-                NotificationManager.error('Error', 'Getting error while adding listening', 15000, () => { });
             }
+            const apiResponse = await addListening(formData);
+            if (apiResponse?.data?.isTokenValid === false) {
+                sessionStorage.removeItem('loggedInUserInfo');
+                router.push('/login/owner')
+            } else if (apiResponse?.data?._id) {
+                props.pushNotification('success', 'Congratulations', 'You listening has been live')
+                props.setOpenSellWizard(false);
+            }
+        } catch (e) {
+            props.pushNotification('error', 'Error', 'Getting error while adding listening')
+        }
     }
 
     return <Dialog
@@ -91,13 +109,9 @@ const SellItemWizard = (props: ISellItemWizard) => {
                     {({ values, setFieldValue, errors, resetForm, submitForm, setFieldError, setErrors }) => {
                         return (<>
                             <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-    
-                                <ImageBlock file={values.image1} setFieldValue={setFieldValue} errors={errors} setFieldError={setFieldError} imageIndex={'image1'} />
-                                <ImageBlock file={values.image2} setFieldValue={setFieldValue} errors={errors} setFieldError={setFieldError} imageIndex={'image2'} />
-                                <ImageBlock file={values.image3} setFieldValue={setFieldValue} errors={errors} setFieldError={setFieldError} imageIndex={'image3'} />
-                                <ImageBlock file={values.image4} setFieldValue={setFieldValue} errors={errors} setFieldError={setFieldError} imageIndex={'image4'} />
+                                <ImageBlock files={values.images} setFieldValue={setFieldValue} errors={errors} setFieldError={setFieldError} imageIndex={0} />
                             </Grid>
-    
+
                             <Grid item xs={12} sm={12} sx={{ marginTop: 2 }}>
                                 <TextField name="title" error={!!errors.title} helperText={errors.title} value={values.title} onChange={(e) => setFieldValue("title", e.target.value)} margin="normal" fullWidth label="Product Title" autoFocus />
                             </Grid>
@@ -119,7 +133,7 @@ const SellItemWizard = (props: ISellItemWizard) => {
                             </Grid>
                             <Grid item xs={12} sm={12} sx={{ marginTop: 2 }}>
                                 <Autocomplete
-    
+
                                     disablePortal
                                     id="society-select"
                                     options={Categories}
@@ -136,7 +150,7 @@ const SellItemWizard = (props: ISellItemWizard) => {
                             </Grid>
                             <Grid item xs={12} sm={12} sx={{ marginTop: 2 }}>
                                 <Autocomplete
-    
+
                                     disablePortal
                                     id="society-select"
                                     options={Condition}
@@ -154,16 +168,9 @@ const SellItemWizard = (props: ISellItemWizard) => {
                             <Grid item xs={12} sm={12} sx={{ marginTop: 2 }}>
                                 <TextField error={!!errors.description} helperText={errors.description} value={values.description} onChange={(e) => setFieldValue("description", e.target.value)} multiline name="description" margin="normal" fullWidth label="Description" autoFocus />
                             </Grid>
-    
+
                             <Grid>
-                                <TCButton size="large" variant="contained" autoFocus onClick={()=>{
-                                    const {image1, image2, image3, image4} = values;
-                                    if(!!(image1 || image2 || image3 || image4)){
-                                        submitForm();
-                                    } else {
-                                        setFieldError('image1', 'At least one item image should be uploaded')
-                                    }
-                                }}>
+                                <TCButton size="large" variant="contained" autoFocus onClick={submitForm}>
                                     Publish
                                 </TCButton>
                             </Grid>
@@ -177,39 +184,70 @@ const SellItemWizard = (props: ISellItemWizard) => {
 }
 
 interface IImageBlock {
-    file: File | null | undefined,
+    files: Array<File | null | string>,
     setFieldValue: (field: string, value: any, shouldValidate?: boolean | undefined) => Promise<void | FormikErrors<IBuySell>>,
     errors: FormikErrors<IBuySell>,
     setFieldError: (field: string, message: string | undefined) => void,
-    imageIndex: string
+    imageIndex: number
 }
 
 const ImageBlock = (props: IImageBlock) => {
-    const inputFileRef = React.useRef<HTMLInputElement>(null)
-    const { file, imageIndex, setFieldValue, setFieldError, errors } = props;
+    const [files, setFiles] = useState<Array<File | null>>([null, null, null, null])
+    let refs = new Map();
+    refs.set(0, React.useRef(null))
+    refs.set(1, React.useRef(null))
+    refs.set(2, React.useRef(null))
+    refs.set(3, React.useRef(null))
+    const { imageIndex, setFieldValue, setFieldError, errors } = props;
 
-    const onRemoveImageHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.preventDefault(); 
-        e.stopPropagation(); 
-        if(inputFileRef?.current?.value){
-            setFieldValue(imageIndex, null); 
-            inputFileRef.current.value = '';
+    const onRemoveImageHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, index: number) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (refs.get(index)?.current?.value) {
+            const filesClone = _.cloneDeep(files)
+            filesClone[index] = null;
+            setFiles(filesClone)
+            setFieldValue('images', filesClone)
+            refs.get(index).current.value = '';
         }
     }
-    return <Grid item xs={2} sm={3} md={3}>
-        <Box sx={{cursor: 'pointer', backgroundColor: App.DarkBlue, color: 'white', height: 150, border: '0.5px solid gray', borderRadius: 2 }} onClick={() => {
-            inputFileRef.current?.click();
-        }}>
-        { file && (
-            <>
-                <Fab color="error" aria-label="edit" size="small" sx={{ float: 'right', top: '-10px', right: '-10px' }} onClick={onRemoveImageHandler}><CloseIcon /></Fab>
-                <img style={{marginTop: '-39px', width: '-webkit-fill-available', height: '150px'}} src={URL.createObjectURL(file as File)} />
-            </>
-            )}
-            {!file && <Typography sx={{ mt: 7 }} textAlign='center'>Click to select</Typography>}
-            <VisuallyHiddenInput type="file" onChange={(e) => setFieldValue(imageIndex, e.target.files && e.target.files[0])} ref={inputFileRef} key={imageIndex} name={imageIndex}/>
-        </Box>
-        <FormHelperText sx={{ color: App.ErrorTextColor, ml: 5 }}>{errors[imageIndex]}</FormHelperText>
-    </Grid>
+
+    return <>
+        {files.map((file, index) => <Grid item xs={2} sm={3} md={3}>
+            <Box sx={{ cursor: 'pointer', backgroundColor: App.DarkBlue, color: 'white', height: 150, border: '0.5px solid gray', borderRadius: 2 }} onClick={() => {
+                refs.get(index).current?.click();
+            }}>
+                {file ?
+                    <>
+                        <Fab color="error" aria-label="edit" size="small" sx={{ float: 'right', top: '-10px', right: '-10px' }} onClick={(e) => { onRemoveImageHandler(e, index) }}><CloseIcon /></Fab>
+                        <img style={{ marginTop: '-39px', width: '-webkit-fill-available', height: '150px' }} src={URL.createObjectURL(file as File)} />
+                    </>
+                    :
+                    <Typography sx={{ mt: 7 }} textAlign='center'>Click to select</Typography>
+                }
+                <VisuallyHiddenInput type="file" onChange={(e) => {
+                    const FILE_SIZE = 2000000; // 2000000 BYTES = 2MB      
+                    const SUPPORTED_IMG_FORMATS = ['image/jpg', 'image/jpeg', 'image/png']
+
+                    if (e.target.files && ((e.target.files[0] as File)?.size) > FILE_SIZE) {
+                        NotificationManager.warning('File Size Exceeded', 'Only 2 MB file size is allowed', 15000, () => { });
+                        return;
+                    }
+                    if (e.target.files && !SUPPORTED_IMG_FORMATS.includes((e.target.files[0] as File)?.type)) {
+                        NotificationManager.warning('File Type Mismatch', 'Only image items are allowed', 15000, () => { });
+                        return;
+                    }
+                    const filesClone = _.cloneDeep(files)
+                    filesClone[index] = e.target.files && e.target.files[0];
+                    setFiles(filesClone)
+                    setFieldValue('images', filesClone)
+
+                }} ref={refs.get(index)} key={index} name={'image' + index}
+                    accept="image/x-png,image/jpeg,image/jpg,image/png" />
+            </Box>
+            <NotificationContainer />
+        </Grid>)}
+        <FormHelperText sx={{ color: App.ErrorTextColor, ml: 5 }}>{errors.images}</FormHelperText>
+    </>
 }
 export default SellItemWizard

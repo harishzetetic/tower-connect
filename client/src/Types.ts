@@ -85,15 +85,13 @@ export const APP_THEME = createTheme({
 
   export interface IBuySell {
     _id?: string,
-    image1: File | null,
-    image2: File | null,
-    image3: File | null,
-    image4: File | null,
+    images: Array<File | null | string>,
     title:string | null,
     price: string | null,
     category: string | null,
     condition: string | null,
     description: string | null,
-    ownerid?: string | null,
-    societyid?: string | null    
+    owner?: IOwnerData | null,
+    societyid?: string | null,
+    created_at?:string | null  
 }

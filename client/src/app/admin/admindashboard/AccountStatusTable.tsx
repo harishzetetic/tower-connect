@@ -38,8 +38,8 @@ const [userInfoForDrawer, setUserInfoForDrawer] = React.useState<IUserInfo | nul
 
 
 
-const logoutOrInvalidateQueries = (loginStatus: boolean) => {
-  if(loginStatus === false){
+const logoutOrInvalidateQueries = (isTokenValid: boolean) => {
+  if(isTokenValid === false){
     alert('You are logging out due to invalid token')
     router.push('/admin/superadmin')
   } else {
@@ -53,9 +53,9 @@ const pendingAccounts = useQuery({
 })
 
 React.useEffect(()=>{
-  const loginStatus = pendingAccounts?.data?.data.loginStatus;
-  console.log(loginStatus)
-  if(loginStatus === false){
+  const isTokenValid = pendingAccounts?.data?.data.isTokenValid;
+  console.log(isTokenValid)
+  if(isTokenValid === false){
     alert('You are logging out due to invalid token')
     router.push('/admin/superadmin')
   }
@@ -64,19 +64,19 @@ React.useEffect(()=>{
 const deleteAccountMutation = useMutation({
   mutationFn: (id:string) => deleteOwner(id),
   onSuccess: (data) => {
-   logoutOrInvalidateQueries(!data?.data.loginStatus);
+   logoutOrInvalidateQueries(!data?.data.isTokenValid);
   }
 });
 const approveAccountMutation = useMutation({
   mutationFn: (id:string) => approveOwnerAccount(id),
   onSuccess: (data) => {
-    logoutOrInvalidateQueries(!data?.data.loginStatus);
+    logoutOrInvalidateQueries(!data?.data.isTokenValid);
   },
 });
 const rejectAccountMutation = useMutation({
   mutationFn: (data: {id:string; rejectionMessage:string}) => rejectOwnerAccount(data),
   onSuccess: (data) => {
-    logoutOrInvalidateQueries(!data?.data.loginStatus);
+    logoutOrInvalidateQueries(!data?.data.isTokenValid);
   }
 });
 

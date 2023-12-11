@@ -3,13 +3,57 @@ import OwnerModal from "../model/OwnerModel.js";
 import { AccountStatus } from "../constants.js";
 import jwt from 'jsonwebtoken'
 import _ from "lodash";
+import BuySellModel from "../model/BuySellModel.js";
 
-export const addListening = async(request, response) => {
+
+
+
+export const fetchListingById= async(request, response) => {
     try{
-        console.log(request.file)
+        let data = await BuySellModel.findById({_id: request.body.id});
+        return response.status(200).json(data)
+
     }catch(e){
-        return response.status(500).json(e)
+        return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
+
     }
+}
+
+export const fetchAllListings= async(request, response) => {
+    try{
+        let data = await BuySellModel.find({societyid: request.body.society});
+        return response.status(200).json(data)
+
+    }catch(e){
+        return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
+
+    }
+}
+export const newListing = async(request, response) => {
+    jwt.verify(request.params.token, process.env.JWT_SECRETKEY, async (err, data) => {
+        if(err){
+            response.send({result: "Invalid Token", isTokenValid: false})
+            console.log('❌ Token Invalid')
+        } else {
+            console.log('👍  Token Valid')
+            try{
+                const imagesPaths = [];
+                request.files.length && request.files.forEach(file => imagesPaths.push(`${file.destination}${file.filename}`))
+                const {title, price, category, condition, description, owner, societyid} = request.body;
+                const newListing = new BuySellModel({
+                     images: imagesPaths,
+                     title, price, category, condition, description, owner: JSON.parse(owner), societyid
+                  });
+
+                 await newListing.save();
+                 return response.status(200).json(newListing)
+                
+            }catch(e){
+                return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
+            }
+        }
+    })
+    
 }
 
 export const addOwner = async (request, response) => {
@@ -54,17 +98,7 @@ export const addOwner = async (request, response) => {
     }
 }
 
-export const verifyToken = (request, response, next) => {
-    jwt.verify(request.params.token, process.env.JWT_SECRETKEY, (err, data) => {
-        if(err){
-            response.send({result: "Invalid Token", loginStatus: false})
-            console.log('❌ Token Invalid')
-        } else {
-            console.log('✅ Token Valid')
-           next()
-        }
-    })
-}
+
 
 export const deleteOwner = async(request, response) => {
     try{
@@ -103,7 +137,7 @@ export const ownerLogin = async (request, response) => {
         const {society, towerNumber, flatNumber, password} = request.body;
         const exist = await OwnerModal.findOne({society, towerNumber, flatNumber, password})
         const responseData = _.cloneDeep(exist);
-        responseData.password = null;
+        responseData.password = 'NO_PASSWORD_AVAILABLE';
         if(exist){
          return response.status(200).json({message: "SUCCESS", data: responseData, token: jwt.sign({society, towerNumber, flatNumber}, process.env.JWT_SECRETKEY)})
         } else {

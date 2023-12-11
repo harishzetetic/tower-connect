@@ -1,6 +1,7 @@
 
-import { IOwnerData, IOwnerLoginData, ISociety } from "@/Types";
+import { IBuySell, IOwnerData, IOwnerLoginData, ISociety } from "@/Types";
 import { BACKEND_URL } from "@/constants";
+import { getLoggedInUserData } from "@/util";
 import axios from "axios";
 
 /*
@@ -26,8 +27,27 @@ export const ownerLoginRequest = async(formData: IOwnerLoginData) => {
 
 export const addListening = async(formData: FormData) => {
     try{
-        return await axios.post(`${BACKEND_URL}/addListening`, formData);
+        const loggedInUserInfo = getLoggedInUserData();
+        return await axios.post(`${BACKEND_URL}/addListening/${loggedInUserInfo?.token}`, formData);
     }catch(e){
         console.log('Getting Error while add your listening')
+    }
+}
+
+export const fetchAllListings = async(society) => {
+    try{
+        const loggedInUserInfo = getLoggedInUserData();
+        return await axios.post(`${BACKEND_URL}/fetchAllListings/${loggedInUserInfo?.token}`, {society});
+    }catch(e){
+        console.log('Getting Error while fetchAllListings')
+    }
+}
+
+export const fetchListingById = async(id:string)=> {
+    try{
+        const loggedInUserInfo = getLoggedInUserData();
+        return await axios.post(`${BACKEND_URL}/fetchListingById/${loggedInUserInfo?.token}`, {id});
+    }catch(e){
+        console.log('Getting Error while fetching listing by id')
     }
 }

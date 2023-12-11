@@ -6,7 +6,7 @@ export interface ITCConfirmProps {
   handleClose: ()=>void;
   handleConfirm: () => void;
   title: string;
-  description: string;
+  description: string | React.JSX.Element;
   successBtnTitle?:string;
   fullScreen?:boolean;
   hideCancel?:boolean;

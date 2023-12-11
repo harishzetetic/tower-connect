@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
 
-const ownerSchema = new mongoose.Schema({
+export const ownerSchema = new mongoose.Schema({
     society: {
         type: Schema.Types.Mixed,
         required: true
