@@ -1,20 +1,24 @@
-import { Grid, Card, CardActionArea, CardMedia, CardContent, Typography, Avatar, CardHeader, Skeleton, Stack } from "@mui/material"
+import { Grid, Card, CardActionArea, CardMedia, CardContent, Typography, Avatar, CardHeader, Skeleton, Stack, Fab, Box, Button } from "@mui/material"
 import { red } from "@mui/material/colors"
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import { App, BACKEND_URL } from "@/constants";
 import { IBuySell } from "@/Types";
-import {default as NextLink} from "next/link";
+import EditIcon from '@mui/icons-material/Edit';
 import dayjs from 'dayjs';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import relativeTime from "dayjs/plugin/relativeTime";
+import { NextLink } from "@/styled";
+import { getLoggedInUserData } from "@/util";
 dayjs.extend(relativeTime)
 
 interface IBuySellInfoCard {
     data: IBuySell
 }
 const BuySellInfoCard = (props: IBuySellInfoCard) => {
-    const {images, title, price, owner, _id, created_at} = props.data;
+    const {images, title, price, owner, _id, created_at, isSold} = props.data;
+    const loggedUser = getLoggedInUserData()
     return <Grid item xs={2} sm={4} md={3}>
-    <NextLink href={{pathname: `/dashboard/listing/${_id}`}}>
+    
     <Card sx={{ maxWidth: 345, color: 'white', backgroundColor: App.DarkBlue }}>
         <CardActionArea>
         <CardHeader
@@ -38,13 +42,36 @@ const BuySellInfoCard = (props: IBuySellInfoCard) => {
                 <Typography gutterBottom variant="h6" sx={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis'}}>
                     {title}
                 </Typography>
-                <Typography variant="body2" sx={{color: 'white'}}>
-                    <CurrencyRupeeIcon sx={{verticalAlign: 'bottom'}}/> {price}
-                </Typography>
+                <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+                    <Box>
+                        {!isSold ? <Typography variant="h5" sx={{color: '#0eb700', fontWeight: 'bold'}}>
+                            <CurrencyRupeeIcon sx={{verticalAlign: 'bottom'}}/> {price}
+                        </Typography> : <Typography variant="h5" sx={{color: '#cf2069', fontWeight: 'bold'}}>
+                            {'SOLD'}
+                        </Typography>}
+                        
+                    </Box>
+                    
+                    <Box sx={{textAlign: 'right'}}>
+                        <NextLink href={{pathname: `/dashboard/listing/${_id}`}}>
+                        <Button color='secondary' variant="contained" size="small">
+                            <VisibilityIcon />
+                        </Button>
+                    </NextLink> &nbsp;
+                    {(loggedUser?.user._id === owner?._id) && <NextLink href={{pathname: `/dashboard/update-listing/${_id}`}}><Button variant="contained" size="small">
+                        <EditIcon />
+                    </Button> </NextLink>}
+
+                    
+                        
+                    </Box>
+                </Box>
+                
+                
             </CardContent>
         </CardActionArea>
     </Card>
-    </NextLink>
+    
 </Grid>
 }
 

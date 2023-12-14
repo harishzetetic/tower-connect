@@ -28,7 +28,6 @@ import Loading from '@/app/Loading';
 import { IOwnerData } from '@/Types';
 import AccountStatusTable from './AccountStatusTable';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 
 
@@ -103,14 +102,12 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const defaultTheme = createTheme();
 
 export default function AdminDashboard() {
-  const queryClient = new QueryClient();
   const [open, setOpen] = React.useState(true);
   const [loadingData, setLoadingData] = React.useState<boolean>(true);
   const [pendingAccounts, setPendingAccounts] = React.useState<IOwnerData[] | null>(null);
   const toggleDrawer = () => {setOpen(!open);};
 
   return (
-    <QueryClientProvider client={queryClient}> {/*for react query*/}
     <ThemeProvider theme={defaultTheme}>
      <Box sx={{ display: 'flex' }}>
         <CssBaseline />
@@ -222,6 +219,5 @@ export default function AdminDashboard() {
       </Box>
      
     </ThemeProvider>
-    </QueryClientProvider>
   );
 }

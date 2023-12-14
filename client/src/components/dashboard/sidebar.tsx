@@ -30,7 +30,6 @@ interface ISidebarProps{
 const Sidebar = (props: ISidebarProps) => {
     const currentPath = usePathname();
     const router = useRouter()
-    console.log(currentPath)
     const [openLogoutConfirm, setOpenLogoutConfirm] = useState(false);
     const {loggedInUser} = props
     const drawerWidth = 240;

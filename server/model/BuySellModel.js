@@ -35,6 +35,9 @@ const buySellSchema = new mongoose.Schema({
     societyid: {
         type: String,
         required:true
+    }, 
+    isSold: {
+        type: Boolean
     }
 },{
     timestamps: {

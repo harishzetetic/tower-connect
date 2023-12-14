@@ -93,5 +93,8 @@ export const APP_THEME = createTheme({
     description: string | null,
     owner?: IOwnerData | null,
     societyid?: string | null,
-    created_at?:string | null  
+    created_at?:string | null,
+    isSold?:boolean  
 }
+
+export type notificationType = 'error' | 'success' | 'warn';

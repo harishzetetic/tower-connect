@@ -75,7 +75,10 @@ const Listing = ({ params }) => {
                 <Grid item xs={6} md={10}>
                     {isLoading && <SkeletonCard />}
                     {!isLoading && listing && <>
-                        &nbsp;&nbsp;<Typography variant='h3' sx={{fontWeight: 'bold'}}><Button variant="text"><NextLink href={{ pathname: `/dashboard/` }}><ArrowBackIcon fontSize='large' /></NextLink></Button>  {listing.title} <Button sx={{float: 'right'}}size="large" variant="contained" onClick={getContactDetailsAction}><LocalPhoneIcon /> Get Contact Details</Button></Typography>
+                        &nbsp;&nbsp;
+                        <Typography variant='h3' sx={{fontWeight: 'bold'}}><Button variant="text"><NextLink href={{ pathname: `/dashboard/` }}><ArrowBackIcon fontSize='large' /></NextLink></Button>  {listing.title} 
+                            {!listing.isSold && <Button sx={{float: 'right'}}size="large" variant="contained" onClick={getContactDetailsAction}><LocalPhoneIcon /> Get Contact Details</Button>}
+                        </Typography>
                         <Typography variant='h6'>{`By ${listing.owner?.firstName} ${listing.owner?.lastName} from ${listing.owner?.towerNumber}-${listing.owner?.flatNumber} on ${dayjs(listing?.created_at).fromNow()}`}  </Typography>
                         <Box sx={{ display: 'inline-block', mt:2 }}>
                             <ImageList sx={{ width: 'auto', height: 'auto' }} cols={4} rowHeight={164}>
@@ -95,7 +98,7 @@ const Listing = ({ params }) => {
                         </Box>
                         <Grid container spacing={2}>
                             <Grid item xs={6} md={4}>
-                                <CardBox title="Price" value={parseInt(listing.price || '0').toFixed(2)} priceFormat/>
+                                <CardBox title="Price" value={listing.isSold ? 'SOLD' : parseInt(listing.price || '0').toFixed(2)}  priceFormat={!!(!listing.isSold)}/>
                             </Grid>
                             <Grid item xs={6} md={4}>
                                 <CardBox title="Condition" value={Condition.find(item => item.value === listing.condition)?.label } />
@@ -127,7 +130,7 @@ const Listing = ({ params }) => {
 interface ICardBox {
     title: string;
     value: string | null | undefined;
-    priceFormat?: true;
+    priceFormat?: boolean;
 }
 const CardBox = (props: ICardBox) => {
     const {title, value, priceFormat} = props;

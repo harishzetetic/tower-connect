@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation";
-import { ILoggedInUser } from "./Types";
+import { ILoggedInUser, notificationType } from "./Types";
 import { NotificationManager } from 'react-notifications';
 
 export const getLoggedInUserData = ():ILoggedInUser|null => {
@@ -12,16 +12,16 @@ export const getLoggedInUserData = ():ILoggedInUser|null => {
     return null;
 }
 
-export const pushNotification = (type:string, title:string, description:string) => {
+export const pushNotification = (type:notificationType, title:string, description:string, time:number = 15000) => {
     switch(type){
         case 'error':
-            NotificationManager.error(title, description, 15000, () => { });
+            NotificationManager.error(title, description, time, () => { });
             return;
         case 'success':
-            NotificationManager.success(title, description, 15000, () => { });
+            NotificationManager.success(title, description, time, () => { });
             return;
         case 'warn':
-            NotificationManager.warn(title, description, 15000, () => { });
+            NotificationManager.info(title, description, time, () => { });
             return;
     }
 }

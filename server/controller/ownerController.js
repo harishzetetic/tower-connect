@@ -7,6 +7,25 @@ import BuySellModel from "../model/BuySellModel.js";
 
 
 
+export const toggleItemSold = async(request, response) => {
+    try{
+        const data = await BuySellModel.updateOne({_id: request.body.ownerId}, {$set: {isSold: request.body.value}})
+        return response.status(200).json(data)
+    }catch(e){
+        return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
+    }
+}
+
+export const fetchMyListings= async(request, response) => {
+    try{
+        let data = await BuySellModel.find({'owner._id': request.body.ownerId, societyid: request.body.societyId});
+        return response.status(200).json(data)
+
+    }catch(e){
+        return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
+
+    }
+}
 
 export const fetchListingById= async(request, response) => {
     try{
@@ -21,7 +40,7 @@ export const fetchListingById= async(request, response) => {
 
 export const fetchAllListings= async(request, response) => {
     try{
-        let data = await BuySellModel.find({societyid: request.body.society});
+        let data = await BuySellModel.find({societyid: request.body.society}).sort({created_at: -1});
         return response.status(200).json(data)
 
     }catch(e){
@@ -54,6 +73,29 @@ export const newListing = async(request, response) => {
         }
     })
     
+}
+
+export const updateListing= async(request, response) => {
+   const listingId = request.params.listingId;
+    jwt.verify(request.params.token, process.env.JWT_SECRETKEY, async (err, data) => {
+        if(err){
+            response.send({result: "Invalid Token", isTokenValid: false})
+            console.log('❌ Token Invalid')
+        } else {
+            console.log('👍  Token Valid for update listing')
+            try{
+                const imagesPaths = [];
+                request.files.length && request.files.forEach(file => imagesPaths.push(`${file.destination}${file.filename}`))
+                const {title, price, category, condition, description, owner, societyid} = request.body;
+              
+                console.log(request.body, imagesPaths)
+                
+                
+            }catch(e){
+                // return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
+            }
+        }
+    })
 }
 
 export const addOwner = async (request, response) => {

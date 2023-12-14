@@ -14,6 +14,7 @@ export const AppName = 'The Luvis'
 
 export const Categories = [
     {label: 'Tools', value: 'tools'},
+    {label: 'Vehicle', value: 'vehicle'},
     {label: 'Furniture', value: 'furniture'},
     {label: 'Garden', value: 'garden'},
     {label: 'Appliances', value: 'appliances'},

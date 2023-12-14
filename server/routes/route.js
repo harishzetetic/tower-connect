@@ -1,6 +1,6 @@
 import express from 'express';
 import { addSociety, getAllSocieties } from '../controller/societyController.js';
-import { fetchListingById, fetchAllListings, newListing, addOwner, deleteOwner, rejectOwnerAccount, approveOwnerAccount, ownerLogin } from '../controller/ownerController.js';
+import { toggleItemSold, updateListing, fetchMyListings, fetchListingById, fetchAllListings, newListing, addOwner, deleteOwner, rejectOwnerAccount, approveOwnerAccount, ownerLogin } from '../controller/ownerController.js';
 import { signInAdmin, getPendingStatusAccounts } from '../controller/adminController.js';
 import multer from 'multer';
 import {verifyToken} from '../middleware.js'
@@ -45,8 +45,12 @@ Route.put('/rejectOwnerAccount/:id/:token', verifyToken, rejectOwnerAccount);
 Route.put('/approveOwnerAccount/:id/:token', verifyToken, approveOwnerAccount)
 
 Route.post('/addListening/:token', buySellImages.array('images'), newListing); //with File ✅ ✅ ✅ ✅ 
+Route.put('/updateListing/:listingId/:token', buySellImages.array('images'), updateListing) //with File ✅ ✅ ✅ ✅ 
 Route.post('/fetchAllListings/:token', verifyToken, fetchAllListings);
 Route.post('/fetchListingById/:token', verifyToken, fetchListingById);
+Route.post('/fetchMyListings/:token', verifyToken, fetchMyListings);
+
+Route.put('/toggleItemSold/:token', verifyToken, toggleItemSold);
 
 
 Route.post('/ownerLogin', ownerLogin)

@@ -25,6 +25,7 @@ dayjs.extend(relativeTime)
 
 
 const Notifications = ({ params }) => {
+    
     const [listing, setListing] = React.useState<IBuySell | null>(null)
     const [isLoading, setIsLoading] = React.useState<boolean>(true);
     const [isContctConfirmOpen, setIsContctConfirmOpen] = React.useState<boolean>(false);

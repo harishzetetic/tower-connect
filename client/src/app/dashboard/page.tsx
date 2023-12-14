@@ -17,12 +17,12 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import notfound from '../../../../client/src/images/notfound.png';
 import Image from "next/image";
 import TopNavigation from '@/components/dashboard/topNavigation';
-
+import { useQuery } from '@tanstack/react-query';
 
 
 const drawerWidth = 240;
 const Dashboard = () => {
-    const [listings, setListings] = React.useState<Array<IBuySell> | null>(null)
+    // const [listings, setListings] = React.useState<Array<IBuySell> | null>(null)
     const router = useRouter()
     const loggedInUser = getLoggedInUserData()
     const [openSellWizard, setOpenSellWizard]= React.useState<boolean>(false);
@@ -34,18 +34,20 @@ const Dashboard = () => {
                 sessionStorage.removeItem('loggedInUserInfo');
                 router.push('/login/owner')
             } else {
-                setListings(apiResponse?.data)
+                return apiResponse?.data;
             }
             
         }catch(e){
             pushNotification('error', 'Error', 'Error while getting listings from server')
+            return []
         }
     }
 
-    React.useEffect(()=>{
-        fetchListings()
-    },[]);
-
+    const {data:listings, isLoading } = useQuery({
+        queryFn: () => fetchListings(),
+        queryKey: ['fetchAllListings'], gcTime: 0
+    })
+  
     React.useEffect(()=>{
         if(!loggedInUser){
             router.push('/login/owner')
@@ -65,19 +67,19 @@ const Dashboard = () => {
             <Toolbar />
             <Grid container spacing={2}>
                 <Grid item xs={12}>
+                    
                     <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-                        {!listings && [1,2,3,4,5,6,7,8].map((_, index)=><SkeletonCard key={index} />)}
-                        {listings && listings.length ? listings.map(item => (<BuySellInfoCard key={item._id} data={item}/>)) : 
+                        {isLoading && [1,2,3,4,5,6,7,8].map((_, index)=><SkeletonCard key={index} />)}
+                        {listings && listings.length ? (listings as IBuySell[]).map(item => (<BuySellInfoCard key={item._id} data={item}/>)) : 
                         <>
                        
                         <Box sx={{textAlign: 'center', margin: 'auto'}}>
                             <Box> 
                                 <Image src={notfound} alt={"owner-logo"} width={300} />
-                                <Div> {'There are no live listing now. Create your first one.'}
-                        
-                        </Div></Box>
-                        <Box><Button variant="contained" size="large" onClick={()=>setOpenSellWizard(true)}><AddPhotoAlternateIcon /> Add Item</Button></Box>
+                                <Div> {'There are no live listing now. Create your first one.'}</Div>
                             </Box>
+                        <Box><Button variant="contained" size="large" onClick={()=>setOpenSellWizard(true)}><AddPhotoAlternateIcon /> Add Item</Button></Box>
+                        </Box>
                         
                         </>
                         }    

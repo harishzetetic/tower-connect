@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from "react";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import { TCButton, VisuallyHiddenInput } from "@/styled";
 import { Formik, FormikErrors } from "formik";
-import { IBuySell } from "@/Types";
+import { IBuySell, notificationType } from "@/Types";
 import { BuySellValidationSchema } from "@/app/yupvalidationschema/buySellPostSchema";
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 import _ from 'lodash'
@@ -14,12 +14,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import { addListening } from "@/api/ownerApis";
 import { getLoggedInUserData } from "@/util";
 import { useRouter } from 'next/navigation'
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 
 interface ISellItemWizard {
     openSellWizard: boolean;
     setOpenSellWizard: React.Dispatch<React.SetStateAction<boolean>>;
-    pushNotification: (type: string, title: string, description: string) => void 
+    pushNotification: (type: notificationType, title: string, description: string) => void 
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -33,6 +34,7 @@ const Transition = React.forwardRef(function Transition(
 
 const SellItemWizard = (props: ISellItemWizard) => {
     const router = useRouter();
+    const queryClient = useQueryClient()
     const initialValues = {
         images: [],
         title: null,
@@ -42,15 +44,14 @@ const SellItemWizard = (props: ISellItemWizard) => {
         description: null,
     } as IBuySell;
 
-    const onSubmit = async (userFormData: IBuySell) => {
 
+    const onSubmit = async (userFormData: IBuySell) => {
         try {
             const loggedInUser = getLoggedInUserData()
             userFormData.owner = loggedInUser?.user;
             userFormData.societyid = loggedInUser?.user.society?._id;
             const formData = new FormData();
             for (let key in userFormData) {
-                console.log(key)
                 switch(key){
                     case 'images':
                         userFormData[key].forEach(file => {
@@ -81,6 +82,13 @@ const SellItemWizard = (props: ISellItemWizard) => {
         }
     }
 
+    const {mutateAsync:sellItemWizardMutation} = useMutation({
+        mutationFn: onSubmit,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['fetchAllListings'] })
+        },   
+    })
+
     return <Dialog
         fullWidth
         maxWidth={'lg'}
@@ -89,6 +97,10 @@ const SellItemWizard = (props: ISellItemWizard) => {
     >
         <AppBar sx={{ position: 'sticky', top: 0, backgroundColor: App.DarkBlue }}>
             <Toolbar>
+                
+                <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+                    Sell an item
+                </Typography>
                 <IconButton
                     edge="start"
                     color="inherit"
@@ -97,15 +109,12 @@ const SellItemWizard = (props: ISellItemWizard) => {
                 >
                     <CloseIcon />
                 </IconButton>
-                <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-                    Sell an item
-                </Typography>
 
             </Toolbar>
         </AppBar>
         <Grid container >
             <Container component="main" sx={{ mb: 4, mt: 4 }}>
-                <Formik initialValues={initialValues} onSubmit={onSubmit} enableReinitialize={true} validationSchema={BuySellValidationSchema}>
+                <Formik initialValues={initialValues} onSubmit={sellItemWizardMutation} enableReinitialize={true} validationSchema={BuySellValidationSchema}>
                     {({ values, setFieldValue, errors, resetForm, submitForm, setFieldError, setErrors }) => {
                         return (<>
                             <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
@@ -166,7 +175,7 @@ const SellItemWizard = (props: ISellItemWizard) => {
                                 <FormHelperText sx={{ color: App.ErrorTextColor }}>{errors.condition}</FormHelperText>
                             </Grid>
                             <Grid item xs={12} sm={12} sx={{ marginTop: 2 }}>
-                                <TextField error={!!errors.description} helperText={errors.description} value={values.description} onChange={(e) => setFieldValue("description", e.target.value)} multiline name="description" margin="normal" fullWidth label="Description" autoFocus />
+                                <TextField rows={8} error={!!errors.description} helperText={errors.description} value={values.description} onChange={(e) => setFieldValue("description", e.target.value)} multiline name="description" margin="normal" fullWidth label="Description" autoFocus />
                             </Grid>
 
                             <Grid>
@@ -191,7 +200,7 @@ interface IImageBlock {
     imageIndex: number
 }
 
-const ImageBlock = (props: IImageBlock) => {
+ const ImageBlock = (props: IImageBlock) => {
     const [files, setFiles] = useState<Array<File | null>>([null, null, null, null])
     let refs = new Map();
     refs.set(0, React.useRef(null))
