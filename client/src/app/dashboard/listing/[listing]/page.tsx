@@ -66,6 +66,7 @@ const Listing = ({ params }) => {
         setIsContctConfirmOpen(true)
     }
     if (loggedInUser) {
+        const itemOwner = listing?.ownerData && listing.ownerData;
         return (<ThemeProvider theme={APP_THEME}>
             <TopNavigation />
             <Sidebar loggedInUser={loggedInUser} setOpenSellWizard={setOpenSellWizard} />
@@ -79,7 +80,7 @@ const Listing = ({ params }) => {
                         <Typography variant='h3' sx={{fontWeight: 'bold'}}><Button variant="text"><NextLink href={{ pathname: `/dashboard/` }}><ArrowBackIcon fontSize='large' /></NextLink></Button>  {listing.title} 
                             {!listing.isSold && <Button sx={{float: 'right'}}size="large" variant="contained" onClick={getContactDetailsAction}><LocalPhoneIcon /> Get Contact Details</Button>}
                         </Typography>
-                        <Typography variant='h6'>{`By ${listing.owner?.firstName} ${listing.owner?.lastName} from ${listing.owner?.towerNumber}-${listing.owner?.flatNumber} on ${dayjs(listing?.created_at).fromNow()}`}  </Typography>
+                        <Typography variant='h6'>{`By ${itemOwner?.firstName} ${itemOwner?.lastName} from ${itemOwner?.towerNumber}-${itemOwner?.flatNumber} on ${dayjs(listing?.created_at).fromNow()}`}  </Typography>
                         <Box sx={{ display: 'inline-block', mt:2 }}>
                             <ImageList sx={{ width: 'auto', height: 'auto' }} cols={4} rowHeight={164}>
                                 {
@@ -119,9 +120,8 @@ const Listing = ({ params }) => {
                 </Grid>
             </Grid>
             <SellItemWizard openSellWizard={openSellWizard} setOpenSellWizard={setOpenSellWizard} pushNotification={pushNotification} />
-            <NotificationContainer />
             <TCConfirm successBtnTitle='Show me the details' open={isContctConfirmOpen} handleClose={()=>{setIsContctConfirmOpen(false)}} handleConfirm={()=>{setIsContctConfirmOpen(false); setShowContactDetails(true)}} title={"Information"} description={"By this action we will let this product owner know that you have viewed the contact information for this product. Please confirm to view the contact details. "} />
-            <TCConfirm successBtnTitle='Ok' hideCancel open={showContactDetails} handleClose={()=>{setShowContactDetails(false)}} handleConfirm={()=>{setShowContactDetails(false)}} title={"Contact Details"} description={<><strong>Phone Number:</strong> {listing?.owner?.phone} <br/> <strong>Email:</strong> {listing?.owner?.email}</>} />
+            <TCConfirm successBtnTitle='Ok' hideCancel open={showContactDetails} handleClose={()=>{setShowContactDetails(false)}} handleConfirm={()=>{setShowContactDetails(false)}} title={"Contact Details"} description={<><strong>Phone Number:</strong> {itemOwner?.phone} <br/> <strong>Email:</strong> {itemOwner?.email}</>} />
         </ThemeProvider>)
     }
     return <>User probably not logged in. Kindly login again.</>

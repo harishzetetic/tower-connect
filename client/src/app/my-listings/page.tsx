@@ -85,7 +85,6 @@ const MyListings = ({ params }) => {
         </Box>
     </Box>
     <SellItemWizard openSellWizard={openSellWizard} setOpenSellWizard={setOpenSellWizard} pushNotification={pushNotification}/>
-    <NotificationContainer />
     </ThemeProvider>)
     }
     return <>User probably not logged in. Kindly login again.</>

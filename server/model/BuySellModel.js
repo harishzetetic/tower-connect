@@ -28,12 +28,12 @@ const buySellSchema = new mongoose.Schema({
         type: String,
         required:true
     },
-    owner: {
-        type: ownerSchema,
+    ownerid: {
+        type: mongoose.Schema.ObjectId,
         required:true
     },
     societyid: {
-        type: String,
+        type: mongoose.Schema.ObjectId,
         required:true
     }, 
     isSold: {

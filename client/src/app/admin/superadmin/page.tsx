@@ -67,7 +67,6 @@ const SuperAdminLogin = () => {
                     Sign In
                 </Button>
             </Container>
-            <NotificationContainer />
         </Box>
     </>
 }

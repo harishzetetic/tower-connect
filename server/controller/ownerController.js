@@ -4,9 +4,22 @@ import { AccountStatus } from "../constants.js";
 import jwt from 'jsonwebtoken'
 import _ from "lodash";
 import BuySellModel from "../model/BuySellModel.js";
+import mongoose from "mongoose";
+import fs from 'fs'
+import { promisify } from "util";
 
 
+const unlinkAsync = promisify(fs.unlink)
 
+export const deleteListing = async(request, response)=>{
+    try{
+        request.body.images.forEach(async(item) => await unlinkAsync(item))
+        await BuySellModel.deleteOne({_id: request.body._id})
+        return response.status(200).json({message: "SUCCESS"})
+    }catch(e){
+        return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
+    }
+}
 export const toggleItemSold = async(request, response) => {
     try{
         const data = await BuySellModel.updateOne({_id: request.body.ownerId}, {$set: {isSold: request.body.value}})
@@ -29,8 +42,26 @@ export const fetchMyListings= async(request, response) => {
 
 export const fetchListingById= async(request, response) => {
     try{
-        let data = await BuySellModel.findById({_id: request.body.id});
-        return response.status(200).json(data)
+        const data = await BuySellModel.aggregate([
+          {$match: { _id: new mongoose.Types.ObjectId(request.body.id)}},
+          {
+            $lookup: {
+              from: "owners",
+              localField: "ownerid",
+              foreignField: "_id",
+              as: "ownerData"
+            }, 
+          },
+          {$project:{
+            'ownerData.password': 0,
+            'ownerData.proofDocumentURL': 0,
+            'ownerData._id': 0,
+            'ownerData.society._id': 0
+          }},
+          { $unwind: "$ownerData"},
+          {$limit: 1}
+        ])
+        return response.status(200).json(data[0])
 
     }catch(e){
         return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
@@ -40,7 +71,18 @@ export const fetchListingById= async(request, response) => {
 
 export const fetchAllListings= async(request, response) => {
     try{
-        let data = await BuySellModel.find({societyid: request.body.society}).sort({created_at: -1});
+        const data = await BuySellModel.aggregate([{$match: {
+            societyid: new mongoose.Types.ObjectId(request.body.society)
+          }},
+          {
+            $lookup: {
+              from: "owners",
+              localField: "ownerid",
+              foreignField: "_id",
+              as: "ownerData"
+            }
+          },
+        ])
         return response.status(200).json(data)
 
     }catch(e){
@@ -58,10 +100,10 @@ export const newListing = async(request, response) => {
             try{
                 const imagesPaths = [];
                 request.files.length && request.files.forEach(file => imagesPaths.push(`${file.destination}${file.filename}`))
-                const {title, price, category, condition, description, owner, societyid} = request.body;
+                const {title, price, category, condition, description, ownerid, societyid} = request.body;
                 const newListing = new BuySellModel({
                      images: imagesPaths,
-                     title, price, category, condition, description, owner: JSON.parse(owner), societyid
+                     title, price, category, condition, description, ownerid, societyid
                   });
 
                  await newListing.save();
@@ -76,7 +118,6 @@ export const newListing = async(request, response) => {
 }
 
 export const updateListing= async(request, response) => {
-   const listingId = request.params.listingId;
     jwt.verify(request.params.token, process.env.JWT_SECRETKEY, async (err, data) => {
         if(err){
             response.send({result: "Invalid Token", isTokenValid: false})
@@ -85,14 +126,34 @@ export const updateListing= async(request, response) => {
             console.log('👍  Token Valid for update listing')
             try{
                 const imagesPaths = [];
+                const data = await BuySellModel.aggregate([
+                    {$match: { _id: new mongoose.Types.ObjectId(request.params.listingId)}},
+                    {$project:{
+                      images: 1,
+                      _id: 0
+                    }},{$limit: 1}
+                  ])
                 request.files.length && request.files.forEach(file => imagesPaths.push(`${file.destination}${file.filename}`))
                 const {title, price, category, condition, description, owner, societyid} = request.body;
-              
-                console.log(request.body, imagesPaths)
-                
+                const newImageArr = [...request.body.images, ...imagesPaths]
+                const shouldDelete = data[0].images.filter(value => newImageArr.indexOf(value) === -1)              
+                shouldDelete.forEach(async(item) => await unlinkAsync(item))
+                await BuySellModel.updateOne({
+                    _id: request.params.listingId
+                }, {
+                    $set: {
+                        images: newImageArr,
+                        title,
+                        price,
+                        category,
+                        condition,
+                        description
+                    }
+                }) 
+                return response.status(200).json({message: "SUCCESS"})
                 
             }catch(e){
-                // return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
+                return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
             }
         }
     })

@@ -145,7 +145,6 @@ const OwnerLogin = () => {
       <PublicFooter />
 
     </Box>
-    <NotificationContainer />
   </ThemeProvider>
 }
 

@@ -91,10 +91,11 @@ export const APP_THEME = createTheme({
     category: string | null,
     condition: string | null,
     description: string | null,
-    owner?: IOwnerData | null,
+    ownerid?: string | null,
     societyid?: string | null,
     created_at?:string | null,
-    isSold?:boolean  
+    isSold?:boolean,
+    ownerData?:IOwnerData  // expected from the backend after aggregate lookup join query
 }
 
 export type notificationType = 'error' | 'success' | 'warn';

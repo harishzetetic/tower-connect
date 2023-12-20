@@ -15,8 +15,9 @@ interface IBuySellInfoCard {
     data: IBuySell
 }
 const BuySellInfoCard = (props: IBuySellInfoCard) => {
-    const {images, title, price, owner, _id, created_at, isSold} = props.data;
+    const {images, title, price, ownerData, _id, created_at, isSold} = props.data;
     const loggedUser = getLoggedInUserData()
+    const itemOwner = ownerData && ownerData[0]
     return <Grid item xs={2} sm={4} md={3}>
     
     <Card sx={{ maxWidth: 345, color: 'white', backgroundColor: App.DarkBlue }}>
@@ -25,11 +26,11 @@ const BuySellInfoCard = (props: IBuySellInfoCard) => {
         subheaderTypographyProps={{sx:{color: 'white'}}}
         avatar={
           <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-            {owner?.firstName?.charAt(0)} {owner?.lastName?.charAt(0)}
+            {itemOwner?.firstName?.charAt(0)} {itemOwner?.lastName?.charAt(0)}
           </Avatar>
         }
         action={<></>}
-        title={`${owner?.firstName} ${owner?.lastName} from ${owner?.towerNumber}-${owner?.flatNumber}`}
+        title={`${itemOwner?.firstName} ${itemOwner?.lastName} from ${itemOwner?.towerNumber}-${itemOwner?.flatNumber}`}
         subheader={`Posted on ${dayjs(created_at).fromNow()}`}
       />
             <CardMedia
@@ -58,7 +59,7 @@ const BuySellInfoCard = (props: IBuySellInfoCard) => {
                             <VisibilityIcon />
                         </Button>
                     </NextLink> &nbsp;
-                    {(loggedUser?.user._id === owner?._id) && <NextLink href={{pathname: `/dashboard/update-listing/${_id}`}}><Button variant="contained" size="small">
+                    {(loggedUser?.user._id === itemOwner?._id) && <NextLink href={{pathname: `/dashboard/update-listing/${_id}`}}><Button variant="contained" size="small">
                         <EditIcon />
                     </Button> </NextLink>}
 

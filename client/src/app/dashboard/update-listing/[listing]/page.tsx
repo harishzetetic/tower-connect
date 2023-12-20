@@ -10,7 +10,7 @@ import Sidebar from "@/components/dashboard/sidebar";
 import { APP_THEME, IBuySell } from "@/Types";
 import SellItemWizard from "@/components/dashboard/sellItemWizard";
 import { NotificationContainer, NotificationManager } from 'react-notifications';
-import {  fetchListingById, toggleItemSold, updateListing } from "@/api/ownerApis";
+import {  deleteListing, fetchListingById, toggleItemSold, updateListing } from "@/api/ownerApis";
 import TopNavigation from '@/components/dashboard/topNavigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from 'next/navigation';
@@ -21,6 +21,8 @@ import dayjs from 'dayjs';
 import LockIcon from '@mui/icons-material/Lock';
 import CloseIcon from '@mui/icons-material/Close';
 import relativeTime from "dayjs/plugin/relativeTime";
+import DeleteIcon from '@mui/icons-material/Delete';
+import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import { BuySellValidationSchema } from '@/app/yupvalidationschema/buySellPostSchema';
 import { TCButton, VisuallyHiddenInput } from '@/styled';
 import { Formik, FormikErrors } from 'formik';
@@ -94,7 +96,7 @@ const UpdateListing = ({ params }) => {
     const updateListingHandler = async (userFormData: IBuySell) => {
         try {
             const loggedInUser = getLoggedInUserData()
-            userFormData.owner = loggedInUser?.user;
+            userFormData.ownerid = loggedInUser?.user._id;
             userFormData.societyid = loggedInUser?.user.society?._id;
             const formData = new FormData();
             for (let key in userFormData) {
@@ -119,7 +121,7 @@ const UpdateListing = ({ params }) => {
             if (apiResponse?.data?.isTokenValid === false) {
                 sessionStorage.removeItem('loggedInUserInfo');
                 router.push('/login/owner')
-            } else if (apiResponse?.data?._id) {
+            } else if (apiResponse?.data?.message === 'SUCCESS') {
                 pushNotification('success', 'Success', 'You listening has been updated')
             }
         } catch (e) {
@@ -130,6 +132,24 @@ const UpdateListing = ({ params }) => {
     const toggleWithSold = (value: boolean) => {
         pushNotification('warn', 'Info', value ? 'Marking as sold' : 'Marking as unsold', 2000)
         markSold(listing?._id, value)
+    }
+
+    const deleteHandler = async () => {
+        try {
+            console.log(listing)
+            const apiResponse = await deleteListing({_id: listing?._id, images: listing?.images});
+            if (apiResponse?.data?.isTokenValid === false) {
+                sessionStorage.removeItem('loggedInUserInfo');
+                router.push('/login/owner')
+            } else if (apiResponse?.data?.message === 'SUCCESS') {
+                pushNotification('success', 'Success', 'You listening has been deleted')
+                router.push('/dashboard')
+            }
+        } catch (e) {
+            pushNotification('error', 'Error', 'Getting error while updating this listing')
+        }
+
+
     }
 
     if (loggedInUser) {
@@ -235,14 +255,18 @@ const UpdateListing = ({ params }) => {
                             </Grid>
 
                             <Grid>
-                            <Button size="large" variant="outlined" autoFocus onClick={() => resetForm()}>
+                                {/*
+                                    <Button size="large" variant="outlined" autoFocus onClick={() => resetForm()}>
                                     Reset
                                 </Button> &nbsp; &nbsp;
-                                <Button size="large" variant="contained" autoFocus onClick={()=>{}} color='error'>
-                                    Delete Listing
+                                
+                                */}
+                            
+                                <Button size="large" variant="contained" autoFocus onClick={deleteHandler} color='error'>
+                                    <DeleteIcon />&nbsp; &nbsp;Delete Listing
                                 </Button>&nbsp; &nbsp;
                                 <Button size="large" variant="contained" autoFocus onClick={submitForm}>
-                                    Update Listing
+                                    <TipsAndUpdatesIcon />&nbsp; &nbsp;Update Listing
                                 </Button>
                             </Grid>
                         </>)
@@ -257,7 +281,6 @@ const UpdateListing = ({ params }) => {
                 </Grid>
             </Grid>
             <SellItemWizard openSellWizard={openSellWizard} setOpenSellWizard={setOpenSellWizard} pushNotification={pushNotification} />
-            <NotificationContainer />
         </ThemeProvider>)
     }
     return <>User probably not logged in. Kindly login again.</>
@@ -340,7 +363,6 @@ const ImageBlock = (props: IImageBlock) => {
                     accept="image/x-png,image/jpeg,image/jpg,image/png" />}
                 
             </Box>
-            <NotificationContainer />
         </Grid>)}
         <FormHelperText sx={{ color: App.ErrorTextColor, ml: 5 }}>{errors.images}</FormHelperText>
     </>

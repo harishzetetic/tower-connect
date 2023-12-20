@@ -249,7 +249,6 @@ const OwnerSignup = () => {
             </Box>
             <PublicFooter />
         </Box>
-        <NotificationContainer />
         </ThemeProvider>
 }
 

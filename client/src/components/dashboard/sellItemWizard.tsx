@@ -48,7 +48,7 @@ const SellItemWizard = (props: ISellItemWizard) => {
     const onSubmit = async (userFormData: IBuySell) => {
         try {
             const loggedInUser = getLoggedInUserData()
-            userFormData.owner = loggedInUser?.user;
+            userFormData.ownerid = loggedInUser?.user._id;
             userFormData.societyid = loggedInUser?.user.society?._id;
             const formData = new FormData();
             for (let key in userFormData) {
@@ -254,7 +254,6 @@ interface IImageBlock {
                 }} ref={refs.get(index)} key={index} name={'image' + index}
                     accept="image/x-png,image/jpeg,image/jpg,image/png" />
             </Box>
-            <NotificationContainer />
         </Grid>)}
         <FormHelperText sx={{ color: App.ErrorTextColor, ml: 5 }}>{errors.images}</FormHelperText>
     </>

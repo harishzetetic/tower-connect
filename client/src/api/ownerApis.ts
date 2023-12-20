@@ -43,6 +43,15 @@ export const updateListing = async(formData: FormData, listingId) => {
     }
 }
 
+export const deleteListing = async(listing) => {
+    try{
+        const loggedInUserInfo = getLoggedInUserData();
+        return await axios.delete(`${BACKEND_URL}/deleteListing/${loggedInUserInfo?.token}`, {data: listing});
+    }catch(e){
+        console.log('Getting Error while add your listening')
+    }
+}
+
 export const fetchAllListings = async(society) => {
     try{
         const loggedInUserInfo = getLoggedInUserData();
