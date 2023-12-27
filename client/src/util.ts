@@ -1,13 +1,12 @@
 import { useRouter } from "next/navigation";
-import { ILoggedInUser, notificationType } from "./Types";
+import { IOwnerData, notificationType } from "./Types";
 import { NotificationManager } from 'react-notifications';
+import { useSelector } from "react-redux";
 
-export const getLoggedInUserData = ():ILoggedInUser|null => {
+export const getToken = ():string|null => {
     if(window && window?.sessionStorage){
-        const data = window.sessionStorage.getItem('loggedInUserInfo');
-        if(data){
-            return JSON.parse(data)
-        } 
+        const token = window.sessionStorage.getItem('token');
+        return token 
     }
     return null;
 }

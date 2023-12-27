@@ -1,14 +1,14 @@
-import { Grid, Card, CardActionArea, CardMedia, CardContent, Typography, Avatar, CardHeader, Skeleton, Stack, Fab, Box, Button } from "@mui/material"
+import { Grid, Card, CardActionArea, CardMedia, CardContent, Typography, Avatar, CardHeader, Skeleton, Stack, Box, Button } from "@mui/material"
 import { red } from "@mui/material/colors"
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import { App, BACKEND_URL } from "@/constants";
-import { IBuySell } from "@/Types";
+import { IBuySell, IOwnerData } from "@/Types";
 import EditIcon from '@mui/icons-material/Edit';
 import dayjs from 'dayjs';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import relativeTime from "dayjs/plugin/relativeTime";
 import { NextLink } from "@/styled";
-import { getLoggedInUserData } from "@/util";
+import { useSelector } from "react-redux";
 dayjs.extend(relativeTime)
 
 interface IBuySellInfoCard {
@@ -16,7 +16,7 @@ interface IBuySellInfoCard {
 }
 const BuySellInfoCard = (props: IBuySellInfoCard) => {
     const {images, title, price, ownerData, _id, created_at, isSold} = props.data;
-    const loggedUser = getLoggedInUserData()
+    const loggedInUser: IOwnerData= useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
     const itemOwner = ownerData && ownerData[0]
     return <Grid item xs={2} sm={4} md={3}>
     
@@ -55,13 +55,14 @@ const BuySellInfoCard = (props: IBuySellInfoCard) => {
                     
                     <Box sx={{textAlign: 'right'}}>
                         <NextLink href={{pathname: `/dashboard/listing/${_id}`}}>
-                        <Button color='secondary' variant="contained" size="small">
+                        {/* <Button color='secondary' variant="contained" size="small"></Button> */}
                             <VisibilityIcon />
-                        </Button>
-                    </NextLink> &nbsp;
-                    {(loggedUser?.user._id === itemOwner?._id) && <NextLink href={{pathname: `/dashboard/update-listing/${_id}`}}><Button variant="contained" size="small">
+                        
+                    </NextLink> &nbsp;&nbsp;&nbsp;&nbsp;
+                    {(loggedInUser?._id === itemOwner?._id) && <NextLink href={{pathname: `/dashboard/update-listing/${_id}`}}>
+                        {/* <Button variant="contained" size="small"></Button> */}
                         <EditIcon />
-                    </Button> </NextLink>}
+                     </NextLink>}
 
                     
                         

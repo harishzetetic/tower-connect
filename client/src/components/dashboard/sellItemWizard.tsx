@@ -6,15 +6,16 @@ import React, { useEffect, useRef, useState } from "react";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import { TCButton, VisuallyHiddenInput } from "@/styled";
 import { Formik, FormikErrors } from "formik";
-import { IBuySell, notificationType } from "@/Types";
+import { IBuySell, IOwnerData, notificationType } from "@/Types";
 import { BuySellValidationSchema } from "@/app/yupvalidationschema/buySellPostSchema";
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 import _ from 'lodash'
 import CloseIcon from '@mui/icons-material/Close';
 import { addListening } from "@/api/ownerApis";
-import { getLoggedInUserData } from "@/util";
 import { useRouter } from 'next/navigation'
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Swal from 'sweetalert2'
+import { useSelector } from "react-redux";
 
 
 interface ISellItemWizard {
@@ -33,6 +34,7 @@ const Transition = React.forwardRef(function Transition(
 });
 
 const SellItemWizard = (props: ISellItemWizard) => {
+    const loggedInUser: IOwnerData= useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
     const router = useRouter();
     const queryClient = useQueryClient()
     const initialValues = {
@@ -47,9 +49,8 @@ const SellItemWizard = (props: ISellItemWizard) => {
 
     const onSubmit = async (userFormData: IBuySell) => {
         try {
-            const loggedInUser = getLoggedInUserData()
-            userFormData.ownerid = loggedInUser?.user._id;
-            userFormData.societyid = loggedInUser?.user.society?._id;
+            userFormData.ownerid = loggedInUser?._id;
+            userFormData.societyid = loggedInUser?.society?._id;
             const formData = new FormData();
             for (let key in userFormData) {
                 switch(key){
@@ -71,10 +72,16 @@ const SellItemWizard = (props: ISellItemWizard) => {
             }
             const apiResponse = await addListening(formData);
             if (apiResponse?.data?.isTokenValid === false) {
-                sessionStorage.removeItem('loggedInUserInfo');
+                sessionStorage.removeItem('token');
                 router.push('/login/owner')
             } else if (apiResponse?.data?._id) {
-                props.pushNotification('success', 'Congratulations', 'You listening has been live')
+                // props.pushNotification('success', 'Congratulations', 'You listening has been live')
+                Swal.fire({
+                    title: 'Success',
+                    text: 'You item has been live now',
+                    icon: 'success',
+                    confirmButtonText: 'Okay'
+                  })
                 props.setOpenSellWizard(false);
             }
         } catch (e) {
@@ -85,7 +92,7 @@ const SellItemWizard = (props: ISellItemWizard) => {
     const {mutateAsync:sellItemWizardMutation} = useMutation({
         mutationFn: onSubmit,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['fetchAllListings'] })
+            queryClient.invalidateQueries({ queryKey: ['fetchAllListings', 'fetchMyListings'] })
         },   
     })
 
@@ -95,7 +102,7 @@ const SellItemWizard = (props: ISellItemWizard) => {
         open={props.openSellWizard}
         TransitionComponent={Transition}
     >
-        <AppBar sx={{ position: 'sticky', top: 0, backgroundColor: App.DarkBlue }}>
+        <AppBar sx={{ position: 'sticky', top: 0, backgroundColor: '#fff', color:'black', boxShadow: 'none' }}>
             <Toolbar>
                 
                 <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
@@ -220,7 +227,7 @@ interface IImageBlock {
             refs.get(index).current.value = '';
         }
     }
-
+    // return <React.Fragment></React.Fragment>
     return <>
         {files.map((file, index) => <Grid item xs={2} sm={3} md={3}>
             <Box sx={{ cursor: 'pointer', backgroundColor: App.DarkBlue, color: 'white', height: 150, border: '0.5px solid gray', borderRadius: 2 }} onClick={() => {

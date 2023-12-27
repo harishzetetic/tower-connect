@@ -4,10 +4,10 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import _ from 'lodash'
 import { Autocomplete, Button, Card, CardContent, Container, Fab, FormControl, FormControlLabel, FormHelperText, Grid, ImageList, ImageListItem, InputAdornment, InputLabel, OutlinedInput, Paper, Snackbar, Switch, TextField, ThemeProvider, Typography } from "@mui/material";
-import { getLoggedInUserData, pushNotification } from "@/util";
+import { pushNotification } from "@/util";
 import { SkeletonCard } from "@/components/dashboard/buySellInfoCard";
 import Sidebar from "@/components/dashboard/sidebar";
-import { APP_THEME, IBuySell } from "@/Types";
+import { APP_THEME, IBuySell, IOwnerData } from "@/Types";
 import SellItemWizard from "@/components/dashboard/sellItemWizard";
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 import {  deleteListing, fetchListingById, toggleItemSold, updateListing } from "@/api/ownerApis";
@@ -18,6 +18,7 @@ import {  App, BACKEND_URL, Categories, Condition } from '@/constants';
 import { default as NextLink } from "next/link";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import dayjs from 'dayjs';
+import Swal from 'sweetalert2'
 import LockIcon from '@mui/icons-material/Lock';
 import CloseIcon from '@mui/icons-material/Close';
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -26,6 +27,7 @@ import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import { BuySellValidationSchema } from '@/app/yupvalidationschema/buySellPostSchema';
 import { TCButton, VisuallyHiddenInput } from '@/styled';
 import { Formik, FormikErrors } from 'formik';
+import { useSelector } from 'react-redux';
 dayjs.extend(relativeTime)
 
 // dayjs('2019-01-25').fromNow()}
@@ -36,7 +38,7 @@ const UpdateListing = ({ params }) => {
     const [isSold, setIsSold] = React.useState<boolean>(false);
     /* ---------------------------------------------------------------------------------- */
     const router = useRouter()
-    const loggedInUser = getLoggedInUserData()
+    const loggedInUser: IOwnerData= useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
     const [openSellWizard, setOpenSellWizard] = React.useState<boolean>(false);
 
     const markSold = async(listingId:string | undefined, value:boolean)=>{
@@ -44,11 +46,17 @@ const UpdateListing = ({ params }) => {
 
             const apiResponse = await toggleItemSold(listingId, value);
             if (apiResponse?.data?.isTokenValid === false) {
-                sessionStorage.removeItem('loggedInUserInfo');
+                sessionStorage.removeItem('token');
                 router.push('/login/owner')
             } else {
                 setIsSold(value)
-                pushNotification('success', 'Success', '👍 Action Done', 2000)
+                Swal.fire({
+                    title: 'Success',
+                    text: `We have marked your product as ${value ? 'sold': 'available'}`,
+                    icon: 'success',
+                    confirmButtonText: 'Okay'
+                })
+                // pushNotification('success', 'Success', '👍 Action Done', 2000)
 
             }
 
@@ -61,7 +69,7 @@ const UpdateListing = ({ params }) => {
         try {
             const apiResponse = await fetchListingById(listingId);
             if (apiResponse?.data?.isTokenValid === false) {
-                sessionStorage.removeItem('loggedInUserInfo');
+                sessionStorage.removeItem('token');
                 router.push('/login/owner')
             } else {
                 setListing(apiResponse?.data)
@@ -95,9 +103,8 @@ const UpdateListing = ({ params }) => {
 
     const updateListingHandler = async (userFormData: IBuySell) => {
         try {
-            const loggedInUser = getLoggedInUserData()
-            userFormData.ownerid = loggedInUser?.user._id;
-            userFormData.societyid = loggedInUser?.user.society?._id;
+            userFormData.ownerid = loggedInUser?._id;
+            userFormData.societyid = loggedInUser?.society?._id;
             const formData = new FormData();
             for (let key in userFormData) {
                 switch(key){
@@ -119,10 +126,16 @@ const UpdateListing = ({ params }) => {
             }
             const apiResponse = await updateListing(formData, listing?._id);
             if (apiResponse?.data?.isTokenValid === false) {
-                sessionStorage.removeItem('loggedInUserInfo');
+                sessionStorage.removeItem('token');
                 router.push('/login/owner')
             } else if (apiResponse?.data?.message === 'SUCCESS') {
-                pushNotification('success', 'Success', 'You listening has been updated')
+                Swal.fire({
+                    title: 'Success',
+                    text: 'You item has been updated',
+                    icon: 'success',
+                    confirmButtonText: 'Okay'
+                  })
+                // pushNotification('success', 'Success', 'You listening has been updated')
             }
         } catch (e) {
             pushNotification('error', 'Error', 'Getting error while updating this listing')
@@ -136,13 +149,17 @@ const UpdateListing = ({ params }) => {
 
     const deleteHandler = async () => {
         try {
-            console.log(listing)
             const apiResponse = await deleteListing({_id: listing?._id, images: listing?.images});
             if (apiResponse?.data?.isTokenValid === false) {
-                sessionStorage.removeItem('loggedInUserInfo');
+                sessionStorage.removeItem('token');
                 router.push('/login/owner')
             } else if (apiResponse?.data?.message === 'SUCCESS') {
-                pushNotification('success', 'Success', 'You listening has been deleted')
+                Swal.fire({
+                    title: 'Success',
+                    text: 'Your listing has been deleted',
+                    icon: 'success',
+                    confirmButtonText: 'Okay'
+                  })
                 router.push('/dashboard')
             }
         } catch (e) {

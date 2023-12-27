@@ -6,7 +6,7 @@ import axios from "axios";
 
 export const adminSignIn = async(credentials) => {
     try{
-        return await axios.post(`${BACKEND_URL}/adminSignIn`, credentials);
+        return await axios.post(`${BACKEND_URL}/superadmin/adminSignIn`, credentials);
     }catch(e){
         console.log('Getting Error while admin signin')
     }
@@ -16,7 +16,7 @@ export const fetchPendingAccounts = async()=>{
     const jwt_token = sessionStorage.getItem('token');
     try{
 
-        return await axios.get(`${BACKEND_URL}/pendingAccounts/${jwt_token}`)
+        return await axios.get(`${BACKEND_URL}/superadmin/pendingAccounts/${jwt_token}`)
     }catch(e){
         console.log('Getting Error while fetching pending account')
     }

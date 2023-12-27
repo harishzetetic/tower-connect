@@ -2,11 +2,11 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import { Button, Card, CardContent, Grid, ImageList, ImageListItem, Paper, ThemeProvider, Typography } from "@mui/material";
-import { getLoggedInUserData, pushNotification } from "@/util";
+import { Button, Card, CardContent, Grid, ImageList, ImageListItem, Paper, SvgIconTypeMap, ThemeProvider, Typography } from "@mui/material";
+import { pushNotification } from "@/util";
 import { SkeletonCard } from "@/components/dashboard/buySellInfoCard";
 import Sidebar from "@/components/dashboard/sidebar";
-import { APP_THEME, IBuySell } from "@/Types";
+import { APP_THEME, IBuySell, IOwnerData } from "@/Types";
 import SellItemWizard from "@/components/dashboard/sellItemWizard";
 import { NotificationContainer } from 'react-notifications';
 import {  fetchListingById } from "@/api/ownerApis";
@@ -18,9 +18,15 @@ import { default as NextLink } from "next/link";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import TCConfirm from '@/components/common/TCConfirm';
+import ChildCareIcon from '@mui/icons-material/ChildCare';
+import PersonIcon from '@mui/icons-material/Person';
+import ElderlyWomanIcon from '@mui/icons-material/ElderlyWoman';
 
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime";
+import { OverridableComponent } from '@mui/material/OverridableComponent';
+import { debug } from 'console';
+import { useSelector } from 'react-redux';
 dayjs.extend(relativeTime)
 
 // dayjs('2019-01-25').fromNow()}
@@ -32,7 +38,7 @@ const Listing = ({ params }) => {
     const [showContactDetails, setShowContactDetails] = React.useState<boolean>(false);
     /* ---------------------------------------------------------------------------------- */
     const router = useRouter()
-    const loggedInUser = getLoggedInUserData()
+    const loggedInUser: IOwnerData= useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
     const [openSellWizard, setOpenSellWizard] = React.useState<boolean>(false);
 
     const fetchListing = async () => {
@@ -40,11 +46,10 @@ const Listing = ({ params }) => {
         try {
             const apiResponse = await fetchListingById(listingId);
             if (apiResponse?.data?.isTokenValid === false) {
-                sessionStorage.removeItem('loggedInUserInfo');
+                sessionStorage.removeItem('token');
                 router.push('/login/owner')
             } else {
                 setListing(apiResponse?.data)
-                console.log(apiResponse?.data)
                 setIsLoading(false)
             }
 
@@ -102,10 +107,10 @@ const Listing = ({ params }) => {
                                 <CardBox title="Price" value={listing.isSold ? 'SOLD' : parseInt(listing.price || '0').toFixed(2)}  priceFormat={!!(!listing.isSold)}/>
                             </Grid>
                             <Grid item xs={6} md={4}>
-                                <CardBox title="Condition" value={Condition.find(item => item.value === listing.condition)?.label } />
+                                <CardBox title="Condition" value={listing.condition} showIcon />
                             </Grid>
                             <Grid item xs={6} md={4}>
-                                <CardBox title="Category" value={Categories.find(item => item.value === listing.category)?.label} />
+                                <CardBox title="Category" value={listing.category} />
                             </Grid>
 
                         </Grid>
@@ -131,13 +136,37 @@ interface ICardBox {
     title: string;
     value: string | null | undefined;
     priceFormat?: boolean;
+    showIcon?:boolean;
 }
 const CardBox = (props: ICardBox) => {
-    const {title, value, priceFormat} = props;
+    const {title, value, priceFormat, showIcon} = props;
+
+    const getValue = (title, value) => {
+        switch(title){
+            case 'Condition': 
+                return Condition.find(item => item.value === value)?.label;
+            case 'Category':
+                return Categories.find(item => item.value === value)?.label;
+        }
+        return value
+    }
+    const getIcon = () => {
+        if(showIcon){
+            switch(value){
+                case 'new':
+                   return <ChildCareIcon />
+                case 'like-new':
+                  return <PersonIcon />
+                case 'old':
+                    return <ElderlyWomanIcon/>
+            }
+        }
+        return <></>
+    }
     return <Card variant="outlined">
     <CardContent>
         <Typography variant='h5' gutterBottom>{title}</Typography>
-        <Typography variant='h4' sx={{ color: priceFormat ? 'green' : '' }}> <strong>{priceFormat ? <CurrencyRupeeIcon/> : '' } {value}</strong> </Typography>
+        <Typography variant='h4' sx={{ color: priceFormat ? 'green' : '' }}> <strong>{priceFormat ? <CurrencyRupeeIcon/> : '' } {getIcon()} {getValue(title, value)}</strong> </Typography>
     </CardContent>
 </Card>
 }

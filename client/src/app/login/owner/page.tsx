@@ -8,7 +8,7 @@ import owner from '../../../images/owner.png';
 import Image from "next/image";
 import { useRouter } from 'next/navigation'
 import { Formik } from "formik";
-import { APP_THEME, ILoggedInUser, IOwnerLoginData, ISociety, SocietyValidationSchema } from "@/Types";
+import { APP_THEME, IOwnerLoginData, ISociety, SocietyValidationSchema } from "@/Types";
 import { useSelector } from "react-redux";
 import {  ownerLoginRequest } from "@/api/ownerApis";
 import { NotificationContainer, NotificationManager } from 'react-notifications';
@@ -39,7 +39,7 @@ const OwnerLogin = () => {
     try{
       const response = await ownerLoginRequest(formData);
       if(response?.data.token){
-        sessionStorage.setItem('loggedInUserInfo', JSON.stringify({user: response.data.data, role: 'OWNER', token: response.data.token } as ILoggedInUser))
+        sessionStorage.setItem('token', response.data.token);
         NotificationManager.success('Login Success', 'Redirecting to dashboard', 15000, () => { });
         router.push('/dashboard')
       } else {

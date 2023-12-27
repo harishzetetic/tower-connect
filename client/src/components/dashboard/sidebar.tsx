@@ -1,10 +1,7 @@
-import { ILoggedInUser } from "@/Types";
-import { getLoggedInUserData } from "@/util";
+import { IOwnerData } from "@/Types";
 import { Drawer, Box, Avatar, Chip, Typography, List, ListItem, ListItemButton, Button, Divider, ListItemIcon, ListItemText, SvgIconTypeMap } from "@mui/material";
 import VerifiedIcon from '@mui/icons-material/Verified';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Dispatch, SetStateAction, useState } from "react";
 import TCConfirm from "../common/TCConfirm";
@@ -13,6 +10,7 @@ import { useRouter } from 'next/navigation'
 import { App } from "@/constants";
 import {usePathname} from 'next/navigation';
 // import { default as NextLink } from "next/link";
+import Swal from 'sweetalert2'
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
@@ -24,7 +22,7 @@ import { OverridableComponent } from "@mui/material/OverridableComponent";
 import { NextLink } from "@/styled";
 
 interface ISidebarProps{
-    loggedInUser: ILoggedInUser
+    loggedInUser: IOwnerData
     setOpenSellWizard: Dispatch<SetStateAction<boolean>>
 }
 const Sidebar = (props: ISidebarProps) => {
@@ -35,7 +33,7 @@ const Sidebar = (props: ISidebarProps) => {
     const drawerWidth = 240;
 
     const logout = () => {
-        sessionStorage.removeItem('loggedInUserInfo');
+        sessionStorage.removeItem('token');
         setOpenLogoutConfirm(false);
         router.push('/login/owner')
     }
@@ -63,17 +61,17 @@ const Sidebar = (props: ISidebarProps) => {
         }}
     >
         <Avatar sx={{ m: 1, bgcolor: 'secondary.main', width: 56, height: 56 }}>
-            {loggedInUser.user.firstName?.charAt(0)} {loggedInUser.user.lastName?.charAt(0)}
+            {loggedInUser.firstName?.charAt(0)} {loggedInUser.lastName?.charAt(0)}
         </Avatar>
         <Chip icon={<VerifiedIcon />} label="verified" color="success" variant="outlined" />
         <Typography component="h2" variant="h6" sx={{ color: 'white' }}>
-             {loggedInUser.user.firstName} {loggedInUser.user.lastName}
+             {loggedInUser.firstName} {loggedInUser.lastName}
         </Typography>
         <Typography>
-            {loggedInUser.user.society?.builderName} {loggedInUser.user.society?.societyName}
+            {loggedInUser.society?.builderName} {loggedInUser.society?.societyName}
         </Typography>
         <Typography>
-            {loggedInUser.user.towerNumber}-{loggedInUser.user.flatNumber}
+            {loggedInUser.towerNumber}-{loggedInUser.flatNumber}
         </Typography>
         
     </Box>
@@ -95,7 +93,7 @@ const Sidebar = (props: ISidebarProps) => {
         <RouteItem icon={BusinessIcon} isActive={currentPath === '/my-business'} text='My Business' redirectURL = '/my-business' />
         <RouteItem icon={CampaignIcon} isActive={currentPath === '/announcement'} text='Announcements' redirectURL = '/announcement' />
         <RouteItem icon={Person4Icon} isActive={currentPath === '/profile'} text='Profile' redirectURL = '/profile' />
-        <RouteItem icon={NotificationsActiveIcon} isActive={currentPath === '/notifications'} text='Notifications' redirectURL = '/notifications' />
+        <RouteItem icon={NotificationsActiveIcon} isActive={currentPath === '/notifications'} text='Messaging' redirectURL = '/notifications' />
 
     </List>
     <Divider />
@@ -103,7 +101,22 @@ const Sidebar = (props: ISidebarProps) => {
         {['Log Out'].map((text, index) => (
             <ListItem key={text} disablePadding>
                 <ListItemButton >
-                    <Button sx={{width: '-webkit-fill-available'}} startIcon={<LogoutIcon />} size="large" variant="contained" color="error" onClick={()=>{setOpenLogoutConfirm(true)}}>Log out</Button>
+                    <Button sx={{width: '-webkit-fill-available'}} startIcon={<LogoutIcon />} size="large" variant="contained" color="error" onClick={()=>{
+                        Swal.fire({
+                            title: "Do you want to logout from Tower Connect?",
+                            showCancelButton: true,
+                            confirmButtonText: "Yes",
+                            icon: 'question'
+                          }).then((result) => {
+                            if (result.isConfirmed) {
+                              logout()
+                              return result.isConfirmed
+                            }
+                          }).then((isConfirmed)=>{
+                            isConfirmed && Swal.fire("You have been logged out", "", "success");
+                          });
+                        // setOpenLogoutConfirm(true)
+                        }}>Log out</Button>
                 </ListItemButton>
             </ListItem>
         ))}

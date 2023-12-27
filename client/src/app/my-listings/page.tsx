@@ -3,12 +3,11 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import { Button, Grid, ThemeProvider } from "@mui/material";
-import { getLoggedInUserData, pushNotification } from "@/util";
+import { pushNotification } from "@/util";
 import BuySellInfoCard, { SkeletonCard } from "@/components/dashboard/buySellInfoCard";
 import Sidebar from "@/components/dashboard/sidebar";
-import { APP_THEME, IBuySell } from "@/Types";
+import { APP_THEME, IBuySell, IOwnerData } from "@/Types";
 import SellItemWizard from "@/components/dashboard/sellItemWizard";
-import { NotificationContainer } from 'react-notifications';
 import TopNavigation from '@/components/dashboard/topNavigation';
 import { useRouter } from 'next/navigation';
 import notfound from '../../../../client/src/images/notfound.png';
@@ -19,19 +18,19 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { useQuery } from '@tanstack/react-query';
 import { Div } from '@/styled';
 import { fetchMyListings } from '@/api/ownerApis';
+import { useSelector } from 'react-redux';
 dayjs.extend(relativeTime)
 
 const MyListings = ({ params }) => {
     const router = useRouter();
-    const loggedUser = getLoggedInUserData();
-    const loggedInUser = getLoggedInUserData();
+    const loggedInUser: IOwnerData= useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
     const [openSellWizard, setOpenSellWizard] = React.useState<boolean>(false);
 
     const fetchMyListing = async () => {
         try {
-            const apiResponse = await fetchMyListings(loggedUser?.user._id, loggedInUser?.user.society?._id);
+            const apiResponse = await fetchMyListings(loggedInUser?._id, loggedInUser?.society?._id);
             if (apiResponse?.data?.isTokenValid === false) {
-                sessionStorage.removeItem('loggedInUserInfo');
+                sessionStorage.removeItem('token');
                 router.push('/login/owner')
             } else {
                 return apiResponse?.data as IBuySell[]
@@ -45,7 +44,7 @@ const MyListings = ({ params }) => {
 
     const {data:myListings, isLoading } = useQuery({
         queryFn: () => fetchMyListing(),
-        queryKey: ['fetchAllListings'], gcTime: 0
+        queryKey: ['fetchMyListings'], gcTime: 0
     })
 
     React.useEffect(() => {
@@ -53,7 +52,6 @@ const MyListings = ({ params }) => {
             router.push('/login/owner')
         }
     })
-
     if(loggedInUser){
         return (<ThemeProvider theme={APP_THEME}><Box sx={{ display: 'flex' }}>
         <TopNavigation />

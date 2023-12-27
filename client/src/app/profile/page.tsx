@@ -2,11 +2,11 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import { Button, Card, CardContent, Grid, ImageList, ImageListItem, Paper, ThemeProvider, Typography } from "@mui/material";
-import { getLoggedInUserData, pushNotification } from "@/util";
+import { Avatar, Button, Card, CardActions, CardContent, CardMedia, Container, Grid, ImageList, ImageListItem, Paper, Stack, ThemeProvider, Typography } from "@mui/material";
+import { pushNotification } from "@/util";
 import { SkeletonCard } from "@/components/dashboard/buySellInfoCard";
 import Sidebar from "@/components/dashboard/sidebar";
-import { APP_THEME, IBuySell } from "@/Types";
+import { APP_THEME, IBuySell, IOwnerData } from "@/Types";
 import SellItemWizard from "@/components/dashboard/sellItemWizard";
 import { NotificationContainer } from 'react-notifications';
 import {  fetchListingById } from "@/api/ownerApis";
@@ -21,6 +21,7 @@ import TCConfirm from '@/components/common/TCConfirm';
 
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime";
+import { useSelector } from 'react-redux';
 dayjs.extend(relativeTime)
 
 
@@ -31,7 +32,7 @@ const Profile = ({ params }) => {
     const [showContactDetails, setShowContactDetails] = React.useState<boolean>(false);
     /* ---------------------------------------------------------------------------------- */
     const router = useRouter()
-    const loggedInUser = getLoggedInUserData()
+    const loggedInUser: IOwnerData= useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
     const [openSellWizard, setOpenSellWizard] = React.useState<boolean>(false);
 
     const fetchListing = async () => {
@@ -39,7 +40,7 @@ const Profile = ({ params }) => {
         try {
             const apiResponse = await fetchListingById(listingId);
             if (apiResponse?.data?.isTokenValid === false) {
-                sessionStorage.removeItem('loggedInUserInfo');
+                sessionStorage.removeItem('token');
                 router.push('/login/owner')
             } else {
                 setListing(apiResponse?.data)
@@ -71,12 +72,12 @@ const Profile = ({ params }) => {
             <Toolbar />
             <Grid container spacing={2} sx={{ p: 2 }}>
                 <Grid item xs={6} md={2}></Grid>
-                <Grid item xs={6} md={10}>
+                <Grid xs={6} md={10}>
                     {isLoading && <SkeletonCard />}
-                    <h1>This is the profile page</h1>
+                    
                     {!isLoading && listing && <>
                         &nbsp;&nbsp;<Typography variant='h3' sx={{fontWeight: 'bold'}}><Button variant="text"><NextLink href={{ pathname: `/dashboard/` }}><ArrowBackIcon fontSize='large' /></NextLink></Button>  {listing.title} <Button sx={{float: 'right'}}size="large" variant="contained" onClick={getContactDetailsAction}><LocalPhoneIcon /> Get Contact Details</Button></Typography>
-                        <Typography variant='h6'>{`By ${listing.owner?.firstName} ${listing.owner?.lastName} from ${listing.owner?.towerNumber}-${listing.owner?.flatNumber} on ${dayjs(listing?.created_at).fromNow()}`}  </Typography>
+                        <Typography variant='h6'>{`By ${listing.ownerData?.firstName} ${listing.ownerData?.lastName} from ${listing.ownerData?.towerNumber}-${listing.ownerData?.flatNumber} on ${dayjs(listing?.created_at).fromNow()}`}  </Typography>
                         
                         <Box sx={{ display: 'inline-block', mt:2 }}>
                             <ImageList sx={{ width: 'auto', height: 'auto' }} cols={4} rowHeight={164}>
@@ -118,7 +119,7 @@ const Profile = ({ params }) => {
             </Grid>
             <SellItemWizard openSellWizard={openSellWizard} setOpenSellWizard={setOpenSellWizard} pushNotification={pushNotification} />
             <TCConfirm successBtnTitle='Show me the details' open={isContctConfirmOpen} handleClose={()=>{setIsContctConfirmOpen(false)}} handleConfirm={()=>{setIsContctConfirmOpen(false); setShowContactDetails(true)}} title={"Information"} description={"By this action we will let this product owner know that you have viewed the contact information for this product. Please confirm to view the contact details. "} />
-            <TCConfirm successBtnTitle='Ok' hideCancel open={showContactDetails} handleClose={()=>{setShowContactDetails(false)}} handleConfirm={()=>{setShowContactDetails(false)}} title={"Contact Details"} description={<><strong>Phone Number:</strong> {listing?.owner?.phone} <br/> <strong>Email:</strong> {listing?.owner?.email}</>} />
+            <TCConfirm successBtnTitle='Ok' hideCancel open={showContactDetails} handleClose={()=>{setShowContactDetails(false)}} handleConfirm={()=>{setShowContactDetails(false)}} title={"Contact Details"} description={<><strong>Phone Number:</strong> {listing?.ownerData?.phone} <br/> <strong>Email:</strong> {listing?.ownerData?.email}</>} />
         </ThemeProvider>)
     }
     return <>User probably not logged in. Kindly login again.</>

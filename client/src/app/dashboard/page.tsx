@@ -4,13 +4,12 @@ import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
 import { Button, Grid, LinearProgress, ThemeProvider } from "@mui/material";
-import { getLoggedInUserData, pushNotification } from "@/util";
+import { pushNotification } from "@/util";
 import { useRouter } from 'next/navigation'
 import BuySellInfoCard, { SkeletonCard } from "@/components/dashboard/buySellInfoCard";
 import Sidebar from "@/components/dashboard/sidebar";
-import { APP_THEME, IBuySell } from "@/Types";
+import { APP_THEME, IBuySell, IOwnerData } from "@/Types";
 import SellItemWizard from "@/components/dashboard/sellItemWizard";
-import { NotificationContainer, NotificationManager } from 'react-notifications';
 import { fetchAllListings } from "@/api/ownerApis";
 import { Div } from '@/styled';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
@@ -18,20 +17,22 @@ import notfound from '../../../../client/src/images/notfound.png';
 import Image from "next/image";
 import TopNavigation from '@/components/dashboard/topNavigation';
 import { useQuery } from '@tanstack/react-query';
+import { useSelector } from 'react-redux';
 
 
 const drawerWidth = 240;
 const Dashboard = () => {
     // const [listings, setListings] = React.useState<Array<IBuySell> | null>(null)
     const router = useRouter()
-    const loggedInUser = getLoggedInUserData()
+    const loggedInUser: IOwnerData= useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
     const [openSellWizard, setOpenSellWizard]= React.useState<boolean>(false);
-
+    console.log('loggedInUser', loggedInUser)
     const fetchListings = async () => {
+        
         try{
-            const apiResponse = await fetchAllListings(loggedInUser?.user.society?._id);
+            const apiResponse = await fetchAllListings(loggedInUser?.society?._id);
             if (apiResponse?.data?.isTokenValid === false) {
-                sessionStorage.removeItem('loggedInUserInfo');
+                sessionStorage.removeItem('token');
                 router.push('/login/owner')
             } else {
                 return apiResponse?.data;
@@ -45,7 +46,7 @@ const Dashboard = () => {
 
     const {data:listings, isLoading } = useQuery({
         queryFn: () => fetchListings(),
-        queryKey: ['fetchAllListings'], gcTime: 0
+        queryKey: ['fetchAllListings'],
     })
   
     React.useEffect(()=>{
