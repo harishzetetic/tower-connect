@@ -27,11 +27,12 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 import { debug } from 'console';
 import { useSelector } from 'react-redux';
+import { HOC } from '@/components/hoc/hoc';
 dayjs.extend(relativeTime)
 
 // dayjs('2019-01-25').fromNow()}
 
-const Listing = ({ params }) => {
+const Listing = HOC(({ params }) => {
     const [listing, setListing] = React.useState<IBuySell | null>(null)
     const [isLoading, setIsLoading] = React.useState<boolean>(true);
     const [isContctConfirmOpen, setIsContctConfirmOpen] = React.useState<boolean>(false);
@@ -45,10 +46,7 @@ const Listing = ({ params }) => {
         const listingId = params.listing;
         try {
             const apiResponse = await fetchListingById(listingId);
-            if (apiResponse?.data?.isTokenValid === false) {
-                sessionStorage.removeItem('token');
-                router.push('/login/owner')
-            } else {
+            if (apiResponse?.status === 200) {
                 setListing(apiResponse?.data)
                 setIsLoading(false)
             }
@@ -62,11 +60,6 @@ const Listing = ({ params }) => {
         fetchListing()
     }, []);
 
-    React.useEffect(() => {
-        if (!loggedInUser) {
-            router.push('/login/owner')
-        }
-    })
     const getContactDetailsAction = () => {
         setIsContctConfirmOpen(true)
     }
@@ -131,7 +124,7 @@ const Listing = ({ params }) => {
     }
     return <>User probably not logged in. Kindly login again.</>
 
-}
+})
 interface ICardBox {
     title: string;
     value: string | null | undefined;

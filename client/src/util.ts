@@ -1,7 +1,5 @@
-import { useRouter } from "next/navigation";
-import { IOwnerData, notificationType } from "./Types";
+import { notificationType } from "./Types";
 import { NotificationManager } from 'react-notifications';
-import { useSelector } from "react-redux";
 
 export const getToken = ():string|null => {
     if(window && window?.sessionStorage){

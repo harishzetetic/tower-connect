@@ -21,5 +21,10 @@ Role: 'OWNER' 'TENANT'
 
 Backlog:
 1. Keep encrypted password in database
-2. remove societydata from IOwnerData it should come after lookup, it should save and send with society id only
-3. Remove Owner data from sessionstorage it should use from redux store
+4. we are showing loading screen before render anything, but if api fails, we need a alternative way to redirect to admin page or somewhere
+5. if we are refreshing ownersignup page its redirecting to login page
+6.make sure each api search the data from db along with societyId
+7.replace all axios calls with react query
+8. Right now user online status only show when he comes to messaging page but we need if user logged in with app, he should online
+9. now we want to remove user from online state if not loggedin or loggedout by self.
+10. use localstorage rather then session storage

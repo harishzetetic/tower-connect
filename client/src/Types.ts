@@ -22,8 +22,12 @@ export interface ISociety{
     addressline1:string;
 }
 
-export interface IOwnerData {
-        society: ISociety | null, 
+interface IOwnerDataServerFields{
+        readonly _id?: string,
+        readonly society?: ISociety | undefined
+}
+export interface IOwnerData extends IOwnerDataServerFields{
+        societyId: string | null, 
         towerNumber: string | null,
         flatNumber: string | null,
         flatType: string | null,
@@ -36,11 +40,10 @@ export interface IOwnerData {
         proofDocument: File | null,
         password: string | null,
         confirmPassword: string | null,
-        proofDocumentURL?: string | null,
-        _id?: string
+        proofDocumentURL?: string | null,     
 }
 export interface IOwnerLoginData {
-    society: ISociety | null, 
+  societyId: string | null, 
     towerNumber: string | null,
     flatNumber: string | null,
     password: string | null
@@ -95,3 +98,21 @@ export const APP_THEME = createTheme({
 }
 
 export type notificationType = 'error' | 'success' | 'warn';
+
+export interface IChat{
+  _id?: string,
+  users: Array<IOwnerData>,
+  latestMessage?:IMessage
+}
+
+export interface IMessage{
+  _id?: string,
+  sender: IOwnerData,
+  content: string,
+  chat: IChat
+}
+
+export interface IIncomingMessage {
+  message: IMessage,
+  sendTo: IOwnerData
+}

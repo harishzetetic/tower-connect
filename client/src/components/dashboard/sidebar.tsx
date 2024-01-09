@@ -7,10 +7,12 @@ import { Dispatch, SetStateAction, useState } from "react";
 import TCConfirm from "../common/TCConfirm";
 import { redirect } from 'next/navigation'
 import { useRouter } from 'next/navigation'
-import { App } from "@/constants";
+import { App, BACKEND_URL } from "@/constants";
 import {usePathname} from 'next/navigation';
 // import { default as NextLink } from "next/link";
 import Swal from 'sweetalert2'
+import { updatedLoggedInUser } from "@/store/slices/loggedInUserSlice";
+import { useDispatch } from "react-redux";
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
@@ -20,12 +22,14 @@ import Person4Icon from '@mui/icons-material/Person4';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 import { NextLink } from "@/styled";
+import { io } from "socket.io-client";
 
 interface ISidebarProps{
     loggedInUser: IOwnerData
     setOpenSellWizard: Dispatch<SetStateAction<boolean>>
 }
 const Sidebar = (props: ISidebarProps) => {
+    const dispatch = useDispatch();
     const currentPath = usePathname();
     const router = useRouter()
     const [openLogoutConfirm, setOpenLogoutConfirm] = useState(false);
@@ -35,6 +39,8 @@ const Sidebar = (props: ISidebarProps) => {
     const logout = () => {
         sessionStorage.removeItem('token');
         setOpenLogoutConfirm(false);
+        dispatch(updatedLoggedInUser({} as IOwnerData))
+        io(BACKEND_URL).emit('removeUser', loggedInUser);
         router.push('/login/owner')
     }
     return <Drawer
@@ -93,7 +99,7 @@ const Sidebar = (props: ISidebarProps) => {
         <RouteItem icon={BusinessIcon} isActive={currentPath === '/my-business'} text='My Business' redirectURL = '/my-business' />
         <RouteItem icon={CampaignIcon} isActive={currentPath === '/announcement'} text='Announcements' redirectURL = '/announcement' />
         <RouteItem icon={Person4Icon} isActive={currentPath === '/profile'} text='Profile' redirectURL = '/profile' />
-        <RouteItem icon={NotificationsActiveIcon} isActive={currentPath === '/notifications'} text='Messaging' redirectURL = '/notifications' />
+        <RouteItem icon={NotificationsActiveIcon} isActive={currentPath === '/messaging'} text='Messaging' redirectURL = '/messaging' />
 
     </List>
     <Divider />

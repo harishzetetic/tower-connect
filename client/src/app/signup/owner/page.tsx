@@ -22,6 +22,7 @@ import { newOwnerSignupRequest } from "@/api/ownerApis";
 import TCConfirm, { ITCConfirmProps } from "@/components/common/TCConfirm";
 import {useRouter} from 'next/navigation'
 import { useState } from "react";
+import Swal from "sweetalert2";
 
 const OwnerSignup = () => {
     const router = useRouter()
@@ -31,7 +32,7 @@ const OwnerSignup = () => {
     const [requestSubmitConfirmProps, setRequestSubmitConfirmProps] = useState<ITCConfirmProps>();
     const [userFormData, setUserFormData] = useState<null | IOwnerData>(null)
     const initialValues = {
-        society: null,
+        societyId: null,
         towerNumber: null,
         flatNumber: null,
         flatType: null,
@@ -83,16 +84,18 @@ const OwnerSignup = () => {
             } else if(apiResponse?.data?.owner){
                 NotificationManager.success('New Account Request Submitted', 'Your request for your account creation with Tower Connect has been submitted.', 15000, () => { });
                 setIsRequestSubmitConfirmOpen(true)
-                setRequestSubmitConfirmProps({
-                    open: true,
-                    handleClose: ()=>setIsRequestSubmitConfirmOpen(false),
-                    handleConfirm: ()=>{router.push('/login/owner')},
-                    title: 'Request Submitted',
-                    description: 'We are starting your provided data verification with uploaded document proof. If all good, it will take usually 24-48 hours to approve. In case information found mismatch account request would be reject.You can check your account status by login with your credentials.',
-                    successBtnTitle: 'Login',
-                    fullScreen: false,
-                    hideCancel:true
-                })
+                Swal.fire({
+                    title: "Request Submitted",
+                    text: 'We are starting your provided data verification with uploaded document proof. If all good, it will take usually 24-48 hours to approve. In case information found mismatch account request would be reject.You can check your account status by login with your credentials.',
+                    confirmButtonText: "Yes",
+                    showCancelButton: true,
+                    icon: 'success',
+                    timerProgressBar: true,
+                    timer: 30000,
+                  }).then((result) => {
+                    router.push('/login/owner')
+                  })
+                
             }
             setIsConfirmOpen(false)
         } catch (e) {
@@ -128,20 +131,20 @@ const OwnerSignup = () => {
                                                         options={allSocieties.map(society => {
                                                             return {
                                                                 label: `${society.builderName} ${society.societyName} | ${society.city}, ${society.country}`,
-                                                                value: society
+                                                                value: society._id
                                                             }
                                                         })}
                                                         onChange={(_, value) => {
                                                             if(value){
-                                                                setFieldValue("society", value?.value)
+                                                                setFieldValue("societyId", value.value)
                                                             } else {
-                                                                setFieldValue("society", null)
+                                                                setFieldValue("societyId", null)
                                                             }
                                                         }}
                                                         // renderOption={(props, option) => (<></>)}
-                                                        renderInput={(params) => <TextField {...params} label="Society Name" name={"society"} error={!!errors.society}/>}                                                        
+                                                        renderInput={(params) => <TextField {...params} label="Society Name" name={"societyId"} error={!!errors.societyId}/>}                                                        
                                                     />
-                                                        <FormHelperText sx={{ color: App.ErrorTextColor }}>{errors.society}</FormHelperText>
+                                                        <FormHelperText sx={{ color: App.ErrorTextColor }}>{errors.societyId}</FormHelperText>
 
         
                                                 </FormControl>

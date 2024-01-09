@@ -12,21 +12,59 @@ import { jwtDecode } from "jwt-decode";
 
 const unlinkAsync = promisify(fs.unlink)
 
-export const getLoggedInUser = async(request, response) => {
-    
-    const loggedInUser = jwtDecode(request.params.token)
-    console.log(loggedInUser)
-    try{
-        if(loggedInUser.user){
-            const user = await OwnerModal.findOne({_id: loggedInUser.user})
-            response.status(200).json(user)
-        } else {
-            response.status(204).json({message: 'user not found'})
+export const searchOwners = async (request, response) => {
+    const authHeader = request.headers['authorization'];
+    if (authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7, authHeader.length);
+        const loggedInUser = jwtDecode(token)
+        try{
+            if(loggedInUser.user){
+                const searchPhrase = request.params.searchPhrase;
+                const user = await OwnerModal.find({$or: [{firstName: {$regex:searchPhrase, $options : "i"}}, {lastName: {$regex:searchPhrase, $options : "i"}}], societyId: loggedInUser.societyId, _id: { $not: { $eq: loggedInUser.user } }  })
+                return response.status(200).json(user)
+            } else {
+                return response.status(204).json({message: 'user not found'})
+            }
+            
+        }catch(e){
+            return response.status(500).json({message: 'An error occured', error: e})
         }
-        
-    }catch(e){
-        response.status(500).json({message: 'An error occured', error: e})
     }
+}
+
+export const getLoggedInUser = async(request, response) => {
+    const authHeader = request.headers['authorization'];
+    if (authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7, authHeader.length);
+        const loggedInUser = jwtDecode(token)
+        try{
+            if(loggedInUser.user){
+
+                const user = await OwnerModal.aggregate([{$match: {
+                    _id: new mongoose.Types.ObjectId(loggedInUser.user),
+                    societyId: new mongoose.Types.ObjectId(loggedInUser.societyId)
+                  }},
+                  {
+                    $lookup: {
+                      from: "societies",
+                      localField: "societyId",
+                      foreignField: "_id",
+                      as: "society"
+                    }
+                  },
+                  { $unwind: "$society"},
+                  {$limit: 1}
+                ])
+                return response.status(200).json(user[0])
+            } else {
+                return response.status(204).json({message: 'user not found'})
+            }
+            
+        }catch(e){
+            return response.status(500).json({message: 'An error occured', error: e})
+        }
+    }
+    
 }
 
 export const deleteListing = async(request, response)=>{
@@ -101,7 +139,6 @@ export const fetchListingById= async(request, response) => {
 
 export const fetchAllListings= async(request, response) => {
     try{
-        const userDetails = jwtDecode(request.params.token);
         const data = await BuySellModel.aggregate([{$match: {
             societyid: new mongoose.Types.ObjectId(request.body.society)
           }},
@@ -122,81 +159,89 @@ export const fetchAllListings= async(request, response) => {
     }
 }
 export const newListing = async(request, response) => {
-    jwt.verify(request.params.token, process.env.JWT_SECRETKEY, async (err, data) => {
-        if(err){
-            response.send({result: "Invalid Token", isTokenValid: false})
-            console.log('❌ Token Invalid')
-        } else {
-            console.log('👍  Token Valid')
-            try{
-                const imagesPaths = [];
-                request.files.length && request.files.forEach(file => imagesPaths.push(`${file.destination}${file.filename}`))
-                const {title, price, category, condition, description, ownerid, societyid} = request.body;
-                const newListing = new BuySellModel({
-                     images: imagesPaths,
-                     title, price, category, condition, description, ownerid, societyid
-                  });
+    const authHeader = request.headers['authorization'];
+    if (authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7, authHeader.length);
+        jwt.verify(token, process.env.JWT_SECRETKEY, async (err, data) => {
+            if(err){
+                console.log('❌ Token Invalid')
+                return response.status(401).json({result: "Invalid Token", isTokenValid: false})    
+            } else {
+                console.log('👍  Token Valid')
+                try{
+                    const imagesPaths = [];
+                    request.files.length && request.files.forEach(file => imagesPaths.push(`${file.destination}${file.filename}`))
+                    const {title, price, category, condition, description, ownerid, societyid} = request.body;
+                    const newListing = new BuySellModel({
+                         images: imagesPaths,
+                         title, price, category, condition, description, ownerid, societyid
+                      });
 
-                 await newListing.save();
-                 return response.status(200).json(newListing)
-                
-            }catch(e){
-                return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
+                     await newListing.save();
+                     return response.status(200).json(newListing)
+                    
+                }catch(e){
+                    return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
+                }
             }
-        }
-    })
+        })
+    }     
     
 }
 
 export const updateListing= async(request, response) => {
-    jwt.verify(request.params.token, process.env.JWT_SECRETKEY, async (err, data) => {
-        if(err){
-            response.send({result: "Invalid Token", isTokenValid: false})
-            console.log('❌ Token Invalid')
-        } else {
-            console.log('👍  Token Valid for update listing')
-            try{
-                const newImagesPaths = [];
-                let alreadySavedImages = await BuySellModel.aggregate([
-                    {$match: { _id: new mongoose.Types.ObjectId(request.params.listingId)}},
-                    {$project:{
-                      images: 1,
-                      _id: 0
-                    }},{$limit: 1}
-                  ])
-                alreadySavedImages = alreadySavedImages[0].images;
-
-                request.files.length && request.files.forEach(file => newImagesPaths.push(`${file.destination}${file.filename}`))
-                const {title, price, category, condition, description} = request.body;
-                let newImageArr = [...newImagesPaths]
-                if(request.body.images){
-                    if(_.isArray(request.body.images)){
-                        newImageArr=  newImageArr.concat(request.body.images)
-                    }else{
-                        newImageArr.push(request.body.images)
+    const authHeader = request.headers['authorization'];
+    if (authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7, authHeader.length);
+        jwt.verify(token, process.env.JWT_SECRETKEY, async (err, data) => {
+            if(err){
+                response.status(401).json({result: "Invalid Token", isTokenValid: false})
+                console.log('❌ Token Invalid')
+            } else {
+                console.log('👍  Token Valid for update listing')
+                try{
+                    const newImagesPaths = [];
+                    let alreadySavedImages = await BuySellModel.aggregate([
+                        {$match: { _id: new mongoose.Types.ObjectId(request.params.listingId)}},
+                        {$project:{
+                          images: 1,
+                          _id: 0
+                        }},{$limit: 1}
+                      ])
+                    alreadySavedImages = alreadySavedImages[0].images;
+    
+                    request.files.length && request.files.forEach(file => newImagesPaths.push(`${file.destination}${file.filename}`))
+                    const {title, price, category, condition, description} = request.body;
+                    let newImageArr = [...newImagesPaths]
+                    if(request.body.images){
+                        if(_.isArray(request.body.images)){
+                            newImageArr=  newImageArr.concat(request.body.images)
+                        }else{
+                            newImageArr.push(request.body.images)
+                        }
                     }
+                    const shouldDelete = alreadySavedImages.filter(value => newImageArr.indexOf(value) === -1)              
+                    shouldDelete.forEach(async(item) => await unlinkAsync(item))
+                    await BuySellModel.updateOne({
+                        _id: request.params.listingId
+                    }, {
+                        $set: {
+                            images: newImageArr,
+                            title,
+                            price,
+                            category,
+                            condition,
+                            description
+                        }
+                    }) 
+                    return response.status(200).json({message: "SUCCESS"})
+                    
+                }catch(e){
+                    return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
                 }
-                const shouldDelete = alreadySavedImages.filter(value => newImageArr.indexOf(value) === -1)              
-                shouldDelete.forEach(async(item) => await unlinkAsync(item))
-                await BuySellModel.updateOne({
-                    _id: request.params.listingId
-                }, {
-                    $set: {
-                        images: newImageArr,
-                        title,
-                        price,
-                        category,
-                        condition,
-                        description
-                    }
-                }) 
-                return response.status(200).json({message: "SUCCESS"})
-                
-            }catch(e){
-                return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
             }
-        }
-    })
+        })
+    }
 }
 
 export const addOwner = async (request, response) => {
@@ -206,7 +251,7 @@ export const addOwner = async (request, response) => {
         
         const userProofDocumentFilePath = `${destination}${filename}`;
        
-        let exist = await OwnerModal.findOne({society: JSON.parse(request.body.society), towerNumber: request.body.towerNumber, flatNumber: request.body.flatNumber});
+        let exist = await OwnerModal.findOne({societyId: request.body.societyId, towerNumber: request.body.towerNumber, flatNumber: request.body.flatNumber});
         if(exist){
             switch(exist.status){
                 case AccountStatus.PENDING:
@@ -218,7 +263,7 @@ export const addOwner = async (request, response) => {
             }
         } else {
             const newOwner = new OwnerModal({
-                society: JSON.parse(request.body.society),
+                societyId: request.body.societyId,
                 towerNumber: request.body.towerNumber,
                 flatNumber: request.body.flatNumber,
                 flatType: request.body.flatType,
@@ -276,13 +321,32 @@ export const approveOwnerAccount = async(request, response) => {
 }
 
 export const ownerLogin = async (request, response) => {
+    
     try{
-        const {society, towerNumber, flatNumber, password} = request.body;
-        const exist = await OwnerModal.findOne({society, towerNumber, flatNumber, password})
+        const {societyId, towerNumber, flatNumber, password} = request.body;
+        let exist = await OwnerModal.aggregate([{$match: {
+            societyId: new mongoose.Types.ObjectId(societyId),
+            towerNumber, 
+            flatNumber, 
+            password
+          }},
+          {
+            $lookup: {
+              from: "societies",
+              localField: "societyId",
+              foreignField: "_id",
+              as: "society"
+            }
+          },
+          { $unwind: "$society"},
+          {$limit: 1}
+        ])
+        exist = exist[0]
+        // const exist = await OwnerModal.findOne({societyId, towerNumber, flatNumber, password})
         const responseData = _.cloneDeep(exist);
         responseData.password = 'NO_PASSWORD_AVAILABLE';
         if(exist){
-         return response.status(200).json({message: "SUCCESS", data: responseData, token: jwt.sign({user: exist._id, society, towerNumber, flatNumber}, process.env.JWT_SECRETKEY)})
+         return response.status(200).json({message: "SUCCESS", data: responseData, token: jwt.sign({user: exist._id, societyId, towerNumber, flatNumber}, process.env.JWT_SECRETKEY)})
         } else {
          return response.status(200).json({message: "FAIL"})
         }    

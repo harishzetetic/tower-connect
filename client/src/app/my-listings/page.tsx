@@ -19,20 +19,18 @@ import { useQuery } from '@tanstack/react-query';
 import { Div } from '@/styled';
 import { fetchMyListings } from '@/api/ownerApis';
 import { useSelector } from 'react-redux';
+import { HOC } from '@/components/hoc/hoc';
 dayjs.extend(relativeTime)
 
-const MyListings = ({ params }) => {
+const MyListings = HOC(({ params }) => {
     const router = useRouter();
     const loggedInUser: IOwnerData= useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
     const [openSellWizard, setOpenSellWizard] = React.useState<boolean>(false);
 
     const fetchMyListing = async () => {
         try {
-            const apiResponse = await fetchMyListings(loggedInUser?._id, loggedInUser?.society?._id);
-            if (apiResponse?.data?.isTokenValid === false) {
-                sessionStorage.removeItem('token');
-                router.push('/login/owner')
-            } else {
+            const apiResponse = await fetchMyListings(loggedInUser?._id, loggedInUser?.societyId);
+            if (apiResponse?.status === 200) {
                 return apiResponse?.data as IBuySell[]
             }
 
@@ -47,11 +45,6 @@ const MyListings = ({ params }) => {
         queryKey: ['fetchMyListings'], gcTime: 0
     })
 
-    React.useEffect(() => {
-        if (!loggedInUser) {
-            router.push('/login/owner')
-        }
-    })
     if(loggedInUser){
         return (<ThemeProvider theme={APP_THEME}><Box sx={{ display: 'flex' }}>
         <TopNavigation />
@@ -87,7 +80,7 @@ const MyListings = ({ params }) => {
     }
     return <>User probably not logged in. Kindly login again.</>
 
-}
+})
 
 
 

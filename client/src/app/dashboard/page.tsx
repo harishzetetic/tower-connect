@@ -18,26 +18,19 @@ import Image from "next/image";
 import TopNavigation from '@/components/dashboard/topNavigation';
 import { useQuery } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
+import { HOC } from '@/components/hoc/hoc';
 
 
-const drawerWidth = 240;
-const Dashboard = () => {
-    // const [listings, setListings] = React.useState<Array<IBuySell> | null>(null)
+const Dashboard = HOC(() => {
     const router = useRouter()
     const loggedInUser: IOwnerData= useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
     const [openSellWizard, setOpenSellWizard]= React.useState<boolean>(false);
-    console.log('loggedInUser', loggedInUser)
     const fetchListings = async () => {
-        
         try{
-            const apiResponse = await fetchAllListings(loggedInUser?.society?._id);
-            if (apiResponse?.data?.isTokenValid === false) {
-                sessionStorage.removeItem('token');
-                router.push('/login/owner')
-            } else {
+            const apiResponse = await fetchAllListings(loggedInUser?.societyId);
+            if (apiResponse?.status === 200) {
                 return apiResponse?.data;
             }
-            
         }catch(e){
             pushNotification('error', 'Error', 'Error while getting listings from server')
             return []
@@ -47,14 +40,8 @@ const Dashboard = () => {
     const {data:listings, isLoading } = useQuery({
         queryFn: () => fetchListings(),
         queryKey: ['fetchAllListings'],
+        refetchOnWindowFocus: true // this feature is really cool if true, browser check with the server if there are any latest data
     })
-  
-    React.useEffect(()=>{
-        if(!loggedInUser){
-            router.push('/login/owner')
-        }
-    })
-
 
     if(loggedInUser){
         return (<ThemeProvider theme={APP_THEME}><Box sx={{ display: 'flex' }}>
@@ -94,6 +81,6 @@ const Dashboard = () => {
     }
     return <>User probably not logged in. Kindly login again.</>
     
-}
+})
 
 export default Dashboard

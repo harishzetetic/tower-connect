@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 import { Schema } from "mongoose";
 
 export const ownerSchema = new mongoose.Schema({
-    society: {
-        type: Schema.Types.Mixed,
+    societyId: {
+        type: mongoose.Schema.ObjectId,
         required: true
     },
     towerNumber: {

@@ -25,12 +25,14 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
       <NextTopLoader />
       <Providers> {/*For redux toolkit*/}
         <Suspense fallback={<Loading/>}> {/* To show loading template*/}
-          <ReduxFetch>  {/*For load pre required data*/}
+         
             <ReactQueryProvider> {/*Added support for react-query*/}
-              {children}    
+            <ReduxFetch>  {/*For load pre required data*/}
+              {children}   
+              </ReduxFetch>   
             </ReactQueryProvider>
               
-          </ReduxFetch>  
+          
         </Suspense>
       </Providers>
       

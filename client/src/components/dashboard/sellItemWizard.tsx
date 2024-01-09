@@ -50,7 +50,7 @@ const SellItemWizard = (props: ISellItemWizard) => {
     const onSubmit = async (userFormData: IBuySell) => {
         try {
             userFormData.ownerid = loggedInUser?._id;
-            userFormData.societyid = loggedInUser?.society?._id;
+            userFormData.societyid = loggedInUser?.societyId;
             const formData = new FormData();
             for (let key in userFormData) {
                 switch(key){
@@ -71,11 +71,7 @@ const SellItemWizard = (props: ISellItemWizard) => {
                 }
             }
             const apiResponse = await addListening(formData);
-            if (apiResponse?.data?.isTokenValid === false) {
-                sessionStorage.removeItem('token');
-                router.push('/login/owner')
-            } else if (apiResponse?.data?._id) {
-                // props.pushNotification('success', 'Congratulations', 'You listening has been live')
+            if (apiResponse?.data?._id) {
                 Swal.fire({
                     title: 'Success',
                     text: 'You item has been live now',
@@ -83,7 +79,7 @@ const SellItemWizard = (props: ISellItemWizard) => {
                     confirmButtonText: 'Okay'
                   })
                 props.setOpenSellWizard(false);
-            }
+            } 
         } catch (e) {
             props.pushNotification('error', 'Error', 'Getting error while adding listening')
         }
@@ -230,7 +226,7 @@ interface IImageBlock {
     // return <React.Fragment></React.Fragment>
     return <>
         {files.map((file, index) => <Grid item xs={2} sm={3} md={3}>
-            <Box sx={{ cursor: 'pointer', backgroundColor: App.DarkBlue, color: 'white', height: 150, border: '0.5px solid gray', borderRadius: 2 }} onClick={() => {
+            <Box sx={{ backgroundColor: App.DarkBlue, color: 'white', height: 150, border: '0.5px solid gray', borderRadius: 2 }} onClick={() => {
                 refs.get(index).current?.click();
             }}>
                 {file ?

@@ -8,14 +8,14 @@ import owner from '../../../images/owner.png';
 import Image from "next/image";
 import { useRouter } from 'next/navigation'
 import { Formik } from "formik";
-import { APP_THEME, IOwnerLoginData, ISociety, SocietyValidationSchema } from "@/Types";
+import { APP_THEME, IOwnerData, IOwnerLoginData, ISociety, SocietyValidationSchema } from "@/Types";
 import { useSelector } from "react-redux";
 import {  ownerLoginRequest } from "@/api/ownerApis";
-import { NotificationContainer, NotificationManager } from 'react-notifications';
+import { NotificationManager } from 'react-notifications';
 import { useDispatch } from "react-redux";
-import jwtDecode from "jwt-decode";
 import {default as NextLink} from "next/link";
-import { TCButton, TCTextField } from "@/styled";
+import { TCButton } from "@/styled";
+import { updatedLoggedInUser } from "@/store/slices/loggedInUserSlice";
 
 export const OwnerLoginSchema = Yup.object({
   society: SocietyValidationSchema,
@@ -29,7 +29,7 @@ const OwnerLogin = () => {
   const router = useRouter()
   const allSocieties: Array<ISociety> = useSelector(reduxStore => (reduxStore as any)?.societies);
   const initialValues = {
-    society: null,
+    societyId: null,
     towerNumber: null,
     flatNumber: null,
     password: null,
@@ -40,6 +40,7 @@ const OwnerLogin = () => {
       const response = await ownerLoginRequest(formData);
       if(response?.data.token){
         sessionStorage.setItem('token', response.data.token);
+        dispatch(updatedLoggedInUser(response.data.data as IOwnerData))
         NotificationManager.success('Login Success', 'Redirecting to dashboard', 15000, () => { });
         router.push('/dashboard')
       } else {
@@ -76,19 +77,19 @@ const OwnerLogin = () => {
                   options={allSocieties.map(society => {
                     return {
                       label: `${society.builderName} ${society.societyName} | ${society.city}, ${society.country}`,
-                      value: society
+                      value: society._id
                     }
                   })}
                   onChange={(_, value) => {
                     if (value) {
-                      setFieldValue("society", value?.value)
+                      setFieldValue("societyId", value?.value)
                     } else {
-                      setFieldValue("society", null)
+                      setFieldValue("societyId", null)
                     }
                   }}
-                  renderInput={(params) => <TextField {...params} label="Society Name" name={"society"} error={!!errors.society} />}
+                  renderInput={(params) => <TextField {...params} label="Society Name" name={"societyId"} error={!!errors.societyId} />}
                 />
-                <FormHelperText sx={{ color: App.ErrorTextColor }}>{errors.society}</FormHelperText>
+                <FormHelperText sx={{ color: App.ErrorTextColor }}>{errors.societyId}</FormHelperText>
                 <TextField 
                   color="error"
                   variant="outlined" 

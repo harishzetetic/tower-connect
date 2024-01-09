@@ -7,14 +7,12 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Title from './Title';
 import {  approveOwnerAccount, deleteOwner, fetchPendingAccounts, rejectOwnerAccount } from '@/api/adminApis';
-import { NotificationContainer, NotificationManager } from 'react-notifications';
-import { IOwnerData, ISociety } from '@/Types';
+import { ISociety } from '@/Types';
 import { Button, ButtonGroup, Card, CardActions, CardContent, Drawer, Tooltip, Typography } from '@mui/material';
 import { BACKEND_URL } from '@/constants';
 import LaunchIcon from '@mui/icons-material/Launch';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import DangerousIcon from '@mui/icons-material/Dangerous';
-
 import DeleteIcon from '@mui/icons-material/Delete';
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'

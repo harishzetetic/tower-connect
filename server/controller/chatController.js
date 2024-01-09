@@ -1,8 +1,25 @@
 import ChatModel from '../model/ChatModel.js'
 import { jwtDecode } from "jwt-decode";
 import OwnerModal from '../model/OwnerModel.js';
+import MessageModel from '../model/Messagemodel.js';
 
 
+
+export const sendMessage = async(request, response) => {
+    // await MessageModel.deleteMany({})
+    // return;
+    const {sender, content, chat} = request.body;
+    if(!sender || !chat){
+        return response.status(204).json({message: 'Request body content not complete or invalid'})
+    }
+    const data = await MessageModel.create({sender, content, chat}) 
+    if(data){
+        await ChatModel.updateOne({_id: chat}, {$set: {latestMessage: data._id}})
+    }
+    return response.status(200).json(data)
+}
+
+/*
 export const removeFromGroup = async(request, response) => {
     const {chatId, userId} = request.body;
     const removed = await ChatModel.findByIdAndUpdate(chatId, {
@@ -14,9 +31,9 @@ export const removeFromGroup = async(request, response) => {
     .populate('groupAdmin', '-password');
 
     if(!removed){
-        response.status(204).json({message: 'Chat not found'})
+        return response.status(204).json({message: 'Chat not found'})
     }else {
-        response.status(200).json(removed)
+        return response.status(200).json(removed)
     }
 }
 
@@ -31,9 +48,9 @@ export const addToGroup = async(request, response) => {
     .populate('groupAdmin', '-password');
 
     if(!added){
-        response.status(204).json({message: 'Chat not found'})
+        return response.status(204).json({message: 'Chat not found'})
     }else {
-        response.status(200).json(added)
+        return response.status(200).json(added)
     }
 }
 
@@ -43,9 +60,9 @@ export const renameGroup = async(request, response) => {
     .populate('users', '-password')
     .populate('groupAdmin', '-password')
     if(!updatedChat){
-        response.status(404).json({message: 'Chat not found'})
+        return response.status(404).json({message: 'Chat not found'})
     } else {
-        response.status(200).json(updatedChat)
+        return response.status(200).json(updatedChat)
     }
 }
 
@@ -71,70 +88,87 @@ export const createGroupChat = async(request, response) => {
         .populate('users', '-password')
         .populate('groupAdmin', '-password');
 
-        response.status(200).json(fullGroupChat)
+        return response.status(200).json(fullGroupChat)
     }catch(e){
-        response.status(500).json(e)
+        return response.status(500).json(e)
     }
 }
 
+*/
+
+export const fetchMessasges= async(request, response) => {
+    const authHeader = request.headers['authorization'];
+    if (authHeader.startsWith('Bearer ')) {
+        try{
+            const chatId = request.params.chat;
+            const results = await MessageModel.find({chat: chatId}).populate('sender').populate('chat')
+            // const results = await ChatModel.find({users: {$elemMatch: {$eq: loggedInUser}}})
+            // .populate('users') //populate function will get user details from user collection because of ref inside the model
+            // .populate('latestMessage')
+            // .sort({updatedAt: -1})
+    
+            return response.status(200).json(results)
+        }catch(e){
+            return response.status(500).json(e)
+        }
+    }
+    
+}
 
 export const fetchChats= async(request, response) => {
-    try{
-        const loggedInUser = jwtDecode(request.params.token).user;
-        const results = await ChatModel.find({users: {$elemMatch: {$eq: loggedInUser}}})
-        .populate('users', '-password')
-        .populate('groupAdmin', '-password')
-        .populate('latestMessage')
-        .sort({updatedAt: -1})
-
-        const allChat = await OwnerModal.populate(results, {
-            path: 'latestMessage.sender',
-            select: 'firstName lastName imageUrl email'
-        })
-        response.status(200).json(allChat)
-    }catch(e){
-        response.status(500).json(e)
+    const authHeader = request.headers['authorization'];
+    if (authHeader.startsWith('Bearer ')) {
+        try{
+            const token = authHeader.substring(7, authHeader.length);
+            const loggedInUser = jwtDecode(token).user;
+            const results = await ChatModel.find({users: {$elemMatch: {$eq: loggedInUser}}})
+            .populate('users') //populate function will get user details from user collection because of ref inside the model
+            .populate('latestMessage')
+            .sort({updatedAt: -1})
+    
+            return response.status(200).json(results)
+        }catch(e){
+            return response.status(500).json(e)
+        }
     }
+    
 }
 
 export const accessChat = async (request, response) => {
-    const {userId} = request.body;
-    const loggedInUser = jwtDecode(request.params.token).user;
-    if(!userId){
+    const {chatWithUserId} = request.body;
+    const authHeader = request.headers['authorization'];
+    if (authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7, authHeader.length);
+    const loggedInUser = jwtDecode(token).user;
+    if(!chatWithUserId){
         console.log('userid param not send with request')
         return response.status(400).json({message: 'userid param not send with request'})
     }
 
-    const isChat = await ChatModel.find({
+    const isChatAvailable = await ChatModel.findOne({
         isGroupChat: false, 
         $and: [
             {users: {$elemMatch: {$eq: loggedInUser}}},
-            {users: {$elemMatch: {$eq: userId}}}
+            {users: {$elemMatch: {$eq: chatWithUserId}}}
         ]
-    }).populate('users', '-password').populate('latestMessage');
-
-    isChat = await OwnerModal.populate(isChat, {
-        path: 'latestMessage.sender',
-        select: 'firstName lastName imageUrl email'
-    })
-
-    if(isChat.length){
-        response.status(200).json(isChat[0])
+    });
+    if(isChatAvailable){
+        return response.status(200).json(isChatAvailable)
     } else {
-        let chatData = {
-            chatName: 'sender',
-            isGroupChat: false,
-            users:[loggedInUser, userId]
-        }
         try{
+            // const chatWithUser = await OwnerModal.findOne({_id: chatWithUserId})
+            let chatData = {
+                users:[loggedInUser, chatWithUserId]
+            }
             const createdChat = await ChatModel.create(chatData)
-            const fullChat = await ChatModel.findOne({_id: createdChat._id}).populate('users', '-password')
-            response.status(200).send(fullChat)
+            return response.status(200).send(createdChat)
 
         }catch(e){
-            response.status(500).send(e)
+            return response.status(500).send(e)
         }
     }
+    }
+    
 
 
 }

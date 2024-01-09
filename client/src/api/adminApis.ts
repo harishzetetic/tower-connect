@@ -13,10 +13,10 @@ export const adminSignIn = async(credentials) => {
 }
 
 export const fetchPendingAccounts = async()=>{
-    const jwt_token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     try{
 
-        return await axios.get(`${BACKEND_URL}/superadmin/pendingAccounts/${jwt_token}`)
+        return await axios.get(`${BACKEND_URL}/superadmin/pendingAccounts`, { headers: {"Authorization" : `Bearer ${token}`} })
     }catch(e){
         console.log('Getting Error while fetching pending account')
     }
@@ -24,7 +24,7 @@ export const fetchPendingAccounts = async()=>{
 export const deleteOwner = async(id:string)=>{
     const jwt_token = sessionStorage.getItem('token');
     try{    
-        return await axios.delete(`${BACKEND_URL}/deleteOwner/${id}/${jwt_token}`)
+        return await axios.delete(`${BACKEND_URL}/deleteOwner/${id}`, { headers: {"Authorization" : `Bearer ${jwt_token}`} })
     }catch(e){
         console.log('Getting Error while clear owner collection')
     }
@@ -33,7 +33,7 @@ export const deleteOwner = async(id:string)=>{
 export const rejectOwnerAccount = async(data: {id:string; rejectionMessage:string})=>{
     const jwt_token = sessionStorage.getItem('token');
     try{   
-        return await axios.put(`${BACKEND_URL}/rejectOwnerAccount/${data.id}/${jwt_token}`, data)
+        return await axios.put(`${BACKEND_URL}/rejectOwnerAccount/${data.id}`, data, { headers: {"Authorization" : `Bearer ${jwt_token}`} })
     }catch(e){
         console.log('Getting Error while clear owner collection')
     }
@@ -42,7 +42,7 @@ export const rejectOwnerAccount = async(data: {id:string; rejectionMessage:strin
 export const approveOwnerAccount = async(id:string)=>{
     const jwt_token = sessionStorage.getItem('token');
     try{    
-        return await axios.put(`${BACKEND_URL}/approveOwnerAccount/${id}/${jwt_token}`)
+        return await axios.put(`${BACKEND_URL}/approveOwnerAccount/${id}`, {}, { headers: {"Authorization" : `Bearer ${jwt_token}`} })
     }catch(e){
         console.log('Getting error while approving the account')
     }

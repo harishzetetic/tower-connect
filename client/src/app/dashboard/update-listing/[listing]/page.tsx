@@ -28,11 +28,12 @@ import { BuySellValidationSchema } from '@/app/yupvalidationschema/buySellPostSc
 import { TCButton, VisuallyHiddenInput } from '@/styled';
 import { Formik, FormikErrors } from 'formik';
 import { useSelector } from 'react-redux';
+import { HOC } from '@/components/hoc/hoc';
 dayjs.extend(relativeTime)
 
 // dayjs('2019-01-25').fromNow()}
 
-const UpdateListing = ({ params }) => {
+const UpdateListing = HOC(({ params }) => {
     const [listing, setListing] = React.useState<IBuySell | null>(null)
     const [isLoading, setIsLoading] = React.useState<boolean>(true);
     const [isSold, setIsSold] = React.useState<boolean>(false);
@@ -45,10 +46,7 @@ const UpdateListing = ({ params }) => {
         try{
 
             const apiResponse = await toggleItemSold(listingId, value);
-            if (apiResponse?.data?.isTokenValid === false) {
-                sessionStorage.removeItem('token');
-                router.push('/login/owner')
-            } else {
+            if (apiResponse?.status === 200) {
                 setIsSold(value)
                 Swal.fire({
                     title: 'Success',
@@ -56,10 +54,7 @@ const UpdateListing = ({ params }) => {
                     icon: 'success',
                     confirmButtonText: 'Okay'
                 })
-                // pushNotification('success', 'Success', '👍 Action Done', 2000)
-
             }
-
         }catch(e){
             pushNotification('error', 'Error', 'Error occured')
         }
@@ -68,14 +63,11 @@ const UpdateListing = ({ params }) => {
         const listingId = params.listing;
         try {
             const apiResponse = await fetchListingById(listingId);
-            if (apiResponse?.data?.isTokenValid === false) {
-                sessionStorage.removeItem('token');
-                router.push('/login/owner')
-            } else {
+            if (apiResponse?.status === 200) {
                 setListing(apiResponse?.data)
                 setIsSold((apiResponse?.data as IBuySell).isSold || false)
                 setIsLoading(false)
-            }
+            } 
 
         } catch (e) {
             pushNotification('error', 'Error', 'Error while getting listings from server')
@@ -85,12 +77,6 @@ const UpdateListing = ({ params }) => {
     React.useEffect(() => {
         fetchListing()
     }, []);
-
-    React.useEffect(() => {
-        if (!loggedInUser) {
-            router.push('/login/owner')
-        }
-    })
 
     const initialValues = {
         images: listing?.images || [],
@@ -104,7 +90,7 @@ const UpdateListing = ({ params }) => {
     const updateListingHandler = async (userFormData: IBuySell) => {
         try {
             userFormData.ownerid = loggedInUser?._id;
-            userFormData.societyid = loggedInUser?.society?._id;
+            userFormData.societyid = loggedInUser?.societyId;
             const formData = new FormData();
             for (let key in userFormData) {
                 switch(key){
@@ -125,17 +111,13 @@ const UpdateListing = ({ params }) => {
                 }
             }
             const apiResponse = await updateListing(formData, listing?._id);
-            if (apiResponse?.data?.isTokenValid === false) {
-                sessionStorage.removeItem('token');
-                router.push('/login/owner')
-            } else if (apiResponse?.data?.message === 'SUCCESS') {
+            if (apiResponse?.data?.message === 'SUCCESS') {
                 Swal.fire({
                     title: 'Success',
                     text: 'You item has been updated',
                     icon: 'success',
                     confirmButtonText: 'Okay'
                   })
-                // pushNotification('success', 'Success', 'You listening has been updated')
             }
         } catch (e) {
             pushNotification('error', 'Error', 'Getting error while updating this listing')
@@ -150,10 +132,7 @@ const UpdateListing = ({ params }) => {
     const deleteHandler = async () => {
         try {
             const apiResponse = await deleteListing({_id: listing?._id, images: listing?.images});
-            if (apiResponse?.data?.isTokenValid === false) {
-                sessionStorage.removeItem('token');
-                router.push('/login/owner')
-            } else if (apiResponse?.data?.message === 'SUCCESS') {
+            if (apiResponse?.data?.message === 'SUCCESS') {
                 Swal.fire({
                     title: 'Success',
                     text: 'Your listing has been deleted',
@@ -161,7 +140,7 @@ const UpdateListing = ({ params }) => {
                     confirmButtonText: 'Okay'
                   })
                 router.push('/dashboard')
-            }
+            } 
         } catch (e) {
             pushNotification('error', 'Error', 'Getting error while updating this listing')
         }
@@ -302,7 +281,7 @@ const UpdateListing = ({ params }) => {
     }
     return <>User probably not logged in. Kindly login again.</>
 
-}
+})
 
 interface IImageBlock {
     files: Array<File | null | string>,
@@ -348,12 +327,12 @@ const ImageBlock = (props: IImageBlock) => {
 
     return <>
         {files.map((file, index) => <Grid item xs={2} sm={3} md={3}>
-            <Box sx={{ cursor: 'pointer', backgroundColor: App.DarkBlue, color: 'white', height: 150, border: '0.5px solid gray', borderRadius: 2 }} onClick={() => {
+            <Box sx={{ backgroundColor: App.DarkBlue, color: 'white', height: 150, border: '0.5px solid gray', borderRadius: 2 }} onClick={() => {
                 refs.get(index).current?.click();
             }}>
                 {file ?
                     <>
-                        <Fab color="error" aria-label="edit" size="small" sx={{ float: 'right', top: '-10px', right: '-10px' }} onClick={(e) => { onRemoveImageHandler(e, index) }}>{disabled ? <LockIcon /> : <CloseIcon />}</Fab>
+                        <Fab color="error" aria-label="edit" size="small" sx={{ float: 'right', top: '-10px', right: '-10px' }} onClick={(e) => { !disabled && onRemoveImageHandler(e, index) }}>{disabled ? <LockIcon /> : <CloseIcon />}</Fab>
                         <img style={{ marginTop: '-39px', width: '-webkit-fill-available', height: '150px' }} src={getImageURL(file)} />
                     </>
                     :

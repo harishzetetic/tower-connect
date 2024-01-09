@@ -45,3 +45,17 @@ export const Condition = [
     {label: 'Like New', value: 'like-new'},
     {label: 'Old', value: 'old'},
 ]
+
+export const QUERY_KEYS = {
+    SEARCH_OWNER: 'search-owners', 
+    CREATE_ACCESS_CHAT: 'create-access-chat',
+    FETCH_MY_CHATS: 'fetch-my-chats',
+    SEND_MESSAGE:'send-message',
+    FETCH_MESSAGES: 'fetch-messages'
+}
+
+export const publicPathNames = [
+    '/',
+    '/login/owner', // Login Page
+    '/signup/owner' // Singup Page
+]
