@@ -9,7 +9,6 @@ import { useSelector } from "react-redux";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from "@mui/x-date-pickers";
-import { NotificationContainer, NotificationManager } from 'react-notifications';
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import jwtDecode from "jwt-decode";
 import { OwnerSignupValidationSchema } from "../../yupvalidationschema/ownerSignupValidationSchema";
@@ -23,6 +22,7 @@ import TCConfirm, { ITCConfirmProps } from "@/components/common/TCConfirm";
 import {useRouter} from 'next/navigation'
 import { useState } from "react";
 import Swal from "sweetalert2";
+import { createParamsForInfoToast } from "@/util";
 
 const OwnerSignup = () => {
     const router = useRouter()
@@ -54,10 +54,8 @@ const OwnerSignup = () => {
         setFieldValue("email", email);
         setFieldValue("imageUrl", picture);
         console.log(values)
-        NotificationManager.success('Success', 'Information Updated', 3000, () => { });
     }
     const onGoogleLoginFailed = () => {
-        NotificationManager.error('Error', 'Something went wrong while fetch your information from Google', 3000, () => { });
     }
     */
     
@@ -80,9 +78,9 @@ const OwnerSignup = () => {
             const apiResponse = await newOwnerSignupRequest(formData);
             console.log(apiResponse)
             if (apiResponse?.data?.message) {
-                NotificationManager.warning('Warning', apiResponse?.data.message, 15000, () => { });
+                Swal.fire(createParamsForInfoToast('info', 'Warning', apiResponse?.data.message, 15000))
             } else if(apiResponse?.data?.owner){
-                NotificationManager.success('New Account Request Submitted', 'Your request for your account creation with Tower Connect has been submitted.', 15000, () => { });
+                Swal.fire(createParamsForInfoToast('success', 'New Account Request Submitted', 'Your request for your account creation with Tower Connect has been submitted.', 15000))
                 setIsRequestSubmitConfirmOpen(true)
                 Swal.fire({
                     title: "Request Submitted",
@@ -99,7 +97,7 @@ const OwnerSignup = () => {
             }
             setIsConfirmOpen(false)
         } catch (e) {
-            NotificationManager.error('Error', 'Getting error while register for new owner', 15000, () => { });
+            Swal.fire(createParamsForInfoToast('error', 'Error', 'Getting error while register for new owner', 15000))
         }
     }
 

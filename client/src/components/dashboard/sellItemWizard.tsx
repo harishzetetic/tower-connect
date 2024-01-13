@@ -8,7 +8,6 @@ import { TCButton, VisuallyHiddenInput } from "@/styled";
 import { Formik, FormikErrors } from "formik";
 import { IBuySell, IOwnerData, notificationType } from "@/Types";
 import { BuySellValidationSchema } from "@/app/yupvalidationschema/buySellPostSchema";
-import { NotificationContainer, NotificationManager } from 'react-notifications';
 import _ from 'lodash'
 import CloseIcon from '@mui/icons-material/Close';
 import { addListening } from "@/api/ownerApis";
@@ -16,12 +15,12 @@ import { useRouter } from 'next/navigation'
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Swal from 'sweetalert2'
 import { useSelector } from "react-redux";
+import { createParamsForInfoToast } from "@/util";
 
 
 interface ISellItemWizard {
     openSellWizard: boolean;
     setOpenSellWizard: React.Dispatch<React.SetStateAction<boolean>>;
-    pushNotification: (type: notificationType, title: string, description: string) => void 
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -81,7 +80,7 @@ const SellItemWizard = (props: ISellItemWizard) => {
                 props.setOpenSellWizard(false);
             } 
         } catch (e) {
-            props.pushNotification('error', 'Error', 'Getting error while adding listening')
+            Swal.fire(createParamsForInfoToast('error', 'Error', 'Getting error while adding listening'))
         }
     }
 
@@ -242,11 +241,11 @@ interface IImageBlock {
                     const SUPPORTED_IMG_FORMATS = ['image/jpg', 'image/jpeg', 'image/png']
 
                     if (e.target.files && ((e.target.files[0] as File)?.size) > FILE_SIZE) {
-                        NotificationManager.warning('File Size Exceeded', 'Only 2 MB file size is allowed', 15000, () => { });
+                        Swal.fire(createParamsForInfoToast('info', 'File Size Exceeded', 'Only 2 MB file size is allowed'))
                         return;
                     }
                     if (e.target.files && !SUPPORTED_IMG_FORMATS.includes((e.target.files[0] as File)?.type)) {
-                        NotificationManager.warning('File Type Mismatch', 'Only image items are allowed', 15000, () => { });
+                        Swal.fire(createParamsForInfoToast('info', 'File Type Mismatch', 'Only image items are allowed'))
                         return;
                     }
                     const filesClone = _.cloneDeep(files)
@@ -262,3 +261,4 @@ interface IImageBlock {
     </>
 }
 export default SellItemWizard
+

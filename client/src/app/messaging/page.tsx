@@ -1,12 +1,9 @@
 "use client"
 import * as React from 'react';
-import { NotificationManager } from 'react-notifications';
-
 import Box from '@mui/material/Box';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import Toolbar from '@mui/material/Toolbar';
 import { AppBar, Avatar, BadgeOwnProps, Button, Card, CardContent, Chip, Container, Drawer, Grid, IconButton, ImageList, ImageListItem, InputAdornment, List, ListItem, ListItemAvatar, ListItemText, Paper, TextField, ThemeProvider, Typography } from "@mui/material";
-import { pushNotification } from "@/util";
 import Sidebar from "@/components/dashboard/sidebar";
 import { APP_THEME, IBuySell, IChat, IIncomingMessage, IMessage, IOwnerData } from "@/Types";
 import SellItemWizard from "@/components/dashboard/sellItemWizard";
@@ -26,6 +23,7 @@ import { useQuery } from '@tanstack/react-query';
 import { StyledBadge } from '@/styled';
 import { HOC } from '@/components/hoc/hoc';
 import Swal from 'sweetalert2';
+import { createParamsForInfoToast } from '@/util';
 dayjs.extend(relativeTime)
 
 
@@ -101,7 +99,7 @@ const Messaging = HOC(({ params }) => {
 
                 </Grid>
             </Grid>
-            <SellItemWizard openSellWizard={openSellWizard} setOpenSellWizard={setOpenSellWizard} pushNotification={pushNotification} />
+            <SellItemWizard openSellWizard={openSellWizard} setOpenSellWizard={setOpenSellWizard} />
         </ThemeProvider>)
     }
     return <>User probably not logged in. Kindly login again.</>
@@ -164,7 +162,7 @@ const ChatBox = (props:IChatBox) => {
     const [message, setMessage] = React.useState<string>('');
     const router = useRouter()
     const loggedInUser: IOwnerData = useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
-    
+    const messageContainerRef = React.useRef<HTMLDivElement>()
     React.useEffect(()=>{
         io(BACKEND_URL).on('getMessage', (data: IIncomingMessage)=>{
             if(data.sendTo._id === loggedInUser._id){
@@ -182,6 +180,7 @@ const ChatBox = (props:IChatBox) => {
         try{
             const apiResponse = await fetchChatMessage(props.chat._id)
             if (apiResponse?.status === 200) {
+                messageContainerRef.current?.scrollIntoView({ behavior: 'smooth' })
                 return apiResponse?.data
             }
         }catch(e){
@@ -191,7 +190,7 @@ const ChatBox = (props:IChatBox) => {
 
     const pingMessage = async () => {
         if(!message.trim()){
-            NotificationManager.info('Info', 'Blank message can not be sent.', 3000, () => { });
+            Swal.fire(createParamsForInfoToast('info', 'Info', 'Blank message can not be sent'))
               return;
         }
         if(!loggedInUser._id){
@@ -241,8 +240,8 @@ const ChatBox = (props:IChatBox) => {
     return <>
     <Typography variant='h6'>Messages</Typography>
                             <Box>
-                                <Box sx={{height: '70vh', overflowY: 'scroll'}}>
-                                {messages && (messages as IMessage[]).map(msg => <React.Fragment key={msg._id}>
+                                <Box sx={{height: '70vh', overflowY: 'scroll'}} ref={messageContainerRef}>
+                                {messages && (messages as IMessage[]).map((msg, index, array) => <React.Fragment key={msg._id} >
                                     <SpeechBubble message={msg} isOwnerMessage={msg.sender._id === loggedInUser._id} />
                                 </React.Fragment>)}
                                 </Box>

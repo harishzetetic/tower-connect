@@ -4,12 +4,10 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import _ from 'lodash'
 import { Autocomplete, Button, Card, CardContent, Container, Fab, FormControl, FormControlLabel, FormHelperText, Grid, ImageList, ImageListItem, InputAdornment, InputLabel, OutlinedInput, Paper, Snackbar, Switch, TextField, ThemeProvider, Typography } from "@mui/material";
-import { pushNotification } from "@/util";
 import { SkeletonCard } from "@/components/dashboard/buySellInfoCard";
 import Sidebar from "@/components/dashboard/sidebar";
 import { APP_THEME, IBuySell, IOwnerData } from "@/Types";
 import SellItemWizard from "@/components/dashboard/sellItemWizard";
-import { NotificationContainer, NotificationManager } from 'react-notifications';
 import {  deleteListing, fetchListingById, toggleItemSold, updateListing } from "@/api/ownerApis";
 import TopNavigation from '@/components/dashboard/topNavigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -29,6 +27,7 @@ import { TCButton, VisuallyHiddenInput } from '@/styled';
 import { Formik, FormikErrors } from 'formik';
 import { useSelector } from 'react-redux';
 import { HOC } from '@/components/hoc/hoc';
+import { createParamsForInfoToast } from '@/util';
 dayjs.extend(relativeTime)
 
 // dayjs('2019-01-25').fromNow()}
@@ -56,7 +55,7 @@ const UpdateListing = HOC(({ params }) => {
                 })
             }
         }catch(e){
-            pushNotification('error', 'Error', 'Error occured')
+            Swal.fire(createParamsForInfoToast('error', 'Error', 'Error occured'))
         }
     }
     const fetchListing = async () => {
@@ -70,7 +69,7 @@ const UpdateListing = HOC(({ params }) => {
             } 
 
         } catch (e) {
-            pushNotification('error', 'Error', 'Error while getting listings from server')
+            Swal.fire(createParamsForInfoToast('error', 'Error', 'Error while getting listings from server'))
         }
     }
 
@@ -120,12 +119,12 @@ const UpdateListing = HOC(({ params }) => {
                   })
             }
         } catch (e) {
-            pushNotification('error', 'Error', 'Getting error while updating this listing')
+            Swal.fire(createParamsForInfoToast('error', 'Error', 'Getting error while updating this listing'))
         }
     }
 
     const toggleWithSold = (value: boolean) => {
-        pushNotification('warn', 'Info', value ? 'Marking as sold' : 'Marking as unsold', 2000)
+        Swal.fire(createParamsForInfoToast('info', 'Info', value ? 'Marking as sold' : 'Marking as unsold'))
         markSold(listing?._id, value)
     }
 
@@ -142,7 +141,7 @@ const UpdateListing = HOC(({ params }) => {
                 router.push('/dashboard')
             } 
         } catch (e) {
-            pushNotification('error', 'Error', 'Getting error while updating this listing')
+            Swal.fire(createParamsForInfoToast('error', 'Error', 'Getting error while updating this listing'))
         }
 
 
@@ -276,7 +275,7 @@ const UpdateListing = HOC(({ params }) => {
                     </>}
                 </Grid>
             </Grid>
-            <SellItemWizard openSellWizard={openSellWizard} setOpenSellWizard={setOpenSellWizard} pushNotification={pushNotification} />
+            <SellItemWizard openSellWizard={openSellWizard} setOpenSellWizard={setOpenSellWizard} />
         </ThemeProvider>)
     }
     return <>User probably not logged in. Kindly login again.</>
@@ -343,11 +342,11 @@ const ImageBlock = (props: IImageBlock) => {
                     const SUPPORTED_IMG_FORMATS = ['image/jpg', 'image/jpeg', 'image/png']
 
                     if (e.target.files && ((e.target.files[0] as File)?.size) > FILE_SIZE) {
-                        NotificationManager.warning('File Size Exceeded', 'Only 2 MB file size is allowed', 15000, () => { });
+                        Swal.fire(createParamsForInfoToast('info', 'File Size Exceeded', 'Only 2 MB file size is allowed', 15000))
                         return;
                     }
                     if (e.target.files && !SUPPORTED_IMG_FORMATS.includes((e.target.files[0] as File)?.type)) {
-                        NotificationManager.warning('File Type Mismatch', 'Only image items are allowed', 15000, () => { });
+                        Swal.fire(createParamsForInfoToast('info', 'File Type Mismatch', 'Only image items are allowed', 15000))
                         return;
                     }
                     const filesClone = _.cloneDeep(files)

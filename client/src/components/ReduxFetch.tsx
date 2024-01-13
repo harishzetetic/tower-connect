@@ -1,5 +1,5 @@
 "use client";
-import { IOwnerData, ISociety } from "@/Types";
+import { IIncomingMessage, IOwnerData, ISociety } from "@/Types";
 import { getAllSocieties } from "@/api/societiesApis";
 import { addSocieties } from "@/store/slices/societySlice";
 import { useEffect } from "react";
@@ -13,6 +13,7 @@ import { getLoggedInUser } from "@/api/ownerApis";
 import { updatedLoggedInUser } from "@/store/slices/loggedInUserSlice";
 import { getToken } from "@/util";
 import { usePathname } from 'next/navigation'
+
 
 export function ReduxFetch({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -48,6 +49,7 @@ export function ReduxFetch({ children }: { children: React.ReactNode }) {
       fetchSocieties(); // public call
       getLoggedInUserInfo() // loggedin user call
     }
+  
     return () => { // When user clsoe the tab or window, we will remove online status
       io(BACKEND_URL).emit('removeUser', loggedInUser);
     }

@@ -3,12 +3,10 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import { Button, Card, CardContent, Grid, ImageList, ImageListItem, Paper, SvgIconTypeMap, ThemeProvider, Typography } from "@mui/material";
-import { pushNotification } from "@/util";
 import { SkeletonCard } from "@/components/dashboard/buySellInfoCard";
 import Sidebar from "@/components/dashboard/sidebar";
 import { APP_THEME, IBuySell, IOwnerData } from "@/Types";
 import SellItemWizard from "@/components/dashboard/sellItemWizard";
-import { NotificationContainer } from 'react-notifications';
 import {  fetchListingById } from "@/api/ownerApis";
 import TopNavigation from '@/components/dashboard/topNavigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -28,6 +26,8 @@ import { OverridableComponent } from '@mui/material/OverridableComponent';
 import { debug } from 'console';
 import { useSelector } from 'react-redux';
 import { HOC } from '@/components/hoc/hoc';
+import { createParamsForInfoToast } from '@/util';
+import Swal from 'sweetalert2';
 dayjs.extend(relativeTime)
 
 // dayjs('2019-01-25').fromNow()}
@@ -52,7 +52,7 @@ const Listing = HOC(({ params }) => {
             }
 
         } catch (e) {
-            pushNotification('error', 'Error', 'Error while getting listings from server')
+            Swal.fire(createParamsForInfoToast('error', 'Error', 'Error while getting listings from server'))
         }
     }
 
@@ -117,7 +117,7 @@ const Listing = HOC(({ params }) => {
                     </>}
                 </Grid>
             </Grid>
-            <SellItemWizard openSellWizard={openSellWizard} setOpenSellWizard={setOpenSellWizard} pushNotification={pushNotification} />
+            <SellItemWizard openSellWizard={openSellWizard} setOpenSellWizard={setOpenSellWizard} />
             <TCConfirm successBtnTitle='Show me the details' open={isContctConfirmOpen} handleClose={()=>{setIsContctConfirmOpen(false)}} handleConfirm={()=>{setIsContctConfirmOpen(false); setShowContactDetails(true)}} title={"Information"} description={"By this action we will let this product owner know that you have viewed the contact information for this product. Please confirm to view the contact details. "} />
             <TCConfirm successBtnTitle='Ok' hideCancel open={showContactDetails} handleClose={()=>{setShowContactDetails(false)}} handleConfirm={()=>{setShowContactDetails(false)}} title={"Contact Details"} description={<><strong>Phone Number:</strong> {itemOwner?.phone} <br/> <strong>Email:</strong> {itemOwner?.email}</>} />
         </ThemeProvider>)

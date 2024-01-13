@@ -116,3 +116,5 @@ export interface IIncomingMessage {
   message: IMessage,
   sendTo: IOwnerData
 }
+
+export type SwalIcons= 'success' | 'error' | 'warning' | 'info' | 'question';

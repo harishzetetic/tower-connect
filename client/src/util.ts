@@ -1,5 +1,5 @@
-import { notificationType } from "./Types";
-import { NotificationManager } from 'react-notifications';
+import Swal, { SweetAlertOptions } from "sweetalert2";
+import { SwalIcons, notificationType } from "./Types";
 
 export const getToken = ():string|null => {
     if(window && window?.sessionStorage){
@@ -9,16 +9,13 @@ export const getToken = ():string|null => {
     return null;
 }
 
-export const pushNotification = (type:notificationType, title:string, description:string, time:number = 15000) => {
-    switch(type){
-        case 'error':
-            NotificationManager.error(title, description, time, () => { });
-            return;
-        case 'success':
-            NotificationManager.success(title, description, time, () => { });
-            return;
-        case 'warn':
-            NotificationManager.info(title, description, time, () => { });
-            return;
-    }
-}
+export const createParamsForInfoToast = (type: SwalIcons, title:string, description:string, timer:number=3000) => ({
+    title: title,
+    text: description,
+    icon: type,
+    toast: true,
+    timer: 3000,
+    animation: false,
+    position: 'top-right',
+    showConfirmButton: false,
+} as SweetAlertOptions)

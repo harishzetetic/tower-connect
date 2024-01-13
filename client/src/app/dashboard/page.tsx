@@ -4,7 +4,6 @@ import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
 import { Button, Grid, LinearProgress, ThemeProvider } from "@mui/material";
-import { pushNotification } from "@/util";
 import { useRouter } from 'next/navigation'
 import BuySellInfoCard, { SkeletonCard } from "@/components/dashboard/buySellInfoCard";
 import Sidebar from "@/components/dashboard/sidebar";
@@ -19,6 +18,8 @@ import TopNavigation from '@/components/dashboard/topNavigation';
 import { useQuery } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import { HOC } from '@/components/hoc/hoc';
+import { createParamsForInfoToast } from '@/util';
+import Swal from 'sweetalert2';
 
 
 const Dashboard = HOC(() => {
@@ -32,7 +33,7 @@ const Dashboard = HOC(() => {
                 return apiResponse?.data;
             }
         }catch(e){
-            pushNotification('error', 'Error', 'Error while getting listings from server')
+            Swal.fire(createParamsForInfoToast('error', 'Error', 'Error while getting listings from server'))
             return []
         }
     }
@@ -76,7 +77,7 @@ const Dashboard = HOC(() => {
             </Grid>
         </Box>
     </Box>
-    <SellItemWizard openSellWizard={openSellWizard} setOpenSellWizard={setOpenSellWizard} pushNotification={pushNotification}/>
+    <SellItemWizard openSellWizard={openSellWizard} setOpenSellWizard={setOpenSellWizard} />
     </ThemeProvider>)
     }
     return <>User probably not logged in. Kindly login again.</>

@@ -2,11 +2,12 @@
 import { adminSignIn, fetchPendingAccounts } from "@/api/adminApis";
 import PublicHeader from "@/components/landingpage/PublicHeader";
 import { App } from "@/constants";
+import { createParamsForInfoToast } from "@/util";
 import { Box, Button, Container, Grid, Link, TextField, Typography } from "@mui/material";
 import axios from "axios";
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from "react";
-import { NotificationContainer, NotificationManager } from 'react-notifications';
+import Swal from "sweetalert2";
 
 
 // data need to fetch from api
@@ -23,14 +24,14 @@ const SuperAdminLogin = () => {
                 password: password
             })
             if(response?.data?.token && response?.data?.message === "SUCCESS"){
-                NotificationManager.success('Success', 'Login Done', 15000, () => { });
+                Swal.fire(createParamsForInfoToast('success', 'Success', 'Login Done', 15000))
                 sessionStorage.setItem('token', response?.data?.token)
                 router.push('/admin/admindashboard')
             } else if(response?.data.message === "FAIL") {
-                NotificationManager.error('Fail', 'Login Failed', 15000, () => { });
+                Swal.fire(createParamsForInfoToast('error', 'Fail', 'Login Failed', 15000))
             }
         } catch(e){
-            NotificationManager.error('Error', 'Getting error while register for new owner', 15000, () => { });
+            Swal.fire(createParamsForInfoToast('error', 'Error', 'Getting error while register for new owner', 15000))
         }
         
     }

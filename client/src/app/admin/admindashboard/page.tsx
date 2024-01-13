@@ -21,15 +21,8 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import { mainListItems, secondaryListItems } from './listItems';
 import Chart from './Chart';
 import Deposits from './Deposits';
-import Orders from './AccountStatusTable';
-import { fetchPendingAccounts } from '@/api/adminApis';
-import { NotificationContainer, NotificationManager } from 'react-notifications';
-import Loading from '@/app/Loading';
 import { IOwnerData } from '@/Types';
 import AccountStatusTable from './AccountStatusTable';
-import { useQuery, useMutation } from '@tanstack/react-query';
-
-
 
 /*
   1. Pending Accounts

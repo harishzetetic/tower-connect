@@ -11,11 +11,13 @@ import { Formik } from "formik";
 import { APP_THEME, IOwnerData, IOwnerLoginData, ISociety, SocietyValidationSchema } from "@/Types";
 import { useSelector } from "react-redux";
 import {  ownerLoginRequest } from "@/api/ownerApis";
-import { NotificationManager } from 'react-notifications';
 import { useDispatch } from "react-redux";
 import {default as NextLink} from "next/link";
 import { TCButton } from "@/styled";
 import { updatedLoggedInUser } from "@/store/slices/loggedInUserSlice";
+import React from "react";
+import { createParamsForInfoToast } from "@/util";
+import Swal from "sweetalert2";
 
 export const OwnerLoginSchema = Yup.object({
   society: SocietyValidationSchema,
@@ -26,7 +28,8 @@ export const OwnerLoginSchema = Yup.object({
 
 const OwnerLogin = () => {
   const dispatch = useDispatch();
-  const router = useRouter()
+  const router = useRouter();
+  const [isLoginButtonDisabled, setIsLoginButtonDisabled] = React.useState<boolean>(false)
   const allSocieties: Array<ISociety> = useSelector(reduxStore => (reduxStore as any)?.societies);
   const initialValues = {
     societyId: null,
@@ -36,19 +39,22 @@ const OwnerLogin = () => {
 } as IOwnerLoginData ;
 
   const loginHandler = async(formData: IOwnerLoginData) => {
+    setIsLoginButtonDisabled(true)
     try{
       const response = await ownerLoginRequest(formData);
       if(response?.data.token){
         sessionStorage.setItem('token', response.data.token);
         dispatch(updatedLoggedInUser(response.data.data as IOwnerData))
-        NotificationManager.success('Login Success', 'Redirecting to dashboard', 15000, () => { });
+        Swal.fire(createParamsForInfoToast('success', 'Login Success', 'Redirecting to dashboard', 15000))
         router.push('/dashboard')
       } else {
-        NotificationManager.error('Error', 'Invalid Credentials', 15000, () => { });
+        Swal.fire(createParamsForInfoToast('error', 'Error', 'Invalid credentials', 15000))
       }
       
     } catch(e){
-      NotificationManager.error('Error', 'Error while signin', 15000, () => { });
+      Swal.fire(createParamsForInfoToast('error', 'Error', 'Error while signin', 15000))
+    } finally{
+      setIsLoginButtonDisabled(false);
     }
     
   }
@@ -119,6 +125,7 @@ const OwnerLogin = () => {
                 />
 
                 <TCButton
+                  disabled={isLoginButtonDisabled}
                   type="submit"
                   fullWidth
                   variant="contained"

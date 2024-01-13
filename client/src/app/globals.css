@@ -33,6 +33,9 @@ html, body {
   align-items: center;
   justify-content: center;
 }
+.swal2-container {
+  z-index: 99999999999;
+}
 ::-webkit-scrollbar{
   width: 6px !important;
   height: 6px !important;

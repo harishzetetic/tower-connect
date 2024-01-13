@@ -3,7 +3,6 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import { Button, Grid, ThemeProvider } from "@mui/material";
-import { pushNotification } from "@/util";
 import BuySellInfoCard, { SkeletonCard } from "@/components/dashboard/buySellInfoCard";
 import Sidebar from "@/components/dashboard/sidebar";
 import { APP_THEME, IBuySell, IOwnerData } from "@/Types";
@@ -20,6 +19,8 @@ import { Div } from '@/styled';
 import { fetchMyListings } from '@/api/ownerApis';
 import { useSelector } from 'react-redux';
 import { HOC } from '@/components/hoc/hoc';
+import { createParamsForInfoToast } from '@/util';
+import Swal from 'sweetalert2';
 dayjs.extend(relativeTime)
 
 const MyListings = HOC(({ params }) => {
@@ -35,7 +36,7 @@ const MyListings = HOC(({ params }) => {
             }
 
         } catch (e) {
-            pushNotification('error', 'Error', 'Error while getting listings from server');
+            Swal.fire(createParamsForInfoToast('error', 'Error', 'Error while getting listings from server'))
             return [] as IBuySell[]
         }
     }
@@ -75,7 +76,7 @@ const MyListings = HOC(({ params }) => {
             </Grid>
         </Box>
     </Box>
-    <SellItemWizard openSellWizard={openSellWizard} setOpenSellWizard={setOpenSellWizard} pushNotification={pushNotification}/>
+    <SellItemWizard openSellWizard={openSellWizard} setOpenSellWizard={setOpenSellWizard} />
     </ThemeProvider>)
     }
     return <>User probably not logged in. Kindly login again.</>
