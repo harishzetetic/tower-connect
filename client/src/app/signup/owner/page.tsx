@@ -12,7 +12,6 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import jwtDecode from "jwt-decode";
 import { OwnerSignupValidationSchema } from "../../yupvalidationschema/ownerSignupValidationSchema";
-import 'react-dropzone-uploader/dist/styles.css'
 import dayjs from "dayjs";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AttachFileIcon from '@mui/icons-material/AttachFile';

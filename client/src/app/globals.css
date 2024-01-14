@@ -9,6 +9,11 @@ html, body {
   overflow-x: hidden;
   cursor: url('../images/cursor.png'), auto;
 }
+/* body:hover{
+  cursor: url('../images/tap.png'), auto;
+  box-shadow: 0 4px 8px 0 #ffffff45, 0 6px 20px 0 #ffffff45;
+  background-color: #ff449e;
+} */
 .full_viewport_height{height: auto;}
 .feature_box_wrapper{
  

@@ -28,3 +28,5 @@ Backlog:
 8. Right now user online status only show when he comes to messaging page but we need if user logged in with app, he should online
 9. now we want to remove user from online state if not loggedin or loggedout by self.
 10. use localstorage rather then session storage
+11. Bug. when seach user on messaging and select it for a new chat, ui not showing selected chat immediately we habe to refreshing
+12. Bug. When we successful signup. i am click on login but it not redirect me on login

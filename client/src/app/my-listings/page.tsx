@@ -46,17 +46,7 @@ const MyListings = HOC(({ params }) => {
         queryKey: ['fetchMyListings'], gcTime: 0
     })
 
-    if(loggedInUser){
-        return (<ThemeProvider theme={APP_THEME}><Box sx={{ display: 'flex' }}>
-        <TopNavigation />
-        <Sidebar loggedInUser={loggedInUser} setOpenSellWizard={setOpenSellWizard}/>
-        <Box
-            component="main"
-            sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
-        >
-            <Toolbar />
-            <Grid container spacing={2}>
-                <Grid item xs={12}>
+        return (
                     <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
                         {isLoading && [1,2,3,4,5,6,7,8].map((_, index)=><SkeletonCard key={index} />)}
                         {myListings && myListings.length ? (myListings as IBuySell[]).map(item => (<BuySellInfoCard key={item._id} data={item}/>)) : 
@@ -72,14 +62,8 @@ const MyListings = HOC(({ params }) => {
                         </>
                         }    
                     </Grid>
-                </Grid>
-            </Grid>
-        </Box>
-    </Box>
-    <SellItemWizard openSellWizard={openSellWizard} setOpenSellWizard={setOpenSellWizard} />
-    </ThemeProvider>)
-    }
-    return <>User probably not logged in. Kindly login again.</>
+               )
+   
 
 })
 

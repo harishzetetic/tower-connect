@@ -1,15 +1,11 @@
 "use client"
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
 import _ from 'lodash'
 import { Autocomplete, Button, Card, CardContent, Container, Fab, FormControl, FormControlLabel, FormHelperText, Grid, ImageList, ImageListItem, InputAdornment, InputLabel, OutlinedInput, Paper, Snackbar, Switch, TextField, ThemeProvider, Typography } from "@mui/material";
 import { SkeletonCard } from "@/components/dashboard/buySellInfoCard";
-import Sidebar from "@/components/dashboard/sidebar";
-import { APP_THEME, IBuySell, IOwnerData } from "@/Types";
-import SellItemWizard from "@/components/dashboard/sellItemWizard";
+import { IBuySell, IOwnerData } from "@/Types";
 import {  deleteListing, fetchListingById, toggleItemSold, updateListing } from "@/api/ownerApis";
-import TopNavigation from '@/components/dashboard/topNavigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from 'next/navigation';
 import {  App, BACKEND_URL, Categories, Condition } from '@/constants';
@@ -23,7 +19,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import DeleteIcon from '@mui/icons-material/Delete';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import { BuySellValidationSchema } from '@/app/yupvalidationschema/buySellPostSchema';
-import { TCButton, VisuallyHiddenInput } from '@/styled';
+import { VisuallyHiddenInput } from '@/styled';
 import { Formik, FormikErrors } from 'formik';
 import { useSelector } from 'react-redux';
 import { HOC } from '@/components/hoc/hoc';
@@ -39,7 +35,6 @@ const UpdateListing = HOC(({ params }) => {
     /* ---------------------------------------------------------------------------------- */
     const router = useRouter()
     const loggedInUser: IOwnerData= useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
-    const [openSellWizard, setOpenSellWizard] = React.useState<boolean>(false);
 
     const markSold = async(listingId:string | undefined, value:boolean)=>{
         try{
@@ -147,24 +142,8 @@ const UpdateListing = HOC(({ params }) => {
 
     }
 
-    if (loggedInUser) {
-        return (<ThemeProvider theme={APP_THEME}>
-            <TopNavigation />
-            <Sidebar loggedInUser={loggedInUser} setOpenSellWizard={setOpenSellWizard} />
-            <Toolbar />
-            <Grid container spacing={2} sx={{ p: 2 }}>
-                <Grid item xs={6} md={2}></Grid>
-                <Grid item xs={6} md={10}>
+        return (<>
                     {isLoading && <SkeletonCard />}
-                    {/*
-                        <Snackbar
-                        open={isLoading}
-                        autoHideDuration={3000}
-                        onClose={()=>{}}
-                        message="Loading"
-                    />
-                    */}
-                    
                     {!isLoading && listing && <>
                         &nbsp;&nbsp;<Typography variant='h3' sx={{fontWeight: 'bold'}}><Button variant="text"><NextLink href={{ pathname: `/dashboard/` }}><ArrowBackIcon fontSize='large' /></NextLink></Button> </Typography>
                         
@@ -269,16 +248,10 @@ const UpdateListing = HOC(({ params }) => {
                 </Formik>
 
             </Container>
-                       
-                        
-
                     </>}
-                </Grid>
-            </Grid>
-            <SellItemWizard openSellWizard={openSellWizard} setOpenSellWizard={setOpenSellWizard} />
-        </ThemeProvider>)
-    }
-    return <>User probably not logged in. Kindly login again.</>
+                    </>
+        )
+
 
 })
 

@@ -34,7 +34,6 @@ const Profile = HOC(({ params }) => {
     /* ---------------------------------------------------------------------------------- */
     const router = useRouter()
     const loggedInUser: IOwnerData= useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
-    const [openSellWizard, setOpenSellWizard] = React.useState<boolean>(false);
 
     const fetchListing = async () => {
         const listingId = params.listing;
@@ -57,14 +56,7 @@ const Profile = HOC(({ params }) => {
     const getContactDetailsAction = () => {
         setIsContctConfirmOpen(true)
     }
-    if (loggedInUser) {
-        return (<ThemeProvider theme={APP_THEME}>
-            <TopNavigation />
-            <Sidebar loggedInUser={loggedInUser} setOpenSellWizard={setOpenSellWizard} />
-            <Toolbar />
-            <Grid container spacing={2} sx={{ p: 2 }}>
-                <Grid item xs={6} md={2}></Grid>
-                <Grid xs={6} md={10}>
+        return (<>
                     {isLoading && <SkeletonCard />}
                     
                     {!isLoading && listing && <>
@@ -107,14 +99,10 @@ const Profile = HOC(({ params }) => {
                         
 
                     </>}
-                </Grid>
-            </Grid>
-            <SellItemWizard openSellWizard={openSellWizard} setOpenSellWizard={setOpenSellWizard}  />
             <TCConfirm successBtnTitle='Show me the details' open={isContctConfirmOpen} handleClose={()=>{setIsContctConfirmOpen(false)}} handleConfirm={()=>{setIsContctConfirmOpen(false); setShowContactDetails(true)}} title={"Information"} description={"By this action we will let this product owner know that you have viewed the contact information for this product. Please confirm to view the contact details. "} />
             <TCConfirm successBtnTitle='Ok' hideCancel open={showContactDetails} handleClose={()=>{setShowContactDetails(false)}} handleConfirm={()=>{setShowContactDetails(false)}} title={"Contact Details"} description={<><strong>Phone Number:</strong> {listing?.ownerData?.phone} <br/> <strong>Email:</strong> {listing?.ownerData?.email}</>} />
-        </ThemeProvider>)
-    }
-    return <>User probably not logged in. Kindly login again.</>
+            </>)
+
 
 })
 interface ICardBox {

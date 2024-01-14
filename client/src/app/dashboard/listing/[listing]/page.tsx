@@ -1,16 +1,11 @@
 "use client"
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import { Button, Card, CardContent, Grid, ImageList, ImageListItem, Paper, SvgIconTypeMap, ThemeProvider, Typography } from "@mui/material";
+import { Button, Card, CardContent, Grid, ImageList, ImageListItem, Paper, Typography } from "@mui/material";
 import { SkeletonCard } from "@/components/dashboard/buySellInfoCard";
-import Sidebar from "@/components/dashboard/sidebar";
-import { APP_THEME, IBuySell, IOwnerData } from "@/Types";
-import SellItemWizard from "@/components/dashboard/sellItemWizard";
+import { IBuySell, IOwnerData } from "@/Types";
 import {  fetchListingById } from "@/api/ownerApis";
-import TopNavigation from '@/components/dashboard/topNavigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useRouter } from 'next/navigation';
 import {  BACKEND_URL, Categories, Condition } from '@/constants';
 import { default as NextLink } from "next/link";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
@@ -22,8 +17,6 @@ import ElderlyWomanIcon from '@mui/icons-material/ElderlyWoman';
 
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime";
-import { OverridableComponent } from '@mui/material/OverridableComponent';
-import { debug } from 'console';
 import { useSelector } from 'react-redux';
 import { HOC } from '@/components/hoc/hoc';
 import { createParamsForInfoToast } from '@/util';
@@ -38,9 +31,6 @@ const Listing = HOC(({ params }) => {
     const [isContctConfirmOpen, setIsContctConfirmOpen] = React.useState<boolean>(false);
     const [showContactDetails, setShowContactDetails] = React.useState<boolean>(false);
     /* ---------------------------------------------------------------------------------- */
-    const router = useRouter()
-    const loggedInUser: IOwnerData= useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
-    const [openSellWizard, setOpenSellWizard] = React.useState<boolean>(false);
 
     const fetchListing = async () => {
         const listingId = params.listing;
@@ -63,15 +53,8 @@ const Listing = HOC(({ params }) => {
     const getContactDetailsAction = () => {
         setIsContctConfirmOpen(true)
     }
-    if (loggedInUser) {
         const itemOwner = listing?.ownerData && listing.ownerData;
-        return (<ThemeProvider theme={APP_THEME}>
-            <TopNavigation />
-            <Sidebar loggedInUser={loggedInUser} setOpenSellWizard={setOpenSellWizard} />
-            <Toolbar />
-            <Grid container spacing={2} sx={{ p: 2 }}>
-                <Grid item xs={6} md={2}></Grid>
-                <Grid item xs={6} md={10}>
+        return (<>
                     {isLoading && <SkeletonCard />}
                     {!isLoading && listing && <>
                         &nbsp;&nbsp;
@@ -115,14 +98,11 @@ const Listing = HOC(({ params }) => {
                         
 
                     </>}
-                </Grid>
-            </Grid>
-            <SellItemWizard openSellWizard={openSellWizard} setOpenSellWizard={setOpenSellWizard} />
             <TCConfirm successBtnTitle='Show me the details' open={isContctConfirmOpen} handleClose={()=>{setIsContctConfirmOpen(false)}} handleConfirm={()=>{setIsContctConfirmOpen(false); setShowContactDetails(true)}} title={"Information"} description={"By this action we will let this product owner know that you have viewed the contact information for this product. Please confirm to view the contact details. "} />
             <TCConfirm successBtnTitle='Ok' hideCancel open={showContactDetails} handleClose={()=>{setShowContactDetails(false)}} handleConfirm={()=>{setShowContactDetails(false)}} title={"Contact Details"} description={<><strong>Phone Number:</strong> {itemOwner?.phone} <br/> <strong>Email:</strong> {itemOwner?.email}</>} />
-        </ThemeProvider>)
-    }
-    return <>User probably not logged in. Kindly login again.</>
+            </>
+       )
+
 
 })
 interface ICardBox {
