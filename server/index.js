@@ -52,7 +52,6 @@ io.on('connection', (socket)=>{
             const user = onlineUsers.find(user => user._id === data.sendTo._id)
             console.log(user?.socketId)
             if(user?.socketId){
-                //socket.to(user.socketId).emit('getMessage', data)
                 socket.broadcast.emit('getMessage', data)
                 console.log('data emmited to  ', user )
             }

@@ -30,7 +30,6 @@ const Messaging = HOC(({ params }) => {
 
     const [toggleSeachOwner, setToggleSearchOwner] = React.useState<boolean>(false)
     const [activeChat, setActiveChat] = React.useState<string | null>(null);
-    console.log('Active Chat', activeChat)
     /* ---------------------------------------------------------------------------------- */
     
     const {data:myChats, isLoading:isFetchingMyChats} = useQuery({

@@ -19,18 +19,20 @@ export const ChatBox = (props:IChatBox) => {
     const [message, setMessage] = React.useState<string>('');
     const loggedInUser: IOwnerData = useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
     const messageContainerRef = React.useRef<HTMLDivElement>()
+    const {data:messages, refetch:fetchCurrentChatMessages} = useQuery({
+        queryFn: () => fetchMessages(),
+        queryKey: [QUERY_KEYS.FETCH_MESSAGES],
+        enabled: false, // Now it will immediately call the api when component mount
+        refetchOnWindowFocus: false // this feature is really cool if true, browser check with the server if there are any latest data
+        
+    })
 
-    React.useEffect(()=>{
-        io(BACKEND_URL).on('getMessage', (data: IIncomingMessage)=>{
-            if(data.sendTo._id === loggedInUser._id){
-                fetchCurrentChatMessages()
-            }
-        })
-    }, [])
-
-    React.useEffect(()=>{
-        fetchCurrentChatMessages()
-    }, [props.chat._id])
+    const {refetch:sendMessage} = useQuery({
+        queryFn: () => pingMessage(),
+        queryKey: [QUERY_KEYS.SEND_MESSAGE],
+        enabled: false, // Now it will not immediately call the api when component mount
+        refetchOnWindowFocus: false // this feature is really cool if true, browser check with the server if there are any latest data
+    })
     
     const fetchMessages = async () => {
         if(!loggedInUser._id){
@@ -76,27 +78,25 @@ export const ChatBox = (props:IChatBox) => {
         }
     }
 
-    const {data:messages, refetch:fetchCurrentChatMessages} = useQuery({
-        queryFn: () => fetchMessages(),
-        queryKey: [QUERY_KEYS.FETCH_MESSAGES],
-        enabled: false, // Now it will immediately call the api when component mount
-        refetchOnWindowFocus: false // this feature is really cool if true, browser check with the server if there are any latest data
-    })
-
-    const {refetch:sendMessage} = useQuery({
-        queryFn: () => pingMessage(),
-        queryKey: [QUERY_KEYS.SEND_MESSAGE],
-        enabled: false, // Now it will not immediately call the api when component mount
-        refetchOnWindowFocus: false // this feature is really cool if true, browser check with the server if there are any latest data
-    })
-
-    
     const onKeyPressHandler = (e) => {
         if(e.key === 'Enter'){
             setMessage('')
             sendMessage()  
         }
     }
+
+    React.useEffect(()=>{
+        io(BACKEND_URL).on('getMessage', (data: IIncomingMessage)=>{
+            if(data.sendTo._id === loggedInUser._id){
+                fetchCurrentChatMessages()
+            }
+        })
+    }, [])
+
+    React.useEffect(()=>{
+        fetchCurrentChatMessages()
+    }, [props.chat._id])
+    
     return <>
     <Typography variant='h6'>Messages</Typography>
                             <Box>

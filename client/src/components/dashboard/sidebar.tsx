@@ -1,6 +1,5 @@
 import { IOwnerData } from "@/Types";
 import { Drawer, Box, Avatar, Chip, Typography, List, ListItem, ListItemButton, Button, Divider, ListItemIcon, ListItemText, SvgIconTypeMap, Badge } from "@mui/material";
-import VerifiedIcon from '@mui/icons-material/Verified';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Dispatch, SetStateAction, useState } from "react";
@@ -23,6 +22,7 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 import { NextLink } from "@/styled";
 import { io } from "socket.io-client";
+import VerifiedIcon from '@mui/icons-material/Verified';
 
 interface ISidebarProps{
     loggedInUser: IOwnerData
@@ -65,13 +65,12 @@ const Sidebar = (props: ISidebarProps) => {
             alignItems: 'center',
             marginBottom: 2
         }}
-    >
-        <Avatar sx={{ m: 1, bgcolor: 'secondary.main', width: 56, height: 56 }}>
+    >   
+        <Avatar sx={{ m: 0.5, bgcolor: 'secondary.main', width: 56, height: 56 }}>
             {loggedInUser.firstName?.charAt(0)} {loggedInUser.lastName?.charAt(0)}
         </Avatar>
-        <Chip icon={<VerifiedIcon />} label="verified" color="success" variant="outlined" />
-        <Typography component="h2" variant="h6" sx={{ color: 'white' }}>
-             {loggedInUser.firstName} {loggedInUser.lastName}
+        <Typography component="h2" variant="h6" sx={{ color: 'white' , display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+             <VerifiedIcon sx={{color: 'green'}}/>{loggedInUser.firstName} {loggedInUser.lastName}
         </Typography>
         <Typography>
             {loggedInUser.society?.builderName} {loggedInUser.society?.societyName}

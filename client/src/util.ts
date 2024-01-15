@@ -1,5 +1,6 @@
-import Swal, { SweetAlertOptions } from "sweetalert2";
-import { SwalIcons, notificationType } from "./Types";
+import { SweetAlertOptions } from "sweetalert2";
+import { IOwnerData, SwalIcons } from "./Types";
+import { useSelector } from "react-redux";
 
 export const getToken = ():string|null => {
     if(window && window?.sessionStorage){
@@ -19,3 +20,4 @@ export const createParamsForInfoToast = (type: SwalIcons, title:string, descript
     position: 'top-right',
     showConfirmButton: false,
 } as SweetAlertOptions)
+

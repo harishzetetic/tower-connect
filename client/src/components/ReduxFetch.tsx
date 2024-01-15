@@ -11,8 +11,9 @@ import { BACKEND_URL, publicPathNames } from "@/constants";
 import { io } from "socket.io-client";
 import { getLoggedInUser } from "@/api/ownerApis";
 import { updatedLoggedInUser } from "@/store/slices/loggedInUserSlice";
-import { getToken } from "@/util";
+import { createParamsForInfoToast, getToken } from "@/util";
 import { usePathname } from 'next/navigation'
+import Swal from "sweetalert2";
 
 
 export function ReduxFetch({ children }: { children: React.ReactNode }) {
@@ -22,38 +23,36 @@ export function ReduxFetch({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();
   const router = useRouter()
  const fetchSocieties = async()=>{
-  try{
     const societiesApiResponse = await getAllSocieties();  
       if(societiesApiResponse?.status === 200){
-        dispatch(addSocieties(societiesApiResponse.data as ISociety[]))
-        
-      }
-  } catch(e){
-      console.log(e)
-  }   
+        dispatch(addSocieties(societiesApiResponse.data as ISociety[])) 
+      } 
  }
 
  const getLoggedInUserInfo = async() => {
-  const token = getToken()
-    const result = await getLoggedInUser(token);
+    const result = await getLoggedInUser(getToken());
     if(result?.status === 200){
       dispatch(updatedLoggedInUser(result.data as IOwnerData))
-      setIsDataFetching(false)
     }
 }
   useEffect(()=>{
-    if(publicPathNames.includes(pathname)){
-      fetchSocieties(); // public call
+    try{
+      if(publicPathNames.includes(pathname)){
+        fetchSocieties();
+      } else {
+        fetchSocieties();
+        getLoggedInUserInfo()
+      }
+    } catch(e){
+      Swal.fire(createParamsForInfoToast('info', 'Error', 'Error while fetching required data', 5000));
+      router.push('/login/owner')
+    } finally{
       setIsDataFetching(false)
-    } else {
-      fetchSocieties(); // public call
-      getLoggedInUserInfo() // loggedin user call
     }
+    
   
-    return () => { // When user clsoe the tab or window, we will remove online status
-      io(BACKEND_URL).emit('removeUser', loggedInUser);
-    }
-    }, []);
+    return () => { io(BACKEND_URL).emit('removeUser', loggedInUser)}}
+    ,[]);
 
     React.useEffect(()=>{
       if(loggedInUser._id){

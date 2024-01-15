@@ -9,6 +9,7 @@ interface IChatListItem {
     activeChat: string | null,
     isOnline: boolean
 }
+
 export const ChatListItem = (props: IChatListItem) => {
     const chatPerson = props.chat?.users.filter(item => item._id !== props.loggedInUser._id)[0]
 
@@ -38,7 +39,7 @@ export const ChatListItem = (props: IChatListItem) => {
            
         </ListItemAvatar>
         <ListItemText 
-            primary={<Typography>{chatPerson.firstName} {chatPerson.lastName} ({props.chat._id})</Typography>} 
+            primary={<Typography>{chatPerson.firstName} {chatPerson.lastName}</Typography>} 
             secondary={<Typography sx={{ color: 'white', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
                 {props.chat?.latestMessage ?  getLatestPrompt() : 'Be the first to drop a message'}
             </Typography>} />
