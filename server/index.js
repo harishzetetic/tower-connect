@@ -4,7 +4,6 @@ import bodyParser from 'body-parser';
 // Our Imports
 import Route from './routes/route.js';
 import Connection from './database/db.js';
-import multer from 'multer';
 import {Server} from 'socket.io';
 import {createServer} from 'http';
 
@@ -41,25 +40,27 @@ io.on('connection', (socket)=>{
     console.log('Connected to socket.io, current online users are ', onlineUsers.length);
     socket.on("addUser", (userData)=>{
         addUser(userData, socket.id)
+        socket.emit('getOnlineUsers', onlineUsers.map(item => item._id))
     })
 
     socket.on("removeUser", userData => {
         removeUser(userData)
+        socket.emit('getOnlineUsers', onlineUsers.map(item => item._id))
     })
+
+    socket.emit('getOnlineUsers', onlineUsers.map(item => item._id))
 
     socket.on('sendMessage', (data)=>{
         if(data){
             const user = onlineUsers.find(user => user._id === data.sendTo._id)
-            console.log(user?.socketId)
             if(user?.socketId){
                 socket.broadcast.emit('getMessage', data)
-                console.log('data emmited to  ', user )
             }
         }
        
     })
 
-    socket.emit('getOnlineUsers', onlineUsers.map(item => item._id))
+    
 
     
 })
