@@ -19,6 +19,7 @@ export const ChatBox = (props:IChatBox) => {
     const [message, setMessage] = React.useState<string>('');
     const loggedInUser: IOwnerData = useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
     const messageContainerRef = React.useRef<HTMLDivElement>()
+    const lastMessageRef = React.useRef<HTMLDivElement>()
     const {data:messages, refetch:fetchCurrentChatMessages} = useQuery({
         queryFn: () => fetchMessages(),
         queryKey: [QUERY_KEYS.FETCH_MESSAGES],
@@ -33,6 +34,16 @@ export const ChatBox = (props:IChatBox) => {
         enabled: false, // Now it will not immediately call the api when component mount
         refetchOnWindowFocus: false // this feature is really cool if true, browser check with the server if there are any latest data
     })
+
+    const scrollToLatest = (containerRef:React.MutableRefObject<HTMLDivElement | undefined>, targetRef:React.MutableRefObject<HTMLDivElement | undefined>) => {
+        let targetElementPostion = targetRef?.current?.offsetTop;
+        if(targetElementPostion) {
+            if(containerRef.current){
+                containerRef.current.scrollTop = targetElementPostion
+            }            
+        }
+        
+    }
     
     const fetchMessages = async () => {
         if(!loggedInUser._id){
@@ -42,7 +53,6 @@ export const ChatBox = (props:IChatBox) => {
         try{
             const apiResponse = await fetchChatMessage(props.chat._id)
             if (apiResponse?.status === 200) {
-                messageContainerRef.current?.scrollIntoView({ behavior: 'smooth' })
                 return apiResponse?.data
             }
         }catch(e){
@@ -96,33 +106,38 @@ export const ChatBox = (props:IChatBox) => {
     React.useEffect(()=>{
         fetchCurrentChatMessages()
     }, [props.chat._id])
-    
+
+    React.useEffect(()=>{
+        scrollToLatest(messageContainerRef, lastMessageRef)
+    }, [messages])
+
     return <>
     <Typography variant='h6'>Messages</Typography>
-                            <Box>
-                                <Box sx={{height: '70vh', overflowY: 'scroll'}} ref={messageContainerRef}>
-                                {messages && (messages as IMessage[]).map((msg, index, array) => <React.Fragment key={msg._id} >
-                                    <SpeechBubble message={msg} isOwnerMessage={msg.sender._id === loggedInUser._id} />
-                                </React.Fragment>)}
-                                </Box>
-                                    <TextField 
-                                    placeholder='Type something or say hello 👋...'
-                                    sx={{width: '90%'}}
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <PersonSearchIcon />
-                                            </InputAdornment>
-                                        ),
-                                        }} label="" variant="standard" 
-                                        onKeyDown={onKeyPressHandler}
-                                        onChange={(e)=>setMessage(e.target.value)}
-                                        value={message}
-                                        />
-                                <Button onClick={()=>{
-                                     setMessage('')
-                                     sendMessage()  
-                                }}>Post</Button>
-                            </Box>
+        <Box>
+            <Box sx={{height: '70vh', overflowY: 'scroll'}} ref={messageContainerRef}>
+            {messages && (messages as IMessage[]).map((msg, index) => <Box key={msg._id}>
+                <SpeechBubble message={msg} isOwnerMessage={msg.sender._id === loggedInUser._id} />
+            </Box>)}
+            <Box ref={lastMessageRef}>{/*This is the last point we wanna scroll to */}</Box>
+            </Box>
+                <TextField 
+                placeholder='Type something or say hello 👋...'
+                sx={{width: '90%'}}
+                InputProps={{
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <PersonSearchIcon />
+                        </InputAdornment>
+                    ),
+                    }} label="" variant="standard" 
+                    onKeyDown={onKeyPressHandler}
+                    onChange={(e)=>setMessage(e.target.value)}
+                    value={message}
+                    />
+            <Button onClick={()=>{
+                    setMessage('')
+                    sendMessage()  
+            }}>Post</Button>
+        </Box>
     </>
 }
