@@ -109,7 +109,8 @@ export interface IMessage{
   _id?: string,
   sender: IOwnerData,
   content: string,
-  chat: IChat
+  chat: IChat,
+  createdAt: string
 }
 
 export interface IIncomingMessage {

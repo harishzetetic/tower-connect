@@ -1,5 +1,8 @@
 import { IMessage } from "@/Types"
-import { Box, Typography, Chip } from "@mui/material"
+import { Box, Typography, Chip, Tooltip } from "@mui/material"
+import dayjs from 'dayjs';
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime)
 
 interface ISpeechBubble{
     message: IMessage,
@@ -11,6 +14,7 @@ export const SpeechBubble = ({message, isOwnerMessage}: ISpeechBubble) => {
         <Typography variant="caption" display="block" gutterBottom>
         {isOwnerMessage? 'You:' : `${message.sender.firstName} ${message.sender.lastName}`}
         </Typography>
+        <Tooltip title={dayjs(message.createdAt).fromNow()}>
         <Chip
         color={isOwnerMessage ? 'primary' : 'default'} //if loggedinuser
         sx={{
@@ -24,6 +28,8 @@ export const SpeechBubble = ({message, isOwnerMessage}: ISpeechBubble) => {
         }}
         label={message.content}
         />
+        </Tooltip>
+        
         </Box>
         <br/><br/><br/>
     </>
