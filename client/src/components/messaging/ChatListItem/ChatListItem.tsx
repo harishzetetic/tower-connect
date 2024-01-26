@@ -1,3 +1,4 @@
+import './ChatListItem.scss'
 import { IChat, IOwnerData } from "@/Types"
 import { StyledBadge } from "@/styled"
 import { ListItem, ListItemAvatar, BadgeOwnProps, Avatar, ListItemText, Typography } from "@mui/material"

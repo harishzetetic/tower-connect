@@ -6,7 +6,7 @@ import {io} from 'socket.io-client'
 import { BACKEND_URL } from '@/constants';
 import Swal from 'sweetalert2';
 import { ThemeProvider } from '@emotion/react';
-import TopNavigation from '../dashboard/topNavigation';
+import TopNavigation from '../dashboard/TopNavigation/topNavigation';
 import { Grid, Toolbar } from '@mui/material';
 import Sidebar from '../dashboard/sidebar';
 import SellItemWizard from '../dashboard/sellItemWizard';
@@ -39,6 +39,7 @@ export function HOC(Component) {
           router.push('/login/owner')
       }
   })
+  
   if(loggedInUser){
     return (
       <ThemeProvider theme={APP_THEME}>

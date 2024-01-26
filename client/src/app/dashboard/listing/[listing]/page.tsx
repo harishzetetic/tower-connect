@@ -2,11 +2,11 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import { Button, Card, CardContent, Grid, ImageList, ImageListItem, Paper, Typography } from "@mui/material";
-import { SkeletonCard } from "@/components/dashboard/buySellInfoCard";
+import { LoadingBackDrop } from "@/components/dashboard/buySellInfoCard";
 import { IBuySell, IOwnerData } from "@/Types";
-import {  fetchListingById } from "@/api/ownerApis";
+import {  accessChatWith, fetchListingById } from "@/api/ownerApis";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import {  BACKEND_URL, Categories, Condition } from '@/constants';
+import {  BACKEND_URL, Categories, Condition, QUERY_KEYS } from '@/constants';
 import { default as NextLink } from "next/link";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
@@ -14,24 +14,49 @@ import TCConfirm from '@/components/common/TCConfirm';
 import ChildCareIcon from '@mui/icons-material/ChildCare';
 import PersonIcon from '@mui/icons-material/Person';
 import ElderlyWomanIcon from '@mui/icons-material/ElderlyWoman';
-
+import MessageIcon from '@mui/icons-material/Message';
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useSelector } from 'react-redux';
 import { HOC } from '@/components/hoc/hoc';
 import { createParamsForInfoToast } from '@/util';
 import Swal from 'sweetalert2';
+import { useQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation'
+
 dayjs.extend(relativeTime)
 
 // dayjs('2019-01-25').fromNow()}
 
 const Listing = HOC(({ params }) => {
+    const router = useRouter()
+    const forwardToMessagingRef = React.useRef<HTMLElement>(null)
+    const loggedInUser: IOwnerData = useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
     const [listing, setListing] = React.useState<IBuySell | null>(null)
     const [isLoading, setIsLoading] = React.useState<boolean>(true);
     const [isContctConfirmOpen, setIsContctConfirmOpen] = React.useState<boolean>(false);
     const [showContactDetails, setShowContactDetails] = React.useState<boolean>(false);
     /* ---------------------------------------------------------------------------------- */
+    const {refetch:accessChat  } = useQuery({
+        queryFn: () => startAChatWith(),
+        queryKey: [QUERY_KEYS.CREATE_ACCESS_CHAT],
+        enabled: false, // Now it will not immediately call the api when component mount
+        refetchOnWindowFocus: false // this feature is really cool if true, browser check with the server if there are any latest data
+    })
 
+    const startAChatWith = async () => {
+        try{
+            if(listing?.ownerData?._id){
+                const apiResponse = await accessChatWith(listing?.ownerData?._id)
+                if (apiResponse?.status === 200) {
+                    return apiResponse?.data
+                }
+            } 
+        }catch(e){
+            Swal.fire(createParamsForInfoToast('error', 'Error', 'Getting issues while setting up the chat'))
+        }
+    }
+    
     const fetchListing = async () => {
         const listingId = params.listing;
         try {
@@ -50,16 +75,30 @@ const Listing = HOC(({ params }) => {
         fetchListing()
     }, []);
 
-    const getContactDetailsAction = () => {
-        setIsContctConfirmOpen(true)
+    const creatMessageThenRedirect = () => {
+        Swal.fire(createParamsForInfoToast('info', '', 'Setting up your chat and redirecting...'))
+        accessChat().then((result)=>{
+            if(result.data._id){
+                router.push(`/messaging?activeChat=${result.data._id}`)
+            }
+        })
+    }
+
+    const shouldMessageBtnDisplay = () => {
+            if(loggedInUser._id === listing?.ownerData?._id){
+                return false
+            } else if(listing?.isSold){
+                return false
+            }
+            return true
     }
         const itemOwner = listing?.ownerData && listing.ownerData;
         return (<>
-                    {isLoading && <SkeletonCard />}
+                    <LoadingBackDrop isLoading={isLoading} />
                     {!isLoading && listing && <>
                         &nbsp;&nbsp;
                         <Typography variant='h3' sx={{fontWeight: 'bold'}}><Button variant="text"><NextLink href={{ pathname: `/dashboard/` }}><ArrowBackIcon fontSize='large' /></NextLink></Button>  {listing.title} 
-                            {!listing.isSold && <Button sx={{float: 'right'}}size="large" variant="contained" onClick={getContactDetailsAction}><LocalPhoneIcon /> Get Contact Details</Button>}
+                            {shouldMessageBtnDisplay() && <Button sx={{float: 'right'}} size="large" variant="contained" onClick={creatMessageThenRedirect}><MessageIcon /> &nbsp; Message to owner</Button>}
                         </Typography>
                         <Typography variant='h6'>{`By ${itemOwner?.firstName} ${itemOwner?.lastName} from ${itemOwner?.towerNumber}-${itemOwner?.flatNumber} on ${dayjs(listing?.created_at).fromNow()}`}  </Typography>
                         <Box sx={{ display: 'inline-block', mt:2 }}>
@@ -96,6 +135,8 @@ const Listing = HOC(({ params }) => {
 
                         </Paper>
                         
+                        <NextLink style={{display: 'none'}} href={{pathname: '/messaging',
+                            query: {activeChat: 'MUST_BE_FILL'}}}><Typography ref={forwardToMessagingRef}>Hidden</Typography></NextLink>
 
                     </>}
             <TCConfirm successBtnTitle='Show me the details' open={isContctConfirmOpen} handleClose={()=>{setIsContctConfirmOpen(false)}} handleConfirm={()=>{setIsContctConfirmOpen(false); setShowContactDetails(true)}} title={"Information"} description={"By this action we will let this product owner know that you have viewed the contact information for this product. Please confirm to view the contact details. "} />

@@ -26,7 +26,7 @@ const SeachOwnerDrawer = (props: ISeachOwnerDrawer) => {
         refetchOnWindowFocus: false // this feature is really cool if true, browser check with the server if there are any latest data
     })
 
-    const {data:chatData, isLoading:isCreatingChat, refetch:accessChat  } = useQuery({
+    const {refetch:accessChat  } = useQuery({
         queryFn: () => startAChatWith(),
         queryKey: [QUERY_KEYS.CREATE_ACCESS_CHAT],
         enabled: false, // Now it will not immediately call the api when component mount

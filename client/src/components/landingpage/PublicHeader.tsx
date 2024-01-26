@@ -5,8 +5,7 @@ import AdbIcon from '@mui/icons-material/Adb';
 import {useRouter} from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import StreamIcon from '@mui/icons-material/Stream';
-import {default as NextLink} from "next/link";
-import { TCButton } from "@/styled";
+import { NextLink, TCButton } from "@/styled";
 
 
 
@@ -39,8 +38,8 @@ const PublicHeader = () => {
                     <Button style={{ borderRadius: 0, color: 'white', borderBottom: pathname === '/login/tenant' ? '4px solid white' : ''}} variant="text" size="large" onClick={()=>{router.push('/login/tenant')}}>Tenant Login</Button>
                     &nbsp; &nbsp;
                   */}
-                  <TCButton style={{color: 'white'}} variant="contained" size="large">
-                  <NextLink href="/login/owner" style={{color: 'white', textDecoration: 'none'}}>Login</NextLink> 
+                  <TCButton variant="contained" size="large">
+                  <NextLink href="/login/owner" style={{textDecoration: 'none'}}>Login</NextLink> 
                   </TCButton>
                   <Button style={{ borderRadius: 0, color: 'white'}} variant="text" size="large">
                   <NextLink href="/signup/owner" style={{color: 'white', textDecoration: 'none'}}>Signup</NextLink> 

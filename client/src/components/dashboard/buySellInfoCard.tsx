@@ -1,4 +1,4 @@
-import { Grid, Card, CardActionArea, CardMedia, CardContent, Typography, Avatar, CardHeader, Skeleton, Stack, Box, Button } from "@mui/material"
+import { Grid, Card, CardActionArea, CardMedia, CardContent, Typography, Avatar, CardHeader, Skeleton, Stack, Box, Button, Backdrop, CircularProgress } from "@mui/material"
 import { red } from "@mui/material/colors"
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import { App, BACKEND_URL } from "@/constants";
@@ -19,7 +19,7 @@ const BuySellInfoCard = (props: IBuySellInfoCard) => {
     const loggedInUser: IOwnerData= useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
     const itemOwner = ownerData && ownerData[0]
     return <Grid item xs={2} sm={4} md={3}>
-    
+    <NextLink href={{pathname: `/dashboard/listing/${_id}`}}>
     <Card sx={{ maxWidth: 345, color: 'white', backgroundColor: App.DarkBlue }}>
         <CardActionArea>
         <CardHeader
@@ -54,18 +54,11 @@ const BuySellInfoCard = (props: IBuySellInfoCard) => {
                     </Box>
                     
                     <Box sx={{textAlign: 'right'}}>
-                        <NextLink href={{pathname: `/dashboard/listing/${_id}`}}>
-                        {/* <Button color='secondary' variant="contained" size="small"></Button> */}
-                            <VisibilityIcon />
                         
-                    </NextLink> &nbsp;&nbsp;&nbsp;&nbsp;
                     {(loggedInUser?._id === itemOwner?._id) && <NextLink href={{pathname: `/dashboard/update-listing/${_id}`}}>
                         {/* <Button variant="contained" size="small"></Button> */}
                         <EditIcon />
                      </NextLink>}
-
-                    
-                        
                     </Box>
                 </Box>
                 
@@ -73,27 +66,19 @@ const BuySellInfoCard = (props: IBuySellInfoCard) => {
             </CardContent>
         </CardActionArea>
     </Card>
+    </NextLink>
+   
     
 </Grid>
 }
 
-export const SkeletonCard = () => {
-    return <Grid item xs={2} sm={4} md={3}> <Card >
-        <CardActionArea>
-            <CardContent>
-                <Stack spacing={1}>
-                    <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
-                    <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
-                    <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
-                    <Skeleton variant="rectangular" height={60} />
-                    <Skeleton variant="rounded" height={60} />
-                    <Skeleton variant="rounded" height={60} />
-                    <Skeleton variant="rounded" height={60} />
-                    <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
-                </Stack>
-            </CardContent>
-        </CardActionArea>
-    </Card> </Grid>
+export const LoadingBackDrop = (props: {isLoading: boolean}) => {
+    return <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={props.isLoading}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
 }
 
 export default BuySellInfoCard

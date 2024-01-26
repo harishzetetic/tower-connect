@@ -1,6 +1,6 @@
 
 import {  IMessage, IOwnerLoginData } from "@/Types";
-import { BACKEND_URL } from "@/constants";
+import { BACKEND_URL, CHAT_MESSAGES_PER_SCROLL } from "@/constants";
 import { getToken } from "@/util";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -27,10 +27,10 @@ POST is best used when you are creating new data.
     }
   })
 
-export const fetchChatMessage = async(chat?:string)=>{
+export const fetchChatMessage = async(chat:string, currentPageResult: number)=>{
     const token = getToken();
     try{
-        return await axios.get(`${BACKEND_URL}/messaging/fetchMessasges/${chat}`, { headers: {"Authorization" : `Bearer ${token}`} });
+        return await axios.get(`${BACKEND_URL}/messaging/fetchMessasges/${chat}?page=${currentPageResult}&records=${CHAT_MESSAGES_PER_SCROLL}`, { headers: {"Authorization" : `Bearer ${token}`} });
     }catch(e){
         console.log('Getting Error while getting all messages for this active chat')
     }
@@ -120,10 +120,10 @@ export const deleteListing = async(listing) => {
     }
 }
 
-export const fetchAllListings = async(society) => {
+export const fetchAllListings = async(society, filterCategory:string) => {
     try{
         const token = getToken();
-        return await axios.post(`${BACKEND_URL}/fetchAllListings`, {society}, { headers: {"Authorization" : `Bearer ${token}`} });
+        return await axios.post(`${BACKEND_URL}/fetchAllListings`, {society, filterCategory}, { headers: {"Authorization" : `Bearer ${token}`} });
     }catch(e){
         console.log('Getting Error while fetchAllListings')
     }

@@ -2,6 +2,7 @@ import ChatModel from '../model/ChatModel.js'
 import { jwtDecode } from "jwt-decode";
 import OwnerModal from '../model/OwnerModel.js';
 import MessageModel from '../model/Messagemodel.js';
+import { skippableItems } from '../util.js';
 
 
 
@@ -100,13 +101,20 @@ export const fetchMessasges= async(request, response) => {
     const authHeader = request.headers['authorization'];
     if (authHeader.startsWith('Bearer ')) {
         try{
+            // UI is seding page starting from 1 but we have to calculate from last page 
             const chatId = request.params.chat;
-            const results = await MessageModel.find({chat: chatId}).populate('sender').populate('chat')
-            // const results = await ChatModel.find({users: {$elemMatch: {$eq: loggedInUser}}})
-            // .populate('users') //populate function will get user details from user collection because of ref inside the model
-            // .populate('latestMessage')
-            // .sort({updatedAt: -1})
-    
+            const itemsPerPage = parseInt(request.query.records);
+            let page = parseInt(request.query.page);
+            const totalItems = await MessageModel.find({chat: chatId}).countDocuments()
+            // const numberOfPages = Math.floor((totalItems + itemsPerPage - 1) / itemsPerPage);
+            if(page < 1){
+                return response.status(200).json([])
+            }
+            
+            const results = await MessageModel.find({chat: chatId})
+                .sort({createdAt: -1}).populate('sender').populate('chat')   
+                .skip(skippableItems(itemsPerPage, page)).limit(itemsPerPage)
+                .sort({createdAt: 1})
             return response.status(200).json(results)
         }catch(e){
             return response.status(500).json(e)

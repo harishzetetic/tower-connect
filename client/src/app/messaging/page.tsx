@@ -1,12 +1,12 @@
 "use client"
 import * as React from 'react';
-import { Grid, IconButton, List, ThemeProvider, Typography } from "@mui/material";
+import { Box, Grid, IconButton, List, ThemeProvider, Typography } from "@mui/material";
 import { IChat, IOwnerData } from "@/Types";
 import _ from 'lodash'
 import {io} from 'socket.io-client'
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { useSelector } from "react-redux";
-import './messaging.css'
+
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime";
 import { fetchAllChats } from '@/api/ownerApis';
@@ -15,27 +15,24 @@ import { BACKEND_URL, QUERY_KEYS } from '@/constants';
 import { useQuery } from '@tanstack/react-query';
 import { HOC } from '@/components/hoc/hoc';
 import { ChatBox } from '@/components/messaging/ChatBox';
-import { ChatListItem } from '@/components/messaging/ChatListItem';
+import { ChatListItem } from '@/components/messaging/ChatListItem/ChatListItem';
+import { useSearchParams } from 'next/navigation'
 dayjs.extend(relativeTime)
 
 
 const Messaging = HOC(({ params }) => {
     const loggedInUser: IOwnerData = useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
-
+    const searchParams = useSearchParams()
+    const activeChatFromSearchParams = searchParams.get('activeChat')
     const [onlineUsers, setOnlineUsers] = React.useState<string[]>([]);
-
-    React.useEffect(()=>{
-        io(BACKEND_URL).on('getOnlineUsers', users => setOnlineUsers(users))
-    },[loggedInUser])
-
     const [toggleSeachOwner, setToggleSearchOwner] = React.useState<boolean>(false)
-    const [activeChat, setActiveChat] = React.useState<string | null>(null);
+    const [activeChat, setActiveChat] = React.useState<string | null>(activeChatFromSearchParams);
     /* ---------------------------------------------------------------------------------- */
     
     const {data:myChats, isLoading:isFetchingMyChats} = useQuery({
         queryFn: () => fetchMyChats(),
         queryKey: [QUERY_KEYS.FETCH_MY_CHATS],
-        enabled: true, // Now it will not immediately call the api when component mount
+        enabled: true,
         refetchOnWindowFocus: false // this feature is really cool if true, browser check with the server if there are any latest data
     })
 
@@ -49,7 +46,9 @@ const Messaging = HOC(({ params }) => {
             console.log('There is some problem while searching owners', e)
         }
     }
-
+    React.useEffect(()=>{
+        io(BACKEND_URL).on('getOnlineUsers', users => setOnlineUsers(users))
+    },[loggedInUser])
         return (
             
                   <>
@@ -73,7 +72,8 @@ const Messaging = HOC(({ params }) => {
                             </List>
                         </Grid>
                         <Grid item xs={6} md={8}>
-                            {activeChat && <ChatBox chat={(myChats as Array<IChat>).find(i=>i._id === activeChat) || {} as IChat}/>}
+                            {activeChat && myChats && <ChatBox chat={(myChats as Array<IChat>).find(i=>i._id === activeChat) || {} as IChat}/>}
+                            {!activeChat && <Box sx={{height: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}><Typography>No Chat Selected</Typography></Box>}
                         </Grid>
                     </Grid>
 

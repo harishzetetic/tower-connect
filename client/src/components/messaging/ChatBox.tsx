@@ -1,6 +1,6 @@
 import { IChat, IOwnerData, IIncomingMessage, IMessage } from "@/Types";
 import { fetchChatMessage, sendChatMessage } from "@/api/ownerApis";
-import { BACKEND_URL, QUERY_KEYS } from "@/constants";
+import { BACKEND_URL, INITIAL_PAGE, QUERY_KEYS } from "@/constants";
 import { createParamsForInfoToast } from "@/util";
 import { Typography, Box, TextField, InputAdornment, Button } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
@@ -10,13 +10,16 @@ import Swal from "sweetalert2";
 import { SpeechBubble } from "./SpeechBubble";
 import React from "react";
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
-
+import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
+import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
+import ReplayCircleFilledIcon from '@mui/icons-material/ReplayCircleFilled';
 
 interface IChatBox{
     chat: IChat,
 }
 export const ChatBox = (props:IChatBox) => {
     const [message, setMessage] = React.useState<string>('');
+    const [currentPageResult, setCurrentPageResult] = React.useState<number>(INITIAL_PAGE)
     const loggedInUser: IOwnerData = useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
     const messageContainerRef = React.useRef<HTMLDivElement>()
     const lastMessageRef = React.useRef<HTMLDivElement>()
@@ -46,12 +49,12 @@ export const ChatBox = (props:IChatBox) => {
     }
     
     const fetchMessages = async () => {
-        if(!loggedInUser._id){
-            console.log('loggedin user data is not ready yet.')
+        if(!loggedInUser._id || !props.chat._id){
+            console.log('Data required for fetch this chat is not ready')
             return
         }
-        try{
-            const apiResponse = await fetchChatMessage(props.chat._id)
+        try{    
+            const apiResponse = await fetchChatMessage(props.chat._id, currentPageResult)
             if (apiResponse?.status === 200) {
                 return apiResponse?.data
             }
@@ -105,6 +108,12 @@ export const ChatBox = (props:IChatBox) => {
 
     React.useEffect(()=>{
         fetchCurrentChatMessages()
+    }, [currentPageResult])
+
+    React.useEffect(()=>{
+        // It will trigger when new chat will open
+        fetchCurrentChatMessages()
+        setCurrentPageResult(INITIAL_PAGE)
     }, [props.chat._id])
 
     React.useEffect(()=>{
@@ -115,9 +124,15 @@ export const ChatBox = (props:IChatBox) => {
     <Typography variant='h6'>Messages</Typography>
         <Box>
             <Box sx={{height: '70vh', overflowY: 'scroll'}} ref={messageContainerRef}>
+            <Button sx={{textTransform: 'capitalize', display: 'flex', margin:'auto'}} onClick={()=>setCurrentPageResult(currentPageResult + 1)}><KeyboardDoubleArrowUpIcon /> Previous Messages</Button>
             {messages && (messages as IMessage[]).map((msg, index) => <Box key={msg._id}>
                 <SpeechBubble message={msg} isOwnerMessage={msg.sender._id === loggedInUser._id} />
             </Box>)}
+            <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+            <Button sx={{textTransform: 'capitalize'}} onClick={()=>setCurrentPageResult(currentPageResult + 1)}><KeyboardDoubleArrowDownIcon /> Next Messages</Button>
+            <Button sx={{textTransform: 'capitalize'}} onClick={()=>setCurrentPageResult(currentPageResult + 1)}><ReplayCircleFilledIcon /> Latest Messages</Button>
+            </Box>
+            
             <Box ref={lastMessageRef}>{/*This is the last point we wanna scroll to */}</Box>
             </Box>
                 <TextField 

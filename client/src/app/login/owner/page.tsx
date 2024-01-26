@@ -63,7 +63,7 @@ const OwnerLogin = () => {
       <PublicHeader />
       <Box
       
-        sx={{ pt: 8, pb: 6 , backgroundColor: 'white'}}
+        sx={{ pt: 8, pb: 6}}
       >
         <Formik initialValues={initialValues} onSubmit={(formData) => {loginHandler(formData) }} enableReinitialize={true} validationSchema={OwnerLoginSchema}>
           {({ values, setFieldValue, errors, resetForm, submitForm }) => (

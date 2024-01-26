@@ -1,15 +1,14 @@
 "use client"
 import * as React from 'react';
+import ReplyIcon from '@mui/icons-material/Reply';
 import Box from '@mui/material/Box';
 import _ from 'lodash'
-import { Autocomplete, Button, Card, CardContent, Container, Fab, FormControl, FormControlLabel, FormHelperText, Grid, ImageList, ImageListItem, InputAdornment, InputLabel, OutlinedInput, Paper, Snackbar, Switch, TextField, ThemeProvider, Typography } from "@mui/material";
-import { SkeletonCard } from "@/components/dashboard/buySellInfoCard";
+import { Autocomplete, Button, Card, CardContent, Container, Fab, FormControl, FormControlLabel, FormHelperText, Grid, ImageList, ImageListItem, InputAdornment, InputLabel, OutlinedInput, Paper, Snackbar, SpeedDial, Switch, TextField, ThemeProvider, Typography } from "@mui/material";
 import { IBuySell, IOwnerData } from "@/Types";
 import {  deleteListing, fetchListingById, toggleItemSold, updateListing } from "@/api/ownerApis";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from 'next/navigation';
 import {  App, BACKEND_URL, Categories, Condition } from '@/constants';
-import { default as NextLink } from "next/link";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import dayjs from 'dayjs';
 import Swal from 'sweetalert2'
@@ -19,11 +18,12 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import DeleteIcon from '@mui/icons-material/Delete';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import { BuySellValidationSchema } from '@/app/yupvalidationschema/buySellPostSchema';
-import { VisuallyHiddenInput } from '@/styled';
+import { NextLink, VisuallyHiddenInput } from '@/styled';
 import { Formik, FormikErrors } from 'formik';
 import { useSelector } from 'react-redux';
 import { HOC } from '@/components/hoc/hoc';
 import { createParamsForInfoToast } from '@/util';
+import { LoadingBackDrop } from '@/components/dashboard/buySellInfoCard';
 dayjs.extend(relativeTime)
 
 // dayjs('2019-01-25').fromNow()}
@@ -143,9 +143,9 @@ const UpdateListing = HOC(({ params }) => {
     }
 
         return (<>
-                    {isLoading && <SkeletonCard />}
+                    <LoadingBackDrop isLoading={isLoading}/>
                     {!isLoading && listing && <>
-                        &nbsp;&nbsp;<Typography variant='h3' sx={{fontWeight: 'bold'}}><Button variant="text"><NextLink href={{ pathname: `/dashboard/` }}><ArrowBackIcon fontSize='large' /></NextLink></Button> </Typography>
+                       
                         
 
                         <Container component="main">
@@ -153,7 +153,15 @@ const UpdateListing = HOC(({ params }) => {
                     {({ values, setFieldValue, errors, resetForm, submitForm, setFieldError, setErrors }) => {
                         return (<>
                         <Grid item xs={12} sm={12} sx={{ mb:2 }}>
-                            <Switch
+                            <Box sx={{display: 'flex', alignItems: 'center'}}>
+                                <Box sx={{flexGrow: 1}}>
+                                <Typography variant='h3' sx={{fontWeight: 'bold'}}>
+                       
+                       <Button><NextLink href={{ pathname: `/dashboard/` }}><ReplyIcon fontSize='large' />&nbsp; Back</NextLink></Button>
+                        </Typography>
+                                </Box>
+                                <Box>
+                                <Switch
                                 checked={isSold}
                                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                     resetForm();
@@ -161,7 +169,12 @@ const UpdateListing = HOC(({ params }) => {
                                   }}
                                 inputProps={{ 'aria-label': 'controlled' }}
                                 />
-                                <span><strong>Mark as sold</strong></span>
+                                <Typography sx={{display: 'inline'}}><strong>Mark as sold</strong></Typography>
+                                </Box>
+                            </Box>
+                       
+                            
+                            
                             </Grid>
                             <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
                                 <ImageBlock files={values.images} setFieldValue={setFieldValue} errors={errors} setFieldError={setFieldError} imageIndex={0} disabled={isSold}/>

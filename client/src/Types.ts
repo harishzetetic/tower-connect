@@ -62,22 +62,44 @@ export const SocietyValidationSchema = Yup.object().shape({
     addressline1:Yup.string(),
 }).required("Select any society")
 
+const drawerWidth = 240;
 
 export const APP_THEME = createTheme({
-  
+  palette: {
+    mode: 'dark',
+  },
+  components: {
+    MuiToolbar: {
+      defaultProps: {
+        sx: {
+          boxShadow: 'none'  
+        }
+      }
+    },
+    MuiAppBar: {
+      defaultProps: {
+        sx: {
+         backgroundColor: App.DarkBlue,
+         width: `calc(100% - ${drawerWidth}px)`,
+         ml: `${drawerWidth}px`,
+         boxShadow: 'none',
+         flexGrow: 1
+        }
+      },
+    }
+  },
     typography: {
+      allVariants: {
+        color: '#fff'
+      },
+      h1:{},
+      h2:{},
+      h3:{},
+      h4:{},
+      h5:{},
+      h6:{},
       fontFamily: [
-        'General Sans',
-        '-apple-system',
-        'BlinkMacSystemFont',
-        '"Segoe UI"',
-        'Roboto',
-        '"Helvetica Neue"',
-        'Arial',
-        'sans-serif',
-        '"Apple Color Emoji"',
-        '"Segoe UI Emoji"',
-        '"Segoe UI Symbol"',
+        "IBM Plex Sans","-apple-system","BlinkMacSystemFont","Segoe UI","Roboto","Helvetica Neue","Arial","sans-serif","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"
       ].join(','),
     },
   });

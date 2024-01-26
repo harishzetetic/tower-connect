@@ -97,7 +97,7 @@ const SellItemWizard = (props: ISellItemWizard) => {
         open={props.openSellWizard}
         TransitionComponent={Transition}
     >
-        <AppBar sx={{ position: 'sticky', top: 0, backgroundColor: '#fff', color:'black', boxShadow: 'none' }}>
+        <AppBar sx={{ position: 'sticky', top: 0}}>
             <Toolbar>
                 
                 <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">

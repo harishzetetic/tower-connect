@@ -30,3 +30,5 @@ Backlog:
 10. use localstorage rather then session storage
 11. Bug. when seach user on messaging and select it for a new chat, ui not showing selected chat immediately we habe to refreshing
 12. Bug. When we successful signup. i am click on login but it not redirect me on login
+13. apply web accesability
+14. responsive understand grid

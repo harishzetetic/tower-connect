@@ -8,6 +8,9 @@ export enum App {
     DarkBlue='#141a1f'
 }
 
+export const CHAT_MESSAGES_PER_SCROLL = 70;
+export const INITIAL_PAGE = 1;
+
 export const BACKEND_URL = 'http://localhost:9000'
 
 export const AppName = 'The Luvis'

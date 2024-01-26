@@ -8,11 +8,9 @@ import { redirect } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { App, BACKEND_URL } from "@/constants";
 import {usePathname} from 'next/navigation';
-// import { default as NextLink } from "next/link";
 import Swal from 'sweetalert2'
 import { updatedLoggedInUser } from "@/store/slices/loggedInUserSlice";
 import { useDispatch } from "react-redux";
-
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import BusinessIcon from '@mui/icons-material/Business';
@@ -23,6 +21,7 @@ import { OverridableComponent } from "@mui/material/OverridableComponent";
 import { NextLink } from "@/styled";
 import { io } from "socket.io-client";
 import VerifiedIcon from '@mui/icons-material/Verified';
+import RouteItem from "./RouteItem/RouteItem";
 
 interface ISidebarProps{
     loggedInUser: IOwnerData
@@ -32,17 +31,10 @@ const Sidebar = (props: ISidebarProps) => {
     const dispatch = useDispatch();
     const currentPath = usePathname();
     const router = useRouter()
-    const [openLogoutConfirm, setOpenLogoutConfirm] = useState(false);
     const {loggedInUser} = props
     const drawerWidth = 240;
 
-    const logout = () => {
-        sessionStorage.removeItem('token');
-        setOpenLogoutConfirm(false);
-        dispatch(updatedLoggedInUser({} as IOwnerData))
-        io(BACKEND_URL).emit('removeUser', loggedInUser);
-        router.push('/login/owner')
-    }
+ 
     return <Drawer
     sx={{
         width: drawerWidth,
@@ -50,8 +42,8 @@ const Sidebar = (props: ISidebarProps) => {
         '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
-            backgroundColor: App.DarkBlue,
-            color: '#9e9e9e'
+            backgroundColor: '#292f33',
+            border: 'none'
         },
     }}
     variant="permanent"
@@ -91,7 +83,6 @@ const Sidebar = (props: ISidebarProps) => {
             </ListItem>
         ))}
     </List>
-    <Divider/>
     <List>
         <RouteItem icon={DashboardIcon} isActive={currentPath === '/dashboard'} text='Dashboard' redirectURL = '/dashboard'/>
         <RouteItem icon={ReceiptLongIcon} isActive={currentPath === '/my-listings'} text='My Listings' redirectURL = '/my-listings' />
@@ -101,54 +92,7 @@ const Sidebar = (props: ISidebarProps) => {
         <RouteItem icon={NotificationsActiveIcon} isActive={currentPath === '/messaging'} text='Messaging' redirectURL = '/messaging' />
 
     </List>
-    <Divider />
-    <List>
-        {['Log Out'].map((text, index) => (
-            <ListItem key={text} disablePadding>
-                <ListItemButton >
-                    <Button sx={{width: '-webkit-fill-available'}} startIcon={<LogoutIcon />} size="large" variant="contained" color="error" onClick={()=>{
-                        Swal.fire({
-                            title: "Do you want to logout from Tower Connect?",
-                            showCancelButton: true,
-                            confirmButtonText: "Yes",
-                            icon: 'question'
-                          }).then((result) => {
-                            if (result.isConfirmed) {
-                              logout()
-                              return result.isConfirmed
-                            }
-                          }).then((isConfirmed)=>{
-                            isConfirmed && Swal.fire("You have been logged out", "", "success");
-                          });
-                        // setOpenLogoutConfirm(true)
-                        }}>Log out</Button>
-                </ListItemButton>
-            </ListItem>
-        ))}
-    </List>
-    <TCConfirm open={openLogoutConfirm} handleClose={()=>{setOpenLogoutConfirm(false)}} handleConfirm={logout} title={"Confirm"} description={"Are you sure to logout?"} />
 </Drawer>
-}
-
-interface IRouteItem {
-    isActive: boolean;
-    text: string;
-    redirectURL: string;
-    icon: OverridableComponent<SvgIconTypeMap<{}, "svg">> & { muiName: string; }
-}
-const RouteItem = ({isActive, text, redirectURL, icon}: IRouteItem) => {
-    const Icon = icon;
-    return <ListItem disablePadding sx={{borderLeft: isActive ? '4px solid white' : ''}}>
-    <NextLink href={{ pathname: redirectURL }} >
-        <ListItemButton>
-            <ListItemIcon>
-                <Icon sx={{ color: isActive ? 'white' : '#9e9e9e' }} />
-            </ListItemIcon>
-            <ListItemText primary={text} />
-        </ListItemButton>
-    </NextLink>
-    
-</ListItem>
 }
 
 export default Sidebar;

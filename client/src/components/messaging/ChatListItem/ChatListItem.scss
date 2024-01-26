@@ -1,0 +1,15 @@
+.chatListItem_wrapper {
+    transition: all .5s ease-in-out; 
+    background-color: #3f3c3c;
+    cursor: url('../../../images/tap.png'), auto;
+    color: white;
+    border-radius: 8px;
+    margin: 0.5em 0;
+ }
+ .chatListItem_wrapper:hover {
+   box-shadow: 0 4px 8px 0 #ffffff45, 0 6px 20px 0 #ffffff45;
+   background-color: #2e7d32;
+  }
+  .chatListItem_activeChat{
+     background-color: #2e7d32;
+  }

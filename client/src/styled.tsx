@@ -21,16 +21,8 @@ export const VisuallyHiddenInput = styled('input')({
     width: 1,
   });
 
-  export const TCButton = styled(Button)`
-    background-image: linear-gradient(180deg, rgba(51, 153, 255, 0.2) 0%, rgba(0, 89, 178, 0.8) 100%);
-    border-radius: 12px !important;
-    &:disabled {
-      background-image: none;
-    }
-  `
-  export const TCButtonOulined = styled(Button)`
-  border-radius: 12px !important;
-`
+  export const TCButton = styled(Button)``
+  export const TCButtonOulined = styled(Button)``
   export const TCTextField = styled(TextField)``
 
   export const Div = styled('div')(({ theme }) => ({

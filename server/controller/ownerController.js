@@ -123,8 +123,6 @@ export const fetchListingById= async(request, response) => {
           {$project:{
             'ownerData.password': 0,
             'ownerData.proofDocumentURL': 0,
-            'ownerData._id': 0,
-            'ownerData.society._id': 0
           }},
           { $unwind: "$ownerData"},
           {$limit: 1}
@@ -140,7 +138,8 @@ export const fetchListingById= async(request, response) => {
 export const fetchAllListings= async(request, response) => {
     try{
         const data = await BuySellModel.aggregate([{$match: {
-            societyid: new mongoose.Types.ObjectId(request.body.society)
+            societyid: new mongoose.Types.ObjectId(request.body.society),
+            ...(request.body.filterCategory ? {category: request.body.filterCategory} : {})
           }},
           {
             $lookup: {
@@ -149,6 +148,9 @@ export const fetchAllListings= async(request, response) => {
               foreignField: "_id",
               as: "ownerData"
             }
+          },
+          { 
+            $sort: { "created_at": -1 }  
           },
         ])
         return response.status(200).json(data)

@@ -1,6 +1,5 @@
 import { Box, Container, Typography } from "@mui/material";
 
-
 import featuredLogo from '../../images/tower-connect-logo.png';
 import Image from "next/image";
 
@@ -16,7 +15,7 @@ const Featured = () => {
         UNLEASH THE REACH OF RESIDENTIALS
       </Typography>
       <Typography variant="h2" align="center" paragraph sx={{color: '#fff'}}>
-        Introducing the web app for societies <span className='highlight'>100% Broker Free</span>
+        Introducing the web app for societies <span className='highlight' id="breathing-text">100% Broker Free</span>
       </Typography>
       <Typography variant="h6" align="center" paragraph sx={{color: '#fff'}}>
       a platform designed exclusively for residents and tenants. With this app, you can easily post buy/sell listings, make announcements, connect with other residents, and even showcase your businesses.
