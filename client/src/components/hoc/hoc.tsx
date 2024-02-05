@@ -44,10 +44,12 @@ export function HOC(Component) {
     return (
       <ThemeProvider theme={APP_THEME}>
          <TopNavigation />
-         <Sidebar loggedInUser={loggedInUser} setOpenSellWizard={setOpenSellWizard} />
          <Toolbar />
          <Grid container spacing={2} sx={{ p: 2 }}>
-                <Grid item xs={6} md={2}></Grid>
+                <Grid item xs={6} md={2}>
+                <Sidebar loggedInUser={loggedInUser} setOpenSellWizard={setOpenSellWizard} />
+
+                </Grid>
                 <Grid item xs={6} md={10}>
                   <Component {...props} />
                 </Grid>

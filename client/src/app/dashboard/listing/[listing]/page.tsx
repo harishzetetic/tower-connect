@@ -9,7 +9,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {  BACKEND_URL, Categories, Condition, QUERY_KEYS } from '@/constants';
 import { default as NextLink } from "next/link";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
-import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import TCConfirm from '@/components/common/TCConfirm';
 import ChildCareIcon from '@mui/icons-material/ChildCare';
 import PersonIcon from '@mui/icons-material/Person';
@@ -23,7 +22,6 @@ import { createParamsForInfoToast } from '@/util';
 import Swal from 'sweetalert2';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation'
-
 dayjs.extend(relativeTime)
 
 // dayjs('2019-01-25').fromNow()}
@@ -41,7 +39,6 @@ const Listing = HOC(({ params }) => {
         queryFn: () => startAChatWith(),
         queryKey: [QUERY_KEYS.CREATE_ACCESS_CHAT],
         enabled: false, // Now it will not immediately call the api when component mount
-        refetchOnWindowFocus: false // this feature is really cool if true, browser check with the server if there are any latest data
     })
 
     const startAChatWith = async () => {
@@ -71,9 +68,6 @@ const Listing = HOC(({ params }) => {
         }
     }
 
-    React.useEffect(() => {
-        fetchListing()
-    }, []);
 
     const creatMessageThenRedirect = () => {
         Swal.fire(createParamsForInfoToast('info', '', 'Setting up your chat and redirecting...'))
@@ -93,6 +87,11 @@ const Listing = HOC(({ params }) => {
             return true
     }
         const itemOwner = listing?.ownerData && listing.ownerData;
+
+        React.useEffect(() => {
+            fetchListing()
+        }, []);
+
         return (<>
                     <LoadingBackDrop isLoading={isLoading} />
                     {!isLoading && listing && <>

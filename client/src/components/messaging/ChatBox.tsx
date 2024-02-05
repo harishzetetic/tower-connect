@@ -26,16 +26,13 @@ export const ChatBox = (props:IChatBox) => {
     const {data:messages, refetch:fetchCurrentChatMessages} = useQuery({
         queryFn: () => fetchMessages(),
         queryKey: [QUERY_KEYS.FETCH_MESSAGES],
-        enabled: false, // Now it will immediately call the api when component mount
-        refetchOnWindowFocus: false // this feature is really cool if true, browser check with the server if there are any latest data
-        
+        enabled: false, // Now it will immediately call the api when component mount        
     })
 
     const {refetch:sendMessage} = useQuery({
         queryFn: () => pingMessage(),
         queryKey: [QUERY_KEYS.SEND_MESSAGE],
         enabled: false, // Now it will not immediately call the api when component mount
-        refetchOnWindowFocus: false // this feature is really cool if true, browser check with the server if there are any latest data
     })
 
     const scrollToLatest = (containerRef:React.MutableRefObject<HTMLDivElement | undefined>, targetRef:React.MutableRefObject<HTMLDivElement | undefined>) => {

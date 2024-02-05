@@ -3,12 +3,11 @@ import * as React from 'react';
 import ReplyIcon from '@mui/icons-material/Reply';
 import Box from '@mui/material/Box';
 import _ from 'lodash'
-import { Autocomplete, Button, Card, CardContent, Container, Fab, FormControl, FormControlLabel, FormHelperText, Grid, ImageList, ImageListItem, InputAdornment, InputLabel, OutlinedInput, Paper, Snackbar, SpeedDial, Switch, TextField, ThemeProvider, Typography } from "@mui/material";
+import { Autocomplete, Button, Container, Fab, FormControl, FormHelperText, Grid, InputAdornment, InputLabel, OutlinedInput, Switch, TextField, Typography } from "@mui/material";
 import { IBuySell, IOwnerData } from "@/Types";
-import {  deleteListing, fetchListingById, toggleItemSold, updateListing } from "@/api/ownerApis";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { deleteListing, fetchListingById, toggleItemSold, updateListing } from "@/api/ownerApis";
 import { useRouter } from 'next/navigation';
-import {  App, BACKEND_URL, Categories, Condition } from '@/constants';
+import { App, BACKEND_URL, Categories, Condition, QUERY_KEYS } from '@/constants';
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import dayjs from 'dayjs';
 import Swal from 'sweetalert2'
@@ -24,53 +23,76 @@ import { useSelector } from 'react-redux';
 import { HOC } from '@/components/hoc/hoc';
 import { createParamsForInfoToast } from '@/util';
 import { LoadingBackDrop } from '@/components/dashboard/buySellInfoCard';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
 dayjs.extend(relativeTime)
 
 // dayjs('2019-01-25').fromNow()}
 
 const UpdateListing = HOC(({ params }) => {
-    const [listing, setListing] = React.useState<IBuySell | null>(null)
-    const [isLoading, setIsLoading] = React.useState<boolean>(true);
     const [isSold, setIsSold] = React.useState<boolean>(false);
-    /* ---------------------------------------------------------------------------------- */
     const router = useRouter()
-    const loggedInUser: IOwnerData= useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
+    const loggedInUser: IOwnerData = useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
 
-    const markSold = async(listingId:string | undefined, value:boolean)=>{
-        try{
+    const { data: listing, isLoading, isError, isSuccess } = useQuery({
+        queryFn: async () => {
+            const apiResponse = await fetchListingById(params.listing);
+            return apiResponse?.data as IBuySell
+        },
+        queryKey: [QUERY_KEYS.FETCH_MY_LISTING],
+        gcTime: 0,
+    })
 
-            const apiResponse = await toggleItemSold(listingId, value);
-            if (apiResponse?.status === 200) {
-                setIsSold(value)
-                Swal.fire({
-                    title: 'Success',
-                    text: `We have marked your product as ${value ? 'sold': 'available'}`,
-                    icon: 'success',
-                    confirmButtonText: 'Okay'
-                })
-            }
-        }catch(e){
-            Swal.fire(createParamsForInfoToast('error', 'Error', 'Error occured'))
-        }
-    }
-    const fetchListing = async () => {
-        const listingId = params.listing;
-        try {
-            const apiResponse = await fetchListingById(listingId);
-            if (apiResponse?.status === 200) {
-                setListing(apiResponse?.data)
-                setIsSold((apiResponse?.data as IBuySell).isSold || false)
-                setIsLoading(false)
-            } 
+    const markSoldMutation = useMutation({
+        mutationFn: async (data: { listingId: string, value: boolean }) => {
+            return await toggleItemSold(data.listingId, data.value)
+        },
+        onError: () => Swal.fire(createParamsForInfoToast('error', 'Error', 'Error occured')),
+        onSuccess: (data: AxiosResponse<any, any> | undefined) => {
+            const { value } = (JSON.parse(data?.config.data))
+            setIsSold(value)
+            Swal.fire({
+                title: 'Success',
+                text: `We have marked your product as ${value ? 'sold' : 'available'}`,
+                icon: 'success',
+                confirmButtonText: 'Okay'
+            })
+        },
+        onSettled: () => { }
+    })
 
-        } catch (e) {
-            Swal.fire(createParamsForInfoToast('error', 'Error', 'Error while getting listings from server'))
-        }
-    }
+    const updateMutation = useMutation({
+        mutationFn: async (data: { formData: FormData, listingId: string }) => {
+            return await updateListing(data.formData, data.listingId)
+        },
+        onError: () => Swal.fire(createParamsForInfoToast('error', 'Error', 'Getting error while updating this listing')),
+        onSuccess: (data: AxiosResponse<any, any> | undefined) => {
+            Swal.fire({
+                title: 'Success',
+                text: 'You item has been updated',
+                icon: 'success',
+                confirmButtonText: 'Okay'
+            })
+        },
+        onSettled: () => { }
+    })
 
-    React.useEffect(() => {
-        fetchListing()
-    }, []);
+    const deleteMutation = useMutation({
+        mutationFn: async (data: { _id: string, images: (string | File | null)[] | undefined }) => {
+            return await deleteListing(data)
+        },
+        onError: () =>  Swal.fire(createParamsForInfoToast('error', 'Error', 'Getting error while updating this listing')),
+        onSuccess: (data: AxiosResponse<any, any> | undefined) => {
+            Swal.fire({
+                title: 'Success',
+                text: 'Your listing has been deleted',
+                icon: 'success',
+                confirmButtonText: 'Okay'
+            })
+            router.push('/dashboard')
+        },
+        onSettled: () => { }
+    })
 
     const initialValues = {
         images: listing?.images || [],
@@ -82,107 +104,87 @@ const UpdateListing = HOC(({ params }) => {
     } as IBuySell;
 
     const updateListingHandler = async (userFormData: IBuySell) => {
-        try {
-            userFormData.ownerid = loggedInUser?._id;
-            userFormData.societyid = loggedInUser?.societyId;
-            const formData = new FormData();
-            for (let key in userFormData) {
-                switch(key){
-                    case 'images':
-                        userFormData[key].forEach(file => {
-                            if (file) {
-                                formData.append('images', file)
-                            }
-                        });
-                        continue;
-                    case 'owner':
-                        formData.append(key, JSON.stringify(userFormData[key]));
-                        continue;
-                    default:
-                        formData.append(key, userFormData[key]);
-                        continue;
+        userFormData.ownerid = loggedInUser?._id;
+        userFormData.societyid = loggedInUser?.societyId;
+        const formData = new FormData();
+        for (let key in userFormData) {
+            switch (key) {
+                case 'images':
+                    userFormData[key].forEach(file => {
+                        if (file) {
+                            formData.append('images', file)
+                        }
+                    });
+                    continue;
+                case 'owner':
+                    formData.append(key, JSON.stringify(userFormData[key]));
+                    continue;
+                default:
+                    formData.append(key, userFormData[key]);
+                    continue;
 
-                }
             }
-            const apiResponse = await updateListing(formData, listing?._id);
-            if (apiResponse?.data?.message === 'SUCCESS') {
-                Swal.fire({
-                    title: 'Success',
-                    text: 'You item has been updated',
-                    icon: 'success',
-                    confirmButtonText: 'Okay'
-                  })
-            }
-        } catch (e) {
-            Swal.fire(createParamsForInfoToast('error', 'Error', 'Getting error while updating this listing'))
         }
+        listing?._id && updateMutation.mutate({ formData, listingId: listing._id })
+
     }
 
     const toggleWithSold = (value: boolean) => {
         Swal.fire(createParamsForInfoToast('info', 'Info', value ? 'Marking as sold' : 'Marking as unsold'))
-        markSold(listing?._id, value)
+        listing?._id && markSoldMutation.mutate({ listingId: listing._id, value })
     }
 
     const deleteHandler = async () => {
-        try {
-            const apiResponse = await deleteListing({_id: listing?._id, images: listing?.images});
-            if (apiResponse?.data?.message === 'SUCCESS') {
-                Swal.fire({
-                    title: 'Success',
-                    text: 'Your listing has been deleted',
-                    icon: 'success',
-                    confirmButtonText: 'Okay'
-                  })
-                router.push('/dashboard')
-            } 
-        } catch (e) {
-            Swal.fire(createParamsForInfoToast('error', 'Error', 'Getting error while updating this listing'))
-        }
-
-
+        listing?._id && deleteMutation.mutate({ _id: listing?._id, images: listing?.images })
     }
 
-        return (<>
-                    <LoadingBackDrop isLoading={isLoading}/>
-                    {!isLoading && listing && <>
-                       
-                        
+    React.useEffect(() => {
+        if (isError) {
+            Swal.fire(createParamsForInfoToast('error', 'Error', 'Error while getting listings from server'))
+        }
+        if (isSuccess) {
+            setIsSold((listing).isSold || false)
+        }
+    }, []);
 
-                        <Container component="main">
+    return (<>
+        <LoadingBackDrop isLoading={isLoading} />
+        {!isLoading && listing && <>
+            <Container component="main">
                 <Formik initialValues={initialValues} onSubmit={updateListingHandler} enableReinitialize={true} validationSchema={BuySellValidationSchema}>
                     {({ values, setFieldValue, errors, resetForm, submitForm, setFieldError, setErrors }) => {
                         return (<>
-                        <Grid item xs={12} sm={12} sx={{ mb:2 }}>
-                            <Box sx={{display: 'flex', alignItems: 'center'}}>
-                                <Box sx={{flexGrow: 1}}>
-                                <Typography variant='h3' sx={{fontWeight: 'bold'}}>
-                       
-                       <Button><NextLink href={{ pathname: `/dashboard/` }}><ReplyIcon fontSize='large' />&nbsp; Back</NextLink></Button>
-                        </Typography>
+                            <Grid item xs={12} sm={12} sx={{ mb: 2 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Box sx={{ flexGrow: 1 }}>
+                                        <Typography variant='h3' sx={{ fontWeight: 'bold' }}>
+
+                                            <Button><NextLink href={{ pathname: `/dashboard/` }}><ReplyIcon fontSize='large' />&nbsp; Back</NextLink></Button>
+                                        </Typography>
+                                    </Box>
+                                    <Box>
+                                        <Switch
+                                            checked={isSold}
+                                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                                resetForm();
+                                                toggleWithSold(event.target.checked)
+                                            }}
+                                            inputProps={{ 'aria-label': 'controlled' }}
+                                        />
+                                        <Typography sx={{ display: 'inline' }}><strong>Mark as sold</strong></Typography>
+                                    </Box>
                                 </Box>
-                                <Box>
-                                <Switch
-                                checked={isSold}
-                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                    resetForm();
-                                    toggleWithSold(event.target.checked)
-                                  }}
-                                inputProps={{ 'aria-label': 'controlled' }}
-                                />
-                                <Typography sx={{display: 'inline'}}><strong>Mark as sold</strong></Typography>
-                                </Box>
-                            </Box>
-                       
-                            
-                            
+
+
+
                             </Grid>
                             <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-                                <ImageBlock files={values.images} setFieldValue={setFieldValue} errors={errors} setFieldError={setFieldError} imageIndex={0} disabled={isSold}/>
+                                <ImageBlock files={values.images} setFieldValue={setFieldValue} errors={errors} setFieldError={setFieldError} imageIndex={0} disabled={isSold} />
                             </Grid>
                             <Grid item xs={12} sm={12} sx={{ marginTop: 2 }}>
                                 <TextField disabled={isSold} name="title" error={!!errors.title} helperText={errors.title} value={values.title} onChange={(e) => setFieldValue("title", e.target.value)} margin="normal" fullWidth label="Product Title" autoFocus />
                             </Grid>
-                            
+
                             <Grid item xs={12} sm={12} sx={{ marginTop: 2 }}>
                                 <FormControl fullWidth >
                                     <InputLabel htmlFor="outlined-adornment-amount">Price</InputLabel>
@@ -248,7 +250,7 @@ const UpdateListing = HOC(({ params }) => {
                                 </Button> &nbsp; &nbsp;
                                 
                                 */}
-                            
+
                                 <Button size="large" variant="contained" autoFocus onClick={deleteHandler} color='error'>
                                     <DeleteIcon />&nbsp; &nbsp;Delete Listing
                                 </Button>&nbsp; &nbsp;
@@ -261,9 +263,9 @@ const UpdateListing = HOC(({ params }) => {
                 </Formik>
 
             </Container>
-                    </>}
-                    </>
-        )
+        </>}
+    </>
+    )
 
 
 })
@@ -274,7 +276,7 @@ interface IImageBlock {
     errors: FormikErrors<IBuySell>,
     setFieldError: (field: string, message: string | undefined) => void,
     imageIndex: number,
-    disabled:boolean
+    disabled: boolean
 }
 
 const ImageBlock = (props: IImageBlock) => {
@@ -304,10 +306,9 @@ const ImageBlock = (props: IImageBlock) => {
     }
 
     const getImageURL = (file: File | string | null) => {
-        console.log(file)
-        if(typeof file === 'string'){
+        if (typeof file === 'string') {
             return `${BACKEND_URL}${file?.slice(1)}`
-        }return URL.createObjectURL(file as File)
+        } return URL.createObjectURL(file as File)
     }
 
     return <>
@@ -342,7 +343,7 @@ const ImageBlock = (props: IImageBlock) => {
 
                 }} ref={refs.get(index)} key={index} name={'image' + index}
                     accept="image/x-png,image/jpeg,image/jpg,image/png" />}
-                
+
             </Box>
         </Grid>)}
         <FormHelperText sx={{ color: App.ErrorTextColor, ml: 5 }}>{errors.images}</FormHelperText>

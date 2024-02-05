@@ -246,6 +246,55 @@ export const updateListing= async(request, response) => {
     }
 }
 
+export const updateProfileImage = async(request, response) => {
+    const authHeader = request.headers['authorization'];
+    if (authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7, authHeader.length);
+        const loggedInUser = jwtDecode(token)
+        jwt.verify(token, process.env.JWT_SECRETKEY, async (err, data) => {
+            if(err){
+                response.status(401).json({result: "Invalid Token", isTokenValid: false})
+                console.log('❌ Token Invalid')
+            } else {
+                console.log('👍  Token Valid')
+                try{
+                    const {destination, filename} = request.file;
+                    const userProfilePicPathPath = `${destination}${filename}`;
+                    const {imageUrl: oldImage} = await OwnerModal.findOne({_id: loggedInUser.user, societyId: loggedInUser.societyId}, {imageUrl: 1, _id:0});
+                    console.log(oldImage)
+                    if(fs.existsSync(oldImage)){
+                        fs.unlink(oldImage, (err)=>{
+                            if(err){
+                                console.log('File found but got error', err)
+                            } else {
+                                console.log('old profile picture successfully deleted.')
+                            }
+                        })
+                    }                    
+                    await OwnerModal.updateOne({_id: loggedInUser.user, societyId: loggedInUser.societyId}, {$set: {imageUrl: userProfilePicPathPath}})
+                    const result = await OwnerModal.aggregate([{$match: {
+                        _id: new mongoose.Types.ObjectId(loggedInUser.user),
+                        societyId: new mongoose.Types.ObjectId(loggedInUser.societyId)
+                      }},
+                      {
+                        $lookup: {
+                          from: "societies",
+                          localField: "societyId",
+                          foreignField: "_id",
+                          as: "society"
+                        },
+                      },
+                      { $unwind: "$society"},
+                    ])
+                    return response.status(200).json(result[0])
+                }catch(e){
+                    return response.status(500).json({message: 'Error while saving your profile picture'})
+                }
+            }
+        })
+    }
+}
+
 export const addOwner = async (request, response) => {
     try{ 
         //await OwnerModal.deleteMany({}); return;

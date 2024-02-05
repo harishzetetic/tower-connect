@@ -131,6 +131,12 @@ const TopNavigation = () => {
           </ListItemIcon>
           Settings
         </MenuItem>
+        <MenuItem onClick={handleClose}>
+          <ListItemIcon>
+            <Settings fontSize="small" />
+          </ListItemIcon>
+          Help & FAQs
+        </MenuItem>
         <MenuItem onClick={logout}>
           <ListItemIcon>
             <Logout fontSize="small" />

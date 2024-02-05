@@ -1,6 +1,6 @@
 import express from 'express';
 import { addSociety, getAllSocieties } from '../controller/societyController.js';
-import { searchOwners, getLoggedInUser, deleteListing, toggleItemSold, updateListing, fetchMyListings, fetchListingById, fetchAllListings, newListing, addOwner, deleteOwner, rejectOwnerAccount, approveOwnerAccount, ownerLogin } from '../controller/ownerController.js';
+import { searchOwners, getLoggedInUser, deleteListing, toggleItemSold, updateListing, fetchMyListings, fetchListingById, fetchAllListings, newListing, updateProfileImage, addOwner, deleteOwner, rejectOwnerAccount, approveOwnerAccount, ownerLogin } from '../controller/ownerController.js';
 import { signInAdmin, getPendingStatusAccounts } from '../controller/adminController.js';
 import { fetchMessasges, sendMessage, fetchChats, accessChat } from '../controller/chatController.js';
 
@@ -26,8 +26,18 @@ const buySellImageStorage = multer.diskStorage({
         return cb(null, `/${uniqueFileNameGenerator(file.originalname)}`)
     },
 })
+
+const profileImageStorage = multer.diskStorage({
+    destination: function(req, file, cb){
+        return cb(null, './profilepictures')
+    },
+    filename: function(req, file, cb){
+        return cb(null, `/${uniqueFileNameGenerator(file.originalname)}`)
+    },
+})
 const userDocs = multer({storage});
 const buySellImages = multer({storage: buySellImageStorage});
+const profileImages = multer({storage: profileImageStorage});
 
 
 const Route = express.Router();
@@ -43,6 +53,7 @@ Route.get('/getAllSocieties', getAllSocieties);
 // Owner Apis
 Route.get('/getLoggedInUser', verifyAuthorization, getLoggedInUser)
 Route.post('/newOwner', userDocs.single('proofDocument'), addOwner); //with File
+Route.put('/updateProfileImage', profileImages.single('profileImage'), updateProfileImage); //with File
 Route.delete('/deleteOwner/:id', verifyAuthorization, deleteOwner);
 Route.put('/rejectOwnerAccount/:id', verifyAuthorization, rejectOwnerAccount);
 Route.put('/approveOwnerAccount/:id', verifyAuthorization, approveOwnerAccount)

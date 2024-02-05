@@ -7,7 +7,14 @@ import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 
 export default function ReactQueryProvider ({children}: {children: ReactNode}){
-    const [queryClient] = useState(()=> new QueryClient())
+    const [queryClient] = useState(()=> new QueryClient({
+        defaultOptions: {
+            queries: {
+                refetchOnWindowFocus: false,
+                staleTime: 10000
+            }
+        }
+    }))
     return (<QueryClientProvider client={queryClient}>
         {/*<ReactQueryDevtools initialIsOpen={false}/>*/}
         {children}

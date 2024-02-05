@@ -23,8 +23,12 @@ export const OwnerLoginSchema = Yup.object({
   society: SocietyValidationSchema,
   towerNumber: Yup.string().matches(/^[a-zA-Z0-9]*$/, { message: 'Only alpha/numeric characters are allowed'}).required('Tower Number is required'),
   flatNumber:  Yup.string().matches(/^[0-9]*$/, { message: 'Only numeric characters are allowed'}).required('Flat Number is required'),
-  password:Yup.string().min(6).required("Password id required"),
+  password:Yup.string().required("Password id required"),
 })
+
+const loginRequest = async () => {
+  // const response = await ownerLoginRequest(formData);
+}
 
 const OwnerLogin = () => {
   const dispatch = useDispatch();

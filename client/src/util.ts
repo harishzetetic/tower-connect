@@ -16,7 +16,7 @@ export const createParamsForInfoToast = (type: SwalIcons, title:string, descript
     icon: type,
     toast: true,
     timer: 3000,
-    animation: false,
+    animation: true,
     position: 'top-right',
     showConfirmButton: false,
 } as SweetAlertOptions)

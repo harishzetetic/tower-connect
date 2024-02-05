@@ -25,10 +25,11 @@ const BuySellInfoCard = (props: IBuySellInfoCard) => {
         <CardHeader
         subheaderTypographyProps={{sx:{color: 'white'}}}
         avatar={
-          <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
+          <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe" src={`${BACKEND_URL}${itemOwner.imageUrl?.slice(1)}`}>
             {itemOwner?.firstName?.charAt(0)} {itemOwner?.lastName?.charAt(0)}
           </Avatar>
         }
+
         action={<></>}
         title={`${itemOwner?.firstName} ${itemOwner?.lastName} from ${itemOwner?.towerNumber}-${itemOwner?.flatNumber}`}
         subheader={`Posted on ${dayjs(created_at).fromNow()}`}

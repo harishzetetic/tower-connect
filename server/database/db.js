@@ -5,7 +5,7 @@ dotenv.config();
 
 const USERNAME = process.env.DB_USER;
 const PASSWORD = process.env.DB_PASSWORD;
-const Connection = async () =>{
+const DBConnection = async () =>{
     const URL = `mongodb+srv://${USERNAME}:${PASSWORD}@tower-connect.nuxtnmz.mongodb.net/?retryWrites=true&w=majority&appName=AtlasApp`
     try{
         await mongoose.connect(URL, {useUnifiedTopology: true});
@@ -15,4 +15,4 @@ const Connection = async () =>{
     }
 }
 
-export default Connection
+export default DBConnection

@@ -33,7 +33,6 @@ const Messaging = HOC(({ params }) => {
         queryFn: () => fetchMyChats(),
         queryKey: [QUERY_KEYS.FETCH_MY_CHATS],
         enabled: true,
-        refetchOnWindowFocus: false // this feature is really cool if true, browser check with the server if there are any latest data
     })
 
     const fetchMyChats = async () => {

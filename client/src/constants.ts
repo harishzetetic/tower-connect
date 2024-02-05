@@ -50,6 +50,8 @@ export const Condition = [
 ]
 
 export const QUERY_KEYS = {
+    FETCH_ALL_LISTINGS: 'fetchAllListings',
+    FETCH_MY_LISTING: 'fetchMyListings',
     SEARCH_OWNER: 'search-owners', 
     CREATE_ACCESS_CHAT: 'create-access-chat',
     FETCH_MY_CHATS: 'fetch-my-chats',

@@ -5,7 +5,8 @@ import { Schema } from "mongoose";
 export const ownerSchema = new mongoose.Schema({
     societyId: {
         type: mongoose.Schema.ObjectId,
-        required: true
+        required: true,
+        ref: 'socities'
     },
     towerNumber: {
         type: String,

@@ -1,13 +1,9 @@
 "use client"
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import { Button, Grid, ThemeProvider } from "@mui/material";
-import BuySellInfoCard, { SkeletonCard } from "@/components/dashboard/buySellInfoCard";
-import Sidebar from "@/components/dashboard/sidebar";
+import { Button, Grid } from "@mui/material";
+import BuySellInfoCard, { LoadingBackDrop } from "@/components/dashboard/buySellInfoCard";
 import { IBuySell, IOwnerData } from "@/Types";
-import SellItemWizard from "@/components/dashboard/sellItemWizard";
-import TopNavigation from '@/components/dashboard/TopNavigation/topNavigation';
 import { useRouter } from 'next/navigation';
 import notfound from '../../../../client/src/images/notfound.png';
 import Image from "next/image";
@@ -21,6 +17,7 @@ import { useSelector } from 'react-redux';
 import { HOC } from '@/components/hoc/hoc';
 import { createParamsForInfoToast } from '@/util';
 import Swal from 'sweetalert2';
+import { QUERY_KEYS } from '@/constants';
 dayjs.extend(relativeTime)
 
 const MyListings = HOC(({ params }) => {
@@ -43,12 +40,12 @@ const MyListings = HOC(({ params }) => {
 
     const {data:myListings, isLoading } = useQuery({
         queryFn: () => fetchMyListing(),
-        queryKey: ['fetchMyListings'], gcTime: 0
+        queryKey: [QUERY_KEYS.FETCH_MY_LISTING], gcTime: 0
     })
 
         return (
                     <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-                        {isLoading && [1,2,3,4,5,6,7,8].map((_, index)=><SkeletonCard key={index} />)}
+                        <LoadingBackDrop isLoading={isLoading} />
                         {myListings && myListings.length ? (myListings as IBuySell[]).map(item => (<BuySellInfoCard key={item._id} data={item}/>)) : 
                         <>
                         <Box sx={{textAlign: 'center', margin: 'auto'}}>

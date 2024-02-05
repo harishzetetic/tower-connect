@@ -3,13 +3,14 @@ import cors from 'cors'
 import bodyParser from 'body-parser';
 // Our Imports
 import Route from './routes/route.js';
-import Connection from './database/db.js';
+import DBConnection from './database/db.js';
 import {Server} from 'socket.io';
 import {createServer} from 'http';
 
 const app = express();
 
 const server = createServer(app);
+
 const io = new Server(server, {
        pingTimeout: 60000,
        cors: {
@@ -23,8 +24,9 @@ app.use('/', Route);
 
 app.use('/userdocs', express.static('userdocs'))
 app.use('/itemImages', express.static('itemImages'))
+app.use('/profilepictures', express.static('profilepictures'))
 
-Connection();
+DBConnection();
 
 let onlineUsers= [];
 
@@ -58,12 +60,7 @@ io.on('connection', (socket)=>{
             }
         }
        
-    })
-
-    
-
-    
+    })    
 })
 
 server.listen(9000, ()=>console.log('Server running successfull on PORT ',9000))
-

@@ -1,7 +1,7 @@
 
 import {  IMessage, IOwnerLoginData } from "@/Types";
 import { BACKEND_URL, CHAT_MESSAGES_PER_SCROLL } from "@/constants";
-import { getToken } from "@/util";
+import { createParamsForInfoToast, getToken } from "@/util";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -24,6 +24,8 @@ POST is best used when you are creating new data.
                window.location.href = '/login/owner'
            }
          })
+    } else if([500].includes(error.response.status)){
+        Swal.fire(createParamsForInfoToast('error', 'Error', 'Error occured'))
     }
   })
 
@@ -67,6 +69,15 @@ export const searchOwners = async (seachPhrase:string)=> {
         return await axios.get(`${BACKEND_URL}/searchOwners/${seachPhrase}`, { headers: {"Authorization" : `Bearer ${token}`} });
     }catch(e){
         console.log('Getting Error while searching owners')
+    }
+}
+
+export const updateProfileImage = async (formData: FormData)=> {
+    try{
+        const token = getToken();
+        return await axios.put(`${BACKEND_URL}/updateProfileImage`, formData, { headers: {"Authorization" : `Bearer ${token}`} });
+    }catch(e){
+        console.log('Getting Error while updating profile image')
     }
 }
 

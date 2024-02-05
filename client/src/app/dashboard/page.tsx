@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux';
 import { HOC } from '@/components/hoc/hoc';
 import { createParamsForInfoToast } from '@/util';
 import Swal from 'sweetalert2';
-import { Categories } from '@/constants';
+import { Categories, QUERY_KEYS } from '@/constants';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterListOffIcon from '@mui/icons-material/FilterListOff';
@@ -37,8 +37,7 @@ const Dashboard = HOC(() => {
 
     const { data: listings, isLoading, refetch:refetchListings } = useQuery({
         queryFn: () => fetchListings(),
-        queryKey: ['fetchAllListings'],
-        refetchOnWindowFocus: true // this feature is really cool if true, browser check with the server if there are any latest data
+        queryKey: [QUERY_KEYS.FETCH_ALL_LISTINGS],
     })
     const label = { inputProps: { 'aria-label': 'Color switch demo' } };
     return (<>
@@ -112,14 +111,7 @@ const AdvanceSearch = (props: IAdvanceSearch) => {
             </Box>
 
             <Box>
-                {/*
-                <Switch
-                    checked={true}
-                    onChange={() => { }}
-                    size='medium'
-                    inputProps={{ 'aria-label': 'controlled' }}
-                />
-                */}
+             
                 
             </Box>
         </Box>
