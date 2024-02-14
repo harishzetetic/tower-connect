@@ -131,10 +131,10 @@ export const deleteListing = async(listing) => {
     }
 }
 
-export const fetchAllListings = async(society, filterCategory:string) => {
+export const fetchAllListings = async(society, filterCategory:string, page, limit) => {
     try{
         const token = getToken();
-        return await axios.post(`${BACKEND_URL}/fetchAllListings`, {society, filterCategory}, { headers: {"Authorization" : `Bearer ${token}`} });
+        return await axios.post(`${BACKEND_URL}/fetchAllListings`, {society, filterCategory, page, limit}, { headers: {"Authorization" : `Bearer ${token}`} });
     }catch(e){
         console.log('Getting Error while fetchAllListings')
     }

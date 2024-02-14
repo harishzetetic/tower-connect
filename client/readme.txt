@@ -32,6 +32,7 @@ Backlog:
 12. Bug. When we successful signup. i am click on login but it not redirect me on login
 13. apply web accesability
 14. responsive understand grid
+15. apply the indexing concept for mongoDB calls, otherwise when collections grow queries will take too much time to process
 
 
 

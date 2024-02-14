@@ -1,6 +1,5 @@
 
 import mongoose from "mongoose";
-import { ownerSchema } from "./OwnerModel.js";
 import _ from "lodash";
 
 const buySellSchema = new mongoose.Schema({
@@ -18,7 +17,7 @@ const buySellSchema = new mongoose.Schema({
     },
     category: {
         type: String,
-        required:true
+        required:true,
     },
     condition: {
         type: String,
@@ -30,11 +29,11 @@ const buySellSchema = new mongoose.Schema({
     },
     ownerid: {
         type: mongoose.Schema.ObjectId,
-        required:true
+        required:true,
     },
     societyid: {
         type: mongoose.Schema.ObjectId,
-        required:true
+        required:true,
     }, 
     isSold: {
         type: Boolean

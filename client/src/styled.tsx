@@ -27,7 +27,6 @@ export const VisuallyHiddenInput = styled('input')({
 
   export const Div = styled('div')(({ theme }) => ({
     ...theme.typography.button,
-    backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(1),
     fontSize: 28,
     margin: 'auto',

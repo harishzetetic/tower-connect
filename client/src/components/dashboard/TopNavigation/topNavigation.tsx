@@ -63,21 +63,33 @@ const TopNavigation = () => {
     <Toolbar variant="regular" sx={{ boxShadow: 'none', backgroundColor: 'none' }}>
     <Box sx={{ flexGrow: 1 }}>
         <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-          <Button style={{borderRadius: 0, color: 'white'}} variant="text" size="large">
-          <NextLink href="/dashboard" style={{color: 'white', textDecoration: 'none'}}><StreamIcon sx={{verticalAlign:'bottom'}}/></NextLink> 
-          </Button>
-          <Button className="TopNavigation_btn" style={{borderRadius: 0, color: 'white', borderBottom: currentPath === '/dashboard' ? '4px solid white' : ''}} variant="text" size="large">
+          
+          
+          
+          <Typography variant="h5" noWrap component="a" href="/" sx={{ mr: 2, display: { xs: 'flex', alignItems: 'center'}, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'inherit', textDecoration: 'none'}}>
+          <StreamIcon className='TopNavigation_rotate'/>&nbsp;TOWER CONNECT
+          </Typography>
+          
+
+
+          {/*
+            <Button className="TopNavigation_btn" style={{borderRadius: 0, color: 'white', borderBottom: currentPath === '/dashboard' ? '4px solid white' : ''}} variant="text" size="large">
           <NextLink href="/dashboard" style={{color: 'white', textDecoration: 'none'}}><ShoppingBagIcon sx={{verticalAlign:'bottom', marginRight: 1}}/>Buy</NextLink> 
           </Button>
-          <Button className="TopNavigation_btn" style={{ borderRadius: 0, color: 'white', borderBottom: ''}} variant="text" size="large">
-          <NextLink href="/signup/owner" style={{color: 'white', textDecoration: 'none'}}><SellIcon sx={{verticalAlign:'bottom', marginRight: 1}}/>Sell</NextLink> 
-          </Button>
+          */}
+          
           <Button className="TopNavigation_btn" style={{ borderRadius: 0, color: 'white', borderBottom: ''}} variant="text" size="large">
           <NextLink href="/signup/owner" style={{color: 'white', textDecoration: 'none'}}><StorefrontIcon sx={{verticalAlign:'bottom', marginRight: 1}}/>Business</NextLink> 
           </Button>
           <Button className="TopNavigation_btn" style={{ borderRadius: 0, color: 'white', borderBottom: ''}} variant="text" size="large">
-          <NextLink href="/signup/owner" style={{color: 'white', textDecoration: 'none'}}><PeopleIcon sx={{verticalAlign:'bottom', marginRight: 1}}/>Community</NextLink> 
+          <NextLink href="/community" style={{color: 'white', textDecoration: 'none'}}><PeopleIcon sx={{verticalAlign:'bottom', marginRight: 1}}/>Community</NextLink> 
           </Button>
+          <Button className="TopNavigation_btn" style={{borderRadius: 0, color: 'white'}} variant="text" size="large">
+          <NextLink href="/dashboard" style={{color: 'white', textDecoration: 'none'}}><ShoppingBagIcon sx={{verticalAlign:'bottom', marginRight: 1}}/>Messaging</NextLink> 
+          </Button>
+
+          
+          
             &nbsp; &nbsp;
         </Box>
       </Box>

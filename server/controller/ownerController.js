@@ -137,9 +137,13 @@ export const fetchListingById= async(request, response) => {
 
 export const fetchAllListings= async(request, response) => {
     try{
+        const {page, limit, filterCategory} = request.body;
+        const authHeader = request.headers['authorization'];
+        const token = authHeader.substring(7, authHeader.length);
+        const {societyId} = jwtDecode(token)
         const data = await BuySellModel.aggregate([{$match: {
-            societyid: new mongoose.Types.ObjectId(request.body.society),
-            ...(request.body.filterCategory ? {category: request.body.filterCategory} : {})
+            societyid: new mongoose.Types.ObjectId(societyId),
+            ...(filterCategory ? {category: filterCategory} : {})
           }},
           {
             $lookup: {
@@ -152,6 +156,12 @@ export const fetchAllListings= async(request, response) => {
           { 
             $sort: { "created_at": -1 }  
           },
+          {
+            $skip: limit*(page-1)
+          },
+          {
+            $limit: limit
+          }
         ])
         return response.status(200).json(data)
 
