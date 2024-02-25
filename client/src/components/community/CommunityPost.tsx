@@ -1,7 +1,7 @@
 import { ICommunityPost, IOwnerData } from "@/Types"
 import { BACKEND_URL } from "@/constants"
 import { FlexBox } from "@/styled"
-import { Box, Avatar, Typography, Accordion, AccordionDetails, AccordionSummary, TextField, Button, Badge } from "@mui/material"
+import { Box, Avatar, Typography, TextField, Button, Badge } from "@mui/material"
 import { red } from "@mui/material/colors"
 import { useSelector } from "react-redux"
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -9,13 +9,11 @@ import FavoriteIcon from '@mui/icons-material/Favorite'; //fill
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt'; //fill
 import CommentIcon from '@mui/icons-material/Comment';
-import AccordionActions from '@mui/material/AccordionActions';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useMutation } from "@tanstack/react-query"
-import { dislikeToggle, dispatchPost, likeToggle } from "@/api/communityApis"
+import { dislikeToggle, likeToggle } from "@/api/communityApis"
 import { createParamsForInfoToast } from "@/util"
 import { AxiosResponse } from "axios"
 import Swal from "sweetalert2"
@@ -34,7 +32,6 @@ enum Reactions {
 
 const CommunityPost = (props: IPost) => {
     const loggedInUser: IOwnerData= useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
-    //const {post} = props;
     const [post, setPost] = useState<ICommunityPost>(props.post)
     const [showCommentSection, setShowCommentSection] = useState<boolean>(false)
 
@@ -83,8 +80,8 @@ const CommunityPost = (props: IPost) => {
     return <>
     <FlexBox>
     <Box>
-    <Avatar sx={{ bgcolor: red[500], m: 2 }} aria-label="recipe" src={`${BACKEND_URL}${loggedInUser.imageUrl?.slice(1)}`}>
-                {loggedInUser?.firstName?.charAt(0)} {loggedInUser?.lastName?.charAt(0)}
+    <Avatar sx={{ bgcolor: red[500], m: 2 }} aria-label="recipe" src={`${BACKEND_URL}${post.user.imageUrl?.slice(1)}`}>
+                {post.user?.firstName?.charAt(0)} {post.user?.lastName?.charAt(0)}
             </Avatar>
     </Box>
     <Box>
