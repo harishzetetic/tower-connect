@@ -33,7 +33,7 @@ Backlog:
 13. apply web accesability
 14. responsive understand grid
 15. apply the indexing concept for mongoDB calls, otherwise when collections grow queries will take too much time to process
-
+16. add a functionality where your share their listing in community
 
 
 Next Tasks

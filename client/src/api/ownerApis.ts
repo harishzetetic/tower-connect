@@ -11,6 +11,7 @@ POST is best used when you are creating new data.
 */
 
   axios.interceptors.response.use(response => response, error => {
+    console.log(error.response.status)
     if (error.response.status == 401 || error.response?.data?.isTokenValid === false) {
         sessionStorage.removeItem('token');
         Swal.fire({
@@ -25,7 +26,7 @@ POST is best used when you are creating new data.
            }
          })
     } else if([500].includes(error.response.status)){
-        Swal.fire(createParamsForInfoToast('error', 'Error', 'Error occured'))
+        throw new Error()
     }
   })
 
@@ -34,7 +35,7 @@ export const fetchChatMessage = async(chat:string, currentPageResult: number)=>{
     try{
         return await axios.get(`${BACKEND_URL}/messaging/fetchMessasges/${chat}?page=${currentPageResult}&records=${CHAT_MESSAGES_PER_SCROLL}`, { headers: {"Authorization" : `Bearer ${token}`} });
     }catch(e){
-        console.log('Getting Error while getting all messages for this active chat')
+        throw new Error('Getting Error while getting all messages for this active chat')
     }
 }
 export const sendChatMessage = async(data:any)=>{
@@ -42,7 +43,7 @@ export const sendChatMessage = async(data:any)=>{
     try{
         return await axios.post(`${BACKEND_URL}/messaging/sendMessage`, data, { headers: {"Authorization" : `Bearer ${token}`} });
     }catch(e){
-        console.log('Getting Error while setup this chat')
+        throw new Error('Getting Error while setup this chat')
     }
 }
 export const fetchAllChats = async ()=> {
@@ -50,7 +51,7 @@ export const fetchAllChats = async ()=> {
     try{
         return await axios.get(`${BACKEND_URL}/messaging/fetchAllChats`, { headers: {"Authorization" : `Bearer ${token}`} });
     }catch(e){
-        console.log('Getting Error while setup this chat')
+        throw new Error('Getting Error while setup this chat')
     }
 }
 
@@ -59,7 +60,7 @@ export const accessChatWith = async (chatWithUserId:string)=> {
     try{
         return await axios.post(`${BACKEND_URL}/messaging/accessChatWith`, {chatWithUserId}, { headers: {"Authorization" : `Bearer ${token}`} });
     }catch(e){
-        console.log('Getting Error while setup this chat')
+        throw new Error('Getting Error while setup this chat')
     }
 }
 
@@ -68,7 +69,7 @@ export const searchOwners = async (seachPhrase:string)=> {
     try{
         return await axios.get(`${BACKEND_URL}/searchOwners/${seachPhrase}`, { headers: {"Authorization" : `Bearer ${token}`} });
     }catch(e){
-        console.log('Getting Error while searching owners')
+        throw new Error('Getting Error while searching owners')
     }
 }
 
@@ -77,7 +78,7 @@ export const updateProfileImage = async (formData: FormData)=> {
         const token = getToken();
         return await axios.put(`${BACKEND_URL}/updateProfileImage`, formData, { headers: {"Authorization" : `Bearer ${token}`} });
     }catch(e){
-        console.log('Getting Error while updating profile image')
+        throw new Error('Getting Error while updating profile image')
     }
 }
 
@@ -85,14 +86,14 @@ export const getLoggedInUser = async (token)=> {
     try{
         return await axios.get(`${BACKEND_URL}/getLoggedInUser`, { headers: {"Authorization" : `Bearer ${token}`} });
     }catch(e){
-        console.log('Getting Error while creating new Owner')
+        throw new Error('Getting Error while creating new Owner')
     }
 }
 export const newOwnerSignupRequest = async(formData: FormData) => {
     try{
         return await axios.post(`${BACKEND_URL}/newOwner`, formData);
     }catch(e){
-        console.log('Getting Error while creating new Owner')
+        throw new Error('Getting Error while creating new Owner')
     }
 }
 
@@ -100,7 +101,7 @@ export const ownerLoginRequest = async(formData: IOwnerLoginData) => {
     try{
         return await axios.post(`${BACKEND_URL}/ownerLogin`, formData);
     }catch(e){
-        console.log('Getting Error while creating new Owner')
+        throw new Error('Getting Error while creating new Owner')
     }
 }
 
@@ -109,7 +110,7 @@ export const addListening = async(formData: FormData) => {
         const token = getToken();
         return await axios.post(`${BACKEND_URL}/addListening`, formData, { headers: {"Authorization" : `Bearer ${token}`} });
     }catch(e){
-        console.log('Getting Error while add your listening')
+        throw new Error('Getting Error while add your listening')
     }
 }
 
@@ -118,7 +119,7 @@ export const updateListing = async(formData: FormData, listingId) => {
         const token = getToken();
         return await axios.put(`${BACKEND_URL}/updateListing/${listingId}`, formData, { headers: {"Authorization" : `Bearer ${token}`} });
     }catch(e){
-        console.log('Getting Error while add your listening')
+        throw new Error('Getting Error while add your listening')
     }
 }
 
@@ -127,7 +128,7 @@ export const deleteListing = async(listing) => {
         const token = getToken();
         return await axios.delete(`${BACKEND_URL}/deleteListing`, {data: listing, headers: {"Authorization" : `Bearer ${token}`}});
     }catch(e){
-        console.log('Getting Error while add your listening')
+        throw new Error('Getting Error while add your listening')
     }
 }
 
@@ -136,7 +137,7 @@ export const fetchAllListings = async(society, filterCategory:string, page, limi
         const token = getToken();
         return await axios.post(`${BACKEND_URL}/fetchAllListings`, {society, filterCategory, page, limit}, { headers: {"Authorization" : `Bearer ${token}`} });
     }catch(e){
-        console.log('Getting Error while fetchAllListings')
+        throw new Error('Getting Error while fetchAllListings')
     }
 }
 
@@ -145,7 +146,7 @@ export const fetchListingById = async(id:string)=> {
         const token = getToken();
         return await axios.post(`${BACKEND_URL}/fetchListingById`, {id}, { headers: {"Authorization" : `Bearer ${token}`} });
     }catch(e){
-        console.log('Getting Error while fetching listing by id')
+        throw new Error('Getting Error while fetching listing by id')
     }
 }
 
@@ -154,7 +155,7 @@ export const fetchMyListings = async(ownerId:string | undefined, societyId:strin
         const token = getToken();
         return await axios.post(`${BACKEND_URL}/fetchMyListings`, {ownerId, societyId}, { headers: {"Authorization" : `Bearer ${token}`} });
     }catch(e){
-        console.log('Getting Error while fetching listing by id')
+        throw new Error('Getting Error while fetching listing by id')
     }
 }
 
@@ -164,6 +165,6 @@ export const toggleItemSold = async(ownerId:string | undefined, value:boolean)=>
         const token = getToken();
         return await axios.put(`${BACKEND_URL}/toggleItemSold`, {ownerId, value}, { headers: {"Authorization" : `Bearer ${token}`} });
     }catch(e){
-        console.log('Getting Error while toggleItemSold')
+        throw new Error('Getting Error while toggleItemSold')
     }
 }

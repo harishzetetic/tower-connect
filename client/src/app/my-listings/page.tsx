@@ -2,7 +2,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import { Button, Grid } from "@mui/material";
-import BuySellInfoCard, { LoadingBackDrop } from "@/components/dashboard/buySellInfoCard";
+import BuySellInfoCard from "@/components/dashboard/buySellInfoCard";
 import { IBuySell, IOwnerData } from "@/Types";
 import { useRouter } from 'next/navigation';
 import notfound from '../../../../client/src/images/notfound.png';
@@ -18,6 +18,7 @@ import { HOC } from '@/components/hoc/hoc';
 import { createParamsForInfoToast } from '@/util';
 import Swal from 'sweetalert2';
 import { QUERY_KEYS } from '@/constants';
+import LoadingBackDrop from '@/components/common/LoadingBackDrop';
 dayjs.extend(relativeTime)
 
 const MyListings = HOC(({ params }) => {

@@ -1,4 +1,4 @@
-import { Badge, TextField, styled } from "@mui/material";
+import { Badge, Box, TextField, styled } from "@mui/material";
 import {Button} from "@mui/material";
 import Link from "next/link";
 
@@ -33,6 +33,9 @@ export const VisuallyHiddenInput = styled('input')({
     paddingTop: '100px'
   }));
 
+  export const FlexBox = styled(Box)`
+    display: flex
+  `
 
   export const StyledBadge = styled(Badge)(({ theme }) => ({
     '& .MuiBadge-badge': {

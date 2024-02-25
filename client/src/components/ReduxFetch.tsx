@@ -14,6 +14,8 @@ import { updatedLoggedInUser } from "@/store/slices/loggedInUserSlice";
 import { createParamsForInfoToast, getToken } from "@/util";
 import { usePathname } from 'next/navigation'
 import Swal from "sweetalert2";
+import Router from 'next/router';
+import LoadingBackDrop from "./common/LoadingBackDrop";
 
 
 export function ReduxFetch({ children }: { children: React.ReactNode }) {
@@ -22,6 +24,7 @@ export function ReduxFetch({ children }: { children: React.ReactNode }) {
   const [isDataFetching, setIsDataFetching] = React.useState(true);
   const dispatch = useDispatch();
   const router = useRouter()
+  const isPublicRoute = publicPathNames.includes(pathname);
  const fetchSocieties = async()=>{
     const societiesApiResponse = await getAllSocieties();  
       if(societiesApiResponse?.status === 200){
@@ -36,29 +39,18 @@ export function ReduxFetch({ children }: { children: React.ReactNode }) {
     }
 }
   useEffect(()=>{
-    try{
-      if(publicPathNames.includes(pathname)){
-        fetchSocieties();
-      } else {
-        fetchSocieties();
-        getLoggedInUserInfo()
-      }
-    } catch(e){
-      Swal.fire(createParamsForInfoToast('info', 'Error', 'Error while fetching required data', 5000));
-      router.push('/login/owner')
-    } finally{
-      setIsDataFetching(false)
-    }
-    
-  
-    return () => { io(BACKEND_URL).emit('removeUser', loggedInUser)}}
-    ,[]);
+    try{ fetchSocieties(); if(!isPublicRoute){ getLoggedInUserInfo() }} 
+    catch(e){ Swal.fire(createParamsForInfoToast('info', 'Error', 'Error while fetching required data', 5000)); router.push('/login/owner')}
+    finally{ setIsDataFetching(false) }
+    return () => { io(BACKEND_URL).emit('removeUser', loggedInUser)  }
+    } ,[]);
 
-    React.useEffect(()=>{
+  useEffect(()=>{
       if(loggedInUser._id){
         io(BACKEND_URL).emit('addUser', loggedInUser) // adding the user to online state with socket io
       }
   },[loggedInUser])
+    
+ return (isDataFetching) ? <LoadingBackDrop isLoading={true}/> : <>{children}</>
 
-    return (isDataFetching) ? <Loading/> : <>{children}</>
 }

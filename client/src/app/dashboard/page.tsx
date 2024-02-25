@@ -2,7 +2,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import { Autocomplete, Button, ButtonGroup, Container, Grid, SpeedDial, TextField, Typography } from "@mui/material";
-import BuySellInfoCard, { LoadingBackDrop } from "@/components/dashboard/buySellInfoCard";
+import BuySellInfoCard from "@/components/dashboard/buySellInfoCard";
 import { IBuySell, IOwnerData } from "@/Types";
 import { fetchAllListings } from "@/api/ownerApis";
 import { Div } from '@/styled';
@@ -19,6 +19,9 @@ import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ClearIcon from '@mui/icons-material/Clear';
+import LoadingBackDrop from '@/components/common/LoadingBackDrop';
+
+
 const Dashboard = HOC(() => {
     const TOTAL_LIMIT = 12;
     const loggedInUser: IOwnerData = useSelector(reduxStore => (reduxStore as any)?.loggedInUser);

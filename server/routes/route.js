@@ -3,7 +3,7 @@ import { addSociety, getAllSocieties } from '../controller/societyController.js'
 import { searchOwners, getLoggedInUser, deleteListing, toggleItemSold, updateListing, fetchMyListings, fetchListingById, fetchAllListings, newListing, updateProfileImage, addOwner, deleteOwner, rejectOwnerAccount, approveOwnerAccount, ownerLogin } from '../controller/ownerController.js';
 import { signInAdmin, getPendingStatusAccounts } from '../controller/adminController.js';
 import { fetchMessasges, sendMessage, fetchChats, accessChat } from '../controller/chatController.js';
-
+import { dispatchPost, fetchPosts, likeToggle, dislikeToggle } from '../controller/communityController.js';
 import multer from 'multer';
 import {verifyAuthorization} from '../middleware.js'
 import {uniqueFileNameGenerator} from '../util.js'
@@ -64,34 +64,23 @@ Route.delete('/deleteListing', verifyAuthorization, deleteListing)
 Route.post('/fetchAllListings', verifyAuthorization, fetchAllListings);
 Route.post('/fetchListingById', verifyAuthorization, fetchListingById);
 Route.post('/fetchMyListings', verifyAuthorization, fetchMyListings);
-
 Route.put('/toggleItemSold', verifyAuthorization, toggleItemSold);
-
 Route.get('/searchOwners/:searchPhrase', verifyAuthorization, searchOwners)
 // Chat Apis
-/* This below route expected to create a new chat between two users(1-1). 
-if chat already exist it would return the same
-*/
+    /* This below route expected to create a new chat between two users(1-1). 
+    if chat already exist it would return the same
+    */
  Route.post('/messaging/accessChatWith', verifyAuthorization, accessChat)
  /* Below route will expected to return all chat for the user */
  Route.get('/messaging/fetchAllChats', verifyAuthorization, fetchChats)
  Route.get('/messaging/fetchMessasges/:chat', verifyAuthorization, fetchMessasges)
-
-
  Route.post('/messaging/sendMessage', verifyAuthorization, sendMessage)
 
- /*
-     Route.post('/messaging/group', verifyAuthorization, createGroupChat)
-        Route.put('/messaging/rename', verifyAuthorization, renameGroup)
-        Route.put('/messaging/groupadd', verifyAuthorization, addToGroup)
-        Route.put('/messaging/groupremove', verifyAuthorization, removeFromGroup)
- */
-
-
-
-
-
 Route.post('/ownerLogin', ownerLogin)
-
+// Community Apis
+Route.post('/community/dispatchPost', verifyAuthorization, dispatchPost)
+Route.get('/community/fetchPosts', verifyAuthorization, fetchPosts)
+Route.put('/community/likeToggle', verifyAuthorization, likeToggle)
+Route.put('/community/dislikeToggle', verifyAuthorization, dislikeToggle)
 
 export default Route

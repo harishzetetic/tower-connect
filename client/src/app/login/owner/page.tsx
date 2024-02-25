@@ -18,6 +18,7 @@ import { updatedLoggedInUser } from "@/store/slices/loggedInUserSlice";
 import React from "react";
 import { createParamsForInfoToast } from "@/util";
 import Swal from "sweetalert2";
+import LoadingBackDrop from "@/components/common/LoadingBackDrop";
 
 export const OwnerLoginSchema = Yup.object({
   society: SocietyValidationSchema,
@@ -53,16 +54,16 @@ const OwnerLogin = () => {
         router.push('/dashboard')
       } else {
         Swal.fire(createParamsForInfoToast('error', 'Error', 'Invalid credentials', 15000))
+        setIsLoginButtonDisabled(false);
       }
       
     } catch(e){
       Swal.fire(createParamsForInfoToast('error', 'Error', 'Error while signin', 15000))
-    } finally{
       setIsLoginButtonDisabled(false);
     }
-    
   }
   return <ThemeProvider theme={APP_THEME}>
+    <LoadingBackDrop isLoading={isLoginButtonDisabled}/>
     <Box className='full_viewport_height' style={{ backgroundColor: App.DarkBlue }}>
       <PublicHeader />
       <Box

@@ -56,7 +56,8 @@ export const QUERY_KEYS = {
     CREATE_ACCESS_CHAT: 'create-access-chat',
     FETCH_MY_CHATS: 'fetch-my-chats',
     SEND_MESSAGE:'send-message',
-    FETCH_MESSAGES: 'fetch-messages'
+    FETCH_MESSAGES: 'fetch-messages',
+    FETCH_COMMUNITY_POSTS: 'fetch-community-post'
 }
 
 export const publicPathNames = [
@@ -64,3 +65,5 @@ export const publicPathNames = [
     '/login/owner', // Login Page
     '/signup/owner' // Singup Page
 ]
+
+export const ALLOWED_CHARATERS_COMMUNITY = 280;
