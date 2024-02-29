@@ -1,7 +1,7 @@
 
-import {  IMessage, IOwnerLoginData } from "@/Types";
+import {  IOwnerLoginData } from "@/Types";
 import { BACKEND_URL, CHAT_MESSAGES_PER_SCROLL } from "@/constants";
-import { createParamsForInfoToast, getToken } from "@/util";
+import { getToken } from "@/util";
 import axios from "axios";
 import Swal from "sweetalert2";
 

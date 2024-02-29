@@ -1,9 +1,4 @@
-import { Container, Typography, Grid, Card, CardHeader, CardContent, Box, CardActions, Button } from "@mui/material";
-import StarIcon from '@mui/icons-material/StarBorder';
-import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
-import AccessibilityNewIcon from '@mui/icons-material/AccessibilityNew';
-import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
-import ApartmentIcon from '@mui/icons-material/Apartment';
+import { Container, Typography, Grid, Box } from "@mui/material";
 import { App } from "@/constants";
 import Image from "next/image";
 

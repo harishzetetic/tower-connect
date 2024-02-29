@@ -3,7 +3,7 @@ import PublicFooter from "@/components/landingpage/PublicFooter"
 import PublicHeader from "@/components/landingpage/PublicHeader"
 import { App } from "@/constants"
 import * as Yup from 'yup';
-import { Autocomplete, Box, Button, Container, FormHelperText, Grid, Link, TextField, ThemeProvider, Typography } from "@mui/material";
+import { Autocomplete, Box, Container, FormHelperText, Grid, TextField, ThemeProvider, Typography } from "@mui/material";
 import owner from '../../../images/owner.png';
 import Image from "next/image";
 import { useRouter } from 'next/navigation'

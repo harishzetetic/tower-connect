@@ -1,8 +1,7 @@
 import './topNavigation.scss'
-import { App, BACKEND_URL } from "@/constants";
+import { BACKEND_URL } from "@/constants";
 import { AppBar, Toolbar, Box, Button, Typography, Avatar, Divider, ListItemIcon, Menu, MenuItem } from "@mui/material"
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
-import SellIcon from '@mui/icons-material/Sell';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import PeopleIcon from '@mui/icons-material/People';
 import { useRouter } from 'next/navigation';
@@ -10,14 +9,12 @@ import {usePathname} from 'next/navigation';
 import { NextLink } from "@/styled";
 import SettingsIcon from '@mui/icons-material/Settings';
 import StreamIcon from '@mui/icons-material/Stream';
-import React, { useState } from 'react';
+import React from 'react';
 import Logout from '@mui/icons-material/Logout';
 import Settings from '@mui/icons-material/Settings';
-import PersonAdd from '@mui/icons-material/PersonAdd';
 import Swal from 'sweetalert2';
 import { IOwnerData } from '@/Types';
 import loggedInUser from '@/store/slices/loggedInUserSlice';
-import router from 'next/router';
 import { io } from "socket.io-client";
 import { useDispatch } from "react-redux";
 import { updatedLoggedInUser } from "@/store/slices/loggedInUserSlice";

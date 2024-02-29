@@ -1,7 +1,6 @@
 "use client"
-import { AppBar, Container, Toolbar, Typography, Box, IconButton, Button, createTheme, ThemeProvider } from "@mui/material";
+import { AppBar, Container, Toolbar, Typography, Box, IconButton, Button} from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
-import AdbIcon from '@mui/icons-material/Adb';
 import {useRouter} from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import StreamIcon from '@mui/icons-material/Stream';

@@ -1,5 +1,5 @@
 "use client"
-import { Box, ThemeProvider, createTheme} from '@mui/material';
+import { Box, ThemeProvider} from '@mui/material';
 import Featured from '../components/landingpage/Featured';
 import PublicHeader from '../components/landingpage/PublicHeader';
 import WhyUs from '../components/landingpage/WhyUs';

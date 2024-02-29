@@ -1,6 +1,5 @@
 import { SweetAlertOptions } from "sweetalert2";
-import { IOwnerData, SwalIcons } from "./Types";
-import { useSelector } from "react-redux";
+import { SwalIcons } from "./Types";
 
 export const getToken = ():string|null => {
     if(window && window?.localStorage){

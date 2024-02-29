@@ -1,6 +1,6 @@
 "use client"
 import * as React from 'react';
-import { Box, Grid, IconButton, List, ThemeProvider, Typography } from "@mui/material";
+import { Box, Grid, IconButton, List, Typography } from "@mui/material";
 import { IChat, IOwnerData } from "@/Types";
 import _ from 'lodash'
 import {io} from 'socket.io-client'

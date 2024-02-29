@@ -6,7 +6,6 @@ import { ReduxFetch } from '@/components/ReduxFetch'
 import { Suspense } from 'react'
 import Loading from './Loading'
 import NextTopLoader from 'nextjs-toploader';
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import ReactQueryProvider from './ReactQueryProvider'
 
 

@@ -1,5 +1,4 @@
 
-import { ISociety } from "@/Types";
 import { BACKEND_URL } from "@/constants";
 import axios from "axios";
 

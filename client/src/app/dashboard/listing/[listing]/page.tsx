@@ -2,7 +2,6 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import { Button, Card, CardContent, Grid, ImageList, ImageListItem, Paper, Typography } from "@mui/material";
-import { LoadingBackDrop } from "@/components/dashboard/buySellInfoCard";
 import { IBuySell, IOwnerData } from "@/Types";
 import {  accessChatWith, fetchListingById } from "@/api/ownerApis";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -22,6 +21,7 @@ import { createParamsForInfoToast } from '@/util';
 import Swal from 'sweetalert2';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation'
+import LoadingBackDrop from '@/components/common/LoadingBackDrop';
 dayjs.extend(relativeTime)
 
 // dayjs('2019-01-25').fromNow()}

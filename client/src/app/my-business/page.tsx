@@ -1,9 +1,7 @@
 "use client"
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import { Button, Card, CardContent, Grid, ImageList, ImageListItem, Paper, ThemeProvider, Typography } from "@mui/material";
-import { SkeletonCard } from "@/components/dashboard/buySellInfoCard";
+import { Button, Card, CardContent, Grid, ImageList, ImageListItem, Paper, Typography } from "@mui/material";
 import {  IBuySell, IOwnerData } from "@/Types";
 import {  fetchListingById } from "@/api/ownerApis";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -19,6 +17,7 @@ import { useSelector } from 'react-redux';
 import { HOC } from '@/components/hoc/hoc';
 import { createParamsForInfoToast } from '@/util';
 import Swal from 'sweetalert2';
+import LoadingBackDrop from '@/components/common/LoadingBackDrop';
 dayjs.extend(relativeTime)
 
 
@@ -53,7 +52,7 @@ const MyBusiness = HOC(({ params }) => {
         setIsContctConfirmOpen(true)
     }
         return (<>
-                    {isLoading && <SkeletonCard />}
+                    <LoadingBackDrop isLoading={isLoading} />
                     <h1>This is the my-business</h1>
                     {!isLoading && listing && <>
                         &nbsp;&nbsp;<Typography variant='h3' sx={{fontWeight: 'bold'}}><Button variant="text"><NextLink href={{ pathname: `/dashboard/` }}><ArrowBackIcon fontSize='large' /></NextLink></Button>  {listing.title} <Button sx={{float: 'right'}}size="large" variant="contained" onClick={getContactDetailsAction}><LocalPhoneIcon /> Get Contact Details</Button></Typography>

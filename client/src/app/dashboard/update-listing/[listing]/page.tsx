@@ -22,9 +22,9 @@ import { Formik, FormikErrors } from 'formik';
 import { useSelector } from 'react-redux';
 import { HOC } from '@/components/hoc/hoc';
 import { createParamsForInfoToast } from '@/util';
-import { LoadingBackDrop } from '@/components/dashboard/buySellInfoCard';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
+import LoadingBackDrop from '@/components/common/LoadingBackDrop';
 dayjs.extend(relativeTime)
 
 // dayjs('2019-01-25').fromNow()}

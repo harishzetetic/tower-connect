@@ -6,8 +6,6 @@ import BuySellInfoCard from "@/components/dashboard/buySellInfoCard";
 import { IBuySell, IOwnerData } from "@/Types";
 import { fetchAllListings } from "@/api/ownerApis";
 import { Div } from '@/styled';
-import notfound from '../../../../client/src/images/notfound.png';
-import Image from "next/image";
 import { QueryObserverResult, RefetchOptions, useQuery } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import { HOC } from '@/components/hoc/hoc';
@@ -18,7 +16,6 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import ClearIcon from '@mui/icons-material/Clear';
 import LoadingBackDrop from '@/components/common/LoadingBackDrop';
 
 

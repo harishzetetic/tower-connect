@@ -1,12 +1,10 @@
 "use client"
 import * as React from 'react';
 import { red } from "@mui/material/colors"
-import { Avatar, Box, Button, Card, CardContent, Container, Grid, ImageList, ImageListItem, InputAdornment, Paper, TextField, ThemeProvider, Typography } from "@mui/material";
+import { Avatar, Box, Button, Container, Grid, InputAdornment, TextField, Typography } from "@mui/material";
 import { IBuySell, ICommunityPost, IOwnerData } from "@/Types";
-import {  fetchListingById } from "@/api/ownerApis";
 import { useRouter } from 'next/navigation';
 import {  ALLOWED_CHARATERS_COMMUNITY, BACKEND_URL, QUERY_KEYS } from '@/constants';
-import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useSelector } from 'react-redux';
