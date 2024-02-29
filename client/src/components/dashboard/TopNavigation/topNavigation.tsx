@@ -45,7 +45,7 @@ const TopNavigation = () => {
             icon: 'question'
           }).then((result) => {
             if (result.isConfirmed) {
-              sessionStorage.removeItem('token');
+              localStorage.removeItem('token');
               dispatch(updatedLoggedInUser({} as IOwnerData))
               io(BACKEND_URL).emit('removeUser', loggedInUser);
               router.push('/login/owner')

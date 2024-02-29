@@ -48,7 +48,7 @@ const OwnerLogin = () => {
     try{
       const response = await ownerLoginRequest(formData);
       if(response?.data.token){
-        sessionStorage.setItem('token', response.data.token);
+        localStorage.setItem('token', response.data.token);
         dispatch(updatedLoggedInUser(response.data.data as IOwnerData))
         Swal.fire(createParamsForInfoToast('success', 'Login Success', 'Redirecting to dashboard', 15000))
         router.push('/dashboard')

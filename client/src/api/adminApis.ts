@@ -13,7 +13,7 @@ export const adminSignIn = async(credentials) => {
 }
 
 export const fetchPendingAccounts = async()=>{
-    const token = sessionStorage.getItem('token');
+    const token = localStorage.getItem('token');
     try{
 
         return await axios.get(`${BACKEND_URL}/superadmin/pendingAccounts`, { headers: {"Authorization" : `Bearer ${token}`} })
@@ -22,7 +22,7 @@ export const fetchPendingAccounts = async()=>{
     }
 }
 export const deleteOwner = async(id:string)=>{
-    const jwt_token = sessionStorage.getItem('token');
+    const jwt_token = localStorage.getItem('token');
     try{    
         return await axios.delete(`${BACKEND_URL}/deleteOwner/${id}`, { headers: {"Authorization" : `Bearer ${jwt_token}`} })
     }catch(e){
@@ -31,7 +31,7 @@ export const deleteOwner = async(id:string)=>{
 }
 
 export const rejectOwnerAccount = async(data: {id:string; rejectionMessage:string})=>{
-    const jwt_token = sessionStorage.getItem('token');
+    const jwt_token = localStorage.getItem('token');
     try{   
         return await axios.put(`${BACKEND_URL}/rejectOwnerAccount/${data.id}`, data, { headers: {"Authorization" : `Bearer ${jwt_token}`} })
     }catch(e){
@@ -40,7 +40,7 @@ export const rejectOwnerAccount = async(data: {id:string; rejectionMessage:strin
 }
 
 export const approveOwnerAccount = async(id:string)=>{
-    const jwt_token = sessionStorage.getItem('token');
+    const jwt_token = localStorage.getItem('token');
     try{    
         return await axios.put(`${BACKEND_URL}/approveOwnerAccount/${id}`, {}, { headers: {"Authorization" : `Bearer ${jwt_token}`} })
     }catch(e){

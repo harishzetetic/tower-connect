@@ -25,7 +25,7 @@ const SuperAdminLogin = () => {
             })
             if(response?.data?.token && response?.data?.message === "SUCCESS"){
                 Swal.fire(createParamsForInfoToast('success', 'Success', 'Login Done', 15000))
-                sessionStorage.setItem('token', response?.data?.token)
+                localStorage.setItem('token', response?.data?.token)
                 router.push('/admin/admindashboard')
             } else if(response?.data.message === "FAIL") {
                 Swal.fire(createParamsForInfoToast('error', 'Fail', 'Login Failed', 15000))

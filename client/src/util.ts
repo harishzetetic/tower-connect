@@ -3,8 +3,8 @@ import { IOwnerData, SwalIcons } from "./Types";
 import { useSelector } from "react-redux";
 
 export const getToken = ():string|null => {
-    if(window && window?.sessionStorage){
-        const token = window.sessionStorage.getItem('token');
+    if(window && window?.localStorage){
+        const token = window.localStorage.getItem('token');
         return token 
     }
     return null;

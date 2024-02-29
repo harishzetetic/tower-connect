@@ -13,7 +13,7 @@ POST is best used when you are creating new data.
   axios.interceptors.response.use(response => response, error => {
     console.log(error.response.status)
     if (error.response.status == 401 || error.response?.data?.isTokenValid === false) {
-        sessionStorage.removeItem('token');
+        localStorage.removeItem('token');
         Swal.fire({
            title: 'Invalid Token',
            text: `Your token has been invalid or deleted. Kindly login again.`,
