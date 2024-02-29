@@ -34,7 +34,9 @@ export const VisuallyHiddenInput = styled('input')({
   }));
 
   export const FlexBox = styled(Box)`
-    display: flex
+    display: flex;
+    margin-top: 6px;
+    margin-bottom: 6px;
   `
 
   export const StyledBadge = styled(Badge)(({ theme }) => ({

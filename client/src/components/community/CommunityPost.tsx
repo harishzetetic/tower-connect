@@ -9,11 +9,11 @@ import FavoriteIcon from '@mui/icons-material/Favorite'; //fill
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt'; //fill
 import CommentIcon from '@mui/icons-material/Comment';
-import { useState } from "react"
+import { Dispatch, SetStateAction, useState } from "react"
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useMutation } from "@tanstack/react-query"
-import { dislikeToggle, likeToggle } from "@/api/communityApis"
+import { commentOnPost, dislikeToggle, likeToggle } from "@/api/communityApis"
 import { createParamsForInfoToast } from "@/util"
 import { AxiosResponse } from "axios"
 import Swal from "sweetalert2"
@@ -109,7 +109,7 @@ const CommunityPost = (props: IPost) => {
              <Button onClick={toggleComment}><CommentIcon /></Button>
             </Box>
 
-            {showCommentSection && <CommentSection />}
+            {showCommentSection && <CommentSection post={post} setPost={setPost}/>}
            
     </Box>
 </FlexBox>
@@ -120,23 +120,45 @@ const CommunityPost = (props: IPost) => {
 export default CommunityPost
 
 
-const CommentSection = () => {
-    const loggedInUser: IOwnerData= useSelector(reduxStore => (reduxStore as any)?.loggedInUser);    
+interface ICommentSection {
+    post:ICommunityPost
+    setPost:Dispatch<SetStateAction<ICommunityPost>>
+}
+
+const CommentSection = (props:ICommentSection) => {
+    const loggedInUser: IOwnerData= useSelector(reduxStore => (reduxStore as any)?.loggedInUser); 
+    const [value, setValue] = useState<string>('')   
+
+    const postCommentMutate = useMutation({
+        mutationFn: async() => {
+            if(!props.post._id) return;
+            return await commentOnPost(props.post._id, value);
+        },
+        onError: () => Swal.fire(createParamsForInfoToast('error', 'Error', 'Error while post your comment')),
+        onSuccess: (data: AxiosResponse<any, any> | undefined) => {
+            data?.data && props.setPost(data.data)            
+        },
+        onSettled: () => { }
+    })
     return<>
     <Box id="comment-box">
+            {props.post.comments && props.post.comments.map((comment, index) => {
+                return <FlexBox key={index}>
+                <Box>
+                <Avatar sx={{ fontSize: 16, bgcolor: red[500], mr: 1, width: 32, height: 32}} aria-label="recipe" src={`${BACKEND_URL}${loggedInUser.imageUrl?.slice(1)}`}>
+            {loggedInUser?.firstName?.charAt(0)} {loggedInUser?.lastName?.charAt(0)}
+        </Avatar>
+                </Box>
+                <Box>
+                    <Typography sx={{color:'white', fontSize: 12}}>{comment.content}</Typography>
+                </Box>
+            </FlexBox>
+            })}
+                
+
                 <FlexBox>
-                    <Box>
-                    <Avatar sx={{ fontSize: 16, bgcolor: red[500], mr: 1, width: 32, height: 32}} aria-label="recipe" src={`${BACKEND_URL}${loggedInUser.imageUrl?.slice(1)}`}>
-                {loggedInUser?.firstName?.charAt(0)} {loggedInUser?.lastName?.charAt(0)}
-            </Avatar>
-                    </Box>
-                    <Box>
-                        <Typography sx={{color:'white', fontSize: 12}}>Jai Shree Ram!</Typography>
-                    </Box>
-                </FlexBox>
-                <FlexBox>
-                <TextField autoFocus sx={{mt: 1}} fullWidth size='small' placeholder="Post your comment..."></TextField>
-                <Button>Post</Button>
+                <TextField value={value} onChange={e=>setValue(e.target.value)} autoFocus sx={{mt: 1}} fullWidth size='small' placeholder="Post your comment..."></TextField>
+                <Button onClick={()=>postCommentMutate.mutate()} disabled={!value.length}>Post</Button>
                 </FlexBox>
                 
             </Box>

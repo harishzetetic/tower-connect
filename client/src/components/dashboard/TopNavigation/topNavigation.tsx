@@ -85,7 +85,7 @@ const TopNavigation = () => {
           <NextLink href="/community" style={{color: 'white', textDecoration: 'none'}}><PeopleIcon sx={{verticalAlign:'bottom', marginRight: 1}}/>Community</NextLink> 
           </Button>
           <Button className="TopNavigation_btn" style={{borderRadius: 0, color: 'white'}} variant="text" size="large">
-          <NextLink href="/dashboard" style={{color: 'white', textDecoration: 'none'}}><ShoppingBagIcon sx={{verticalAlign:'bottom', marginRight: 1}}/>Messaging</NextLink> 
+          <NextLink href="/messaging" style={{color: 'white', textDecoration: 'none'}}><ShoppingBagIcon sx={{verticalAlign:'bottom', marginRight: 1}}/>Messaging</NextLink> 
           </Button>
 
           

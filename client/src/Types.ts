@@ -146,7 +146,7 @@ export interface ICommunityPost {
   content: string,
   likes: Array<string>,
   dislikes: Array<string>,
-  comments: any,
+  comments: Array<{user: IOwnerData, content: string}>,
   _id?: string,
   created_at?: string,
   updated_at?: string

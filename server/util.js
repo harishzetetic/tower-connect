@@ -15,3 +15,10 @@ export const skippableItems = (itemsPerPage, page) => {
         }
 
 }
+
+export const getSecureUserDetails = (pathName) => {
+        return {
+            path: pathName,
+            select: 'towerNumber flatNumber flatType firstName lastName email phone imageUrl'    
+        }
+}

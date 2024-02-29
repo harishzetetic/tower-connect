@@ -3,7 +3,7 @@ import { addSociety, getAllSocieties } from '../controller/societyController.js'
 import { searchOwners, getLoggedInUser, deleteListing, toggleItemSold, updateListing, fetchMyListings, fetchListingById, fetchAllListings, newListing, updateProfileImage, addOwner, deleteOwner, rejectOwnerAccount, approveOwnerAccount, ownerLogin } from '../controller/ownerController.js';
 import { signInAdmin, getPendingStatusAccounts } from '../controller/adminController.js';
 import { fetchMessasges, sendMessage, fetchChats, accessChat } from '../controller/chatController.js';
-import { dispatchPost, fetchPosts, likeToggle, dislikeToggle } from '../controller/communityController.js';
+import { dispatchPost, fetchPosts, likeToggle, dislikeToggle, commentOnPost } from '../controller/communityController.js';
 import multer from 'multer';
 import {verifyAuthorization} from '../middleware.js'
 import {uniqueFileNameGenerator} from '../util.js'
@@ -82,5 +82,6 @@ Route.post('/community/dispatchPost', verifyAuthorization, dispatchPost)
 Route.get('/community/fetchPosts', verifyAuthorization, fetchPosts)
 Route.put('/community/likeToggle', verifyAuthorization, likeToggle)
 Route.put('/community/dislikeToggle', verifyAuthorization, dislikeToggle)
+Route.put('/community/commentOnPost', verifyAuthorization, commentOnPost)
 
 export default Route

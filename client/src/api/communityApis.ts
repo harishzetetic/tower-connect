@@ -42,3 +42,13 @@ export const dislikeToggle = async(postId:string, isPostDisLiked: boolean) => {
         throw new Error('Getting Error while dislike this post');
     }
 }
+
+export const commentOnPost = async(postId:string, comment: string) => {
+    try{
+        const token = getToken();
+    return await axios.put(`${BACKEND_URL}/community/commentOnPost`, {postId, comment}, { headers: {"Authorization" : `Bearer ${token}`} });
+    }
+    catch(e){
+        throw new Error('Getting Error while dislike this post');
+    }
+}

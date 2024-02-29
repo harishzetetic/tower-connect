@@ -23,7 +23,7 @@ import { useMutation } from '@tanstack/react-query';
 import { createParamsForInfoToast } from '@/util';
 import Swal from 'sweetalert2';
 import { updatedLoggedInUser } from '@/store/slices/loggedInUserSlice';
-import { LoadingBackDrop } from '@/components/dashboard/buySellInfoCard';
+import LoadingBackDrop from '@/components/common/LoadingBackDrop';
 dayjs.extend(relativeTime)
 
 const Profile = HOC(({ params }) => {

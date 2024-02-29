@@ -1,5 +1,6 @@
 import { jwtDecode } from "jwt-decode";
 import CommunityModel from "../model/CommunityModel.js";
+import { getSecureUserDetails } from "../util.js";
 
 export const dispatchPost = async(request, response)=>{
     try{
@@ -27,7 +28,7 @@ export const fetchPosts = async (request, response) => {
         const authHeader = request.headers['authorization'];
         const token = authHeader.substring(7, authHeader.length);
         const {user, societyId} = jwtDecode(token)
-        const result = await CommunityModel.find({society: societyId}).populate('user').populate('society').sort({updated_at: -1});
+        const result = await CommunityModel.find({society: societyId}).populate(getSecureUserDetails('user')).populate('society').sort({updated_at: -1});
         return response.status(200).json(result)
     }catch(e){
         return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
@@ -63,4 +64,17 @@ export const dislikeToggle = async (request, response) => {
     }
 }
 
-//likeToggle, dislikeToggle
+export const commentOnPost = async (request, response) => {
+    try{
+        const authHeader = request.headers['authorization'];
+       const token = authHeader.substring(7, authHeader.length);
+       const {user} = jwtDecode(token)
+       const {postId, comment} = request.body;
+       // const query = isPostDisLiked ? { "$push": { dislikes: user }, "$pull": { likes: user } } : { "$pull": { dislikes: user } } 
+       const updatedRecord = await CommunityModel.findOneAndUpdate({_id: postId}, {$push: {comments: {user, content: comment}}}, { new: true }).populate(getSecureUserDetails('comments.user')).populate(getSecureUserDetails('user')).populate('society');
+       return response.status(200).json(updatedRecord)
+    }catch(e){
+        return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
+    }
+}
+
