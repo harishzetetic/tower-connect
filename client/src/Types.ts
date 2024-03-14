@@ -140,17 +140,21 @@ export interface IIncomingMessage {
   sendTo: IOwnerData
 }
 
+export interface IPostComment {
+  user: IOwnerData,
+  content: string,
+  _id: string
+}
 export interface ICommunityPost {
   user: IOwnerData,
   society: ISociety,
   content: string,
   likes: Array<string>,
   dislikes: Array<string>,
-  comments: Array<{user: IOwnerData, content: string}>,
-  _id?: string,
-  created_at?: string,
-  updated_at?: string
-
+  comments: Array<IPostComment>,
+  _id: string,
+  created_at: string,
+  updated_at: string
 }
 
 export type SwalIcons= 'success' | 'error' | 'warning' | 'info' | 'question';

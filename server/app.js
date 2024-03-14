@@ -6,15 +6,11 @@ import Route from './routes/route.js';
 import DBConnection from './database/db.js';
 import {Server} from 'socket.io';
 import {createServer} from 'http';
+import { ClientURL } from './constants.js';
 
 const app = express();
-
 const server = createServer(app);
-const io = new Server(server, {
-       pingTimeout: 60000,
-       cors: {
-           origin: 'http://localhost:3000'
-       }})
+const io = new Server(server, { pingTimeout: 60000, cors: { origin: ClientURL }})
 
 app.use(cors())
 app.use(bodyParser.json({extended: true}))
@@ -25,9 +21,10 @@ app.use('/userdocs', express.static('userdocs'))
 app.use('/itemImages', express.static('itemImages'))
 app.use('/profilepictures', express.static('profilepictures'))
 
-DBConnection();
+DBConnection(); // Making a DB Connection Here..
 
 let onlineUsers= [];
+
 const addUser = (userData, socketId)=>{
     !onlineUsers.some(user => user._id == userData._id) && onlineUsers.push({...userData, socketId})
 } 
@@ -52,8 +49,9 @@ io.on('connection', (socket)=>{
                 socket.broadcast.emit('getMessage', data)
             }
         }
-       
     })    
 })
+
 const PORT = process.env.PORT || 9000;
+
 server.listen(PORT, ()=>console.log('Server running successfull on PORT ',PORT))

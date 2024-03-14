@@ -1,6 +1,7 @@
+import { IPostComment } from "@/Types";
 import { BACKEND_URL } from "@/constants";
 import { getToken } from "@/util";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 
 export const dispatchPost = async(content: string) => {
     try{
@@ -41,10 +42,50 @@ export const dislikeToggle = async(postId:string, isPostDisLiked: boolean) => {
     }
 }
 
+export const updatePost = async(postId:string, updatedContent: string) => {
+    try{
+        const token = getToken();
+    return await axios.put(`${BACKEND_URL}/community/updatePost`, {postId, updatedContent}, { headers: {"Authorization" : `Bearer ${token}`} });
+    }
+    catch(e){
+        throw new Error('Getting Error while update this post');
+    }
+}
+
+export const deletePost = async(postId:string) => {
+    try{
+        const token = getToken();
+    return await axios.delete(`${BACKEND_URL}/community/deletePost/${postId}`, { headers: {"Authorization" : `Bearer ${token}`} });
+    }
+    catch(e){
+        throw new Error('Getting Error while dislike this post');
+    }
+}
+
 export const commentOnPost = async(postId:string, comment: string) => {
     try{
         const token = getToken();
     return await axios.put(`${BACKEND_URL}/community/commentOnPost`, {postId, comment}, { headers: {"Authorization" : `Bearer ${token}`} });
+    }
+    catch(e){
+        throw new Error('Getting Error while dislike this post');
+    }
+}
+
+export const deleteComment = async(postId:string, commentId: string) => {
+    try{
+        const token = getToken();
+    return await axios.put(`${BACKEND_URL}/community/deleteComment`, {postId, commentId}, { headers: {"Authorization" : `Bearer ${token}`} });
+    }
+    catch(e){
+        throw new Error('Getting Error while dislike this post');
+    }
+}
+
+export const fetchPostComments = async(postId:string):Promise<AxiosResponse<IPostComment[]>> => {
+    try{
+        const token = getToken();
+        return await axios.get(`${BACKEND_URL}/community/fetchPostComments/${postId}`, { headers: {"Authorization" : `Bearer ${token}`} });
     }
     catch(e){
         throw new Error('Getting Error while dislike this post');

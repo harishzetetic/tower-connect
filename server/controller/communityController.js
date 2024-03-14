@@ -64,6 +64,16 @@ export const dislikeToggle = async (request, response) => {
     }
 }
 
+export const updatePost = async (request, response) => {
+    try{
+       const {postId, updatedContent} = request.body;
+       const updatedRecord = await CommunityModel.findOneAndUpdate({_id: postId}, {$set: {content: updatedContent}}, { new: true }).populate('user').populate('society');
+       return response.status(200).json(updatedRecord)
+    }catch(e){
+        return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
+    }
+}
+
 export const commentOnPost = async (request, response) => {
     try{
         const authHeader = request.headers['authorization'];
@@ -77,4 +87,42 @@ export const commentOnPost = async (request, response) => {
         return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
     }
 }
+
+export const deleteComment = async (request, response) => {
+    try{
+        // const authHeader = request.headers['authorization'];
+       // const token = authHeader.substring(7, authHeader.length);
+       // const {user} = jwtDecode(token)
+       const {postId, commentId} = request.body;
+       const updatedRecord = await CommunityModel.findOneAndUpdate({_id: postId}, {$pull: {comments: {_id: commentId}}}, { new: true }).populate(getSecureUserDetails('comments.user')).populate(getSecureUserDetails('user')).populate('society');
+       return response.status(200).json(updatedRecord)
+    }catch(e){
+        return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
+    }
+}
+
+export const fetchPostComments = async (request, response) => {
+    try{
+       const {postId} = request.params;
+       const postComments = await CommunityModel.findOne({_id: postId}, 'comments').populate(getSecureUserDetails('comments.user'));
+       if(postComments?.comments){
+        return response.status(200).json(postComments.comments)
+       }
+       return response.status(200).json([])
+       
+    }catch(e){
+        return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
+    }
+}
+
+export const deletePost = async (request, response) => {
+    try{
+       const {postId} = request.params;
+       await CommunityModel.deleteOne({_id: postId});
+       return response.status(200).json({message: 'success'})
+    }catch(e){
+        return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
+    }
+}
+
 

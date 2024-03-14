@@ -19,7 +19,7 @@ import LoadingBackDrop from '@/components/common/LoadingBackDrop';
 dayjs.extend(relativeTime)
 
 
-const Announcement = HOC(({ params }) => {
+const Community = HOC(({ params }) => {
     const [listing, setListing] = React.useState<IBuySell | null>(null)
     const [value, setValue] = React.useState<string>('');
 
@@ -110,4 +110,4 @@ const Announcement = HOC(({ params }) => {
 
 })
 
-export default Announcement
+export default Community

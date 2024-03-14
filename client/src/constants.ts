@@ -57,7 +57,8 @@ export const QUERY_KEYS = {
     FETCH_MY_CHATS: 'fetch-my-chats',
     SEND_MESSAGE:'send-message',
     FETCH_MESSAGES: 'fetch-messages',
-    FETCH_COMMUNITY_POSTS: 'fetch-community-post'
+    FETCH_COMMUNITY_POSTS: 'fetch-community-post',
+    FETCH_POST_COMMENTS: 'fetch-post-comments'
 }
 
 export const publicPathNames = [
