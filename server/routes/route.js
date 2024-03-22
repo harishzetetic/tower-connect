@@ -3,7 +3,7 @@ import { addSociety, getAllSocieties } from '../controller/societyController.js'
 import { searchOwners, getLoggedInUser, deleteListing, toggleItemSold, updateListing, fetchMyListings, fetchListingById, fetchAllListings, newListing, updateProfileImage, addOwner, deleteOwner, rejectOwnerAccount, approveOwnerAccount, ownerLogin } from '../controller/ownerController.js';
 import { signInAdmin, getPendingStatusAccounts } from '../controller/adminController.js';
 import { fetchMessasges, sendMessage, fetchChats, accessChat } from '../controller/chatController.js';
-import { dispatchPost, fetchPosts, likeToggle, dislikeToggle, commentOnPost, deleteComment, deletePost, updatePost, fetchPostComments } from '../controller/communityController.js';
+import { dispatchPost, fetchPosts, likeToggle, dislikeToggle, commentOnPost, deleteComment,editComment,  deletePost, updatePost, fetchPostComments } from '../controller/communityController.js';
 import multer from 'multer';
 import {verifyAuthorization} from '../middleware.js'
 import {uniqueFileNameGenerator} from '../util.js'
@@ -85,6 +85,7 @@ Route.put('/community/dislikeToggle', verifyAuthorization, dislikeToggle)
 Route.put('/community/updatePost', verifyAuthorization, updatePost)
 Route.put('/community/commentOnPost', verifyAuthorization, commentOnPost)
 Route.put('/community/deleteComment', verifyAuthorization, deleteComment)
+Route.put('/community/editComment', verifyAuthorization, editComment)
 Route.delete('/community/deletePost/:postId', verifyAuthorization, deletePost)
 Route.get('/community/fetchPostComments/:postId', verifyAuthorization, fetchPostComments)
 

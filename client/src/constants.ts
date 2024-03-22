@@ -13,6 +13,8 @@ export const INITIAL_PAGE = 1;
 
 export const BACKEND_URL = 'http://localhost:9000'
 
+// export const BACKEND_URL = 'https://tower-connect.onrender.com';
+
 export const AppName = 'The Luvis'
 
 export const Categories = [

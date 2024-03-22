@@ -13,20 +13,23 @@ import { createParamsForInfoToast } from '@/util';
 import Swal from 'sweetalert2';
 import CommunityPost from '@/components/community/CommunityPost';
 import { dispatchPost, fetchCommunityPosts } from '@/api/communityApis';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { AxiosResponse } from 'axios';
+import { QueryFunctionContext, UndefinedInitialDataInfiniteOptions, useMutation, useQuery } from '@tanstack/react-query';
+import axios, { AxiosResponse } from 'axios';
 import LoadingBackDrop from '@/components/common/LoadingBackDrop';
+import { useState } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
+
 dayjs.extend(relativeTime)
 
-
+interface IFetchPostResult{
+        result: ICommunityPost[],
+        totalPages: number,
+        currentPage: number
+}
 const Community = HOC(({ params }) => {
-    const [listing, setListing] = React.useState<IBuySell | null>(null)
-    const [value, setValue] = React.useState<string>('');
-
-    /* ---------------------------------------------------------------------------------- */
-    const router = useRouter()
+    const [value, setValue] = useState<string>('');
     const loggedInUser: IOwnerData= useSelector(reduxStore => (reduxStore as any)?.loggedInUser);
-
+    
     const dispatchPostMutation = useMutation({
         mutationFn: async() => {
             if(loggedInUser._id){
@@ -35,7 +38,7 @@ const Community = HOC(({ params }) => {
             throw new Error('Loggedin user not found')
         },
         onError: () => Swal.fire(createParamsForInfoToast('error', 'Error', 'Error while posting. Try Again.')),
-        onSuccess: (data: AxiosResponse<any, any> | undefined) => {
+        onSuccess: () => {
              Swal.fire({
                  title: 'Success',
                  text: `Post Successfully`,
@@ -48,25 +51,28 @@ const Community = HOC(({ params }) => {
         onSettled: () => { }
     }) 
 
-
-    const { data: posts, isLoading, refetch:refetchPosts } = useQuery({
-        queryFn: async () => {
-            try{
-                const apiResponse = await fetchCommunityPosts()
-                if (apiResponse?.status === 200) {
-                    return apiResponse?.data;
-                }
-            }catch(e){
-                Swal.fire(createParamsForInfoToast('error', 'Error', 'Error while getting community posts'))
-                return []
-            }
-            
-        },
+    const fetchPosts = async ({ pageParam = 1 }) => {
+        const res = await fetchCommunityPosts(pageParam);
+        return (res.data);
+      };
+      
+      const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetching: isLoading,
+        isFetchingNextPage,
+        status,
+        refetch: refetchPosts
+      } = useInfiniteQuery({
         queryKey: [QUERY_KEYS.FETCH_COMMUNITY_POSTS],
-        enabled: true,
-    })
+        queryFn: fetchPosts,
+        getNextPageParam: (lastPage, allPages) => lastPage.currentPage + 1 <= lastPage.totalPages ? lastPage.currentPage + 1 : null
+      } as any);
 
-    const isCharatersExceedFromLimit = () => value.length > ALLOWED_CHARATERS_COMMUNITY;
+      const posts = data?.pages.flatMap(page => (page as IFetchPostResult).result) || [];
+
+      const isCharatersExceedFromLimit = () => value.length > ALLOWED_CHARATERS_COMMUNITY;
     
     React.useEffect(() => {}, []);
 
@@ -98,6 +104,16 @@ const Community = HOC(({ params }) => {
                             </Box>
                             <Container>
                                 {posts && (posts as ICommunityPost[]).map(item => <CommunityPost post={item}/>)}
+                                {hasNextPage && (
+                            <Button
+                            onClick={() => fetchNextPage()}
+                            disabled={isFetchingNextPage}
+                            >
+                            {isFetchingNextPage ? 'Loading more...' : 'Load more Messages'}
+                            </Button>
+                        )}
+                        {isLoading && !isFetchingNextPage && <p>Loading...</p>}
+                        {status === 'error' && <p>Error fetching data</p>}
                             </Container>
                         </Grid>
                         <Grid item xs={12} sm={12} md={2}></Grid>

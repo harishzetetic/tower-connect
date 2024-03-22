@@ -1,4 +1,4 @@
-import { IPostComment } from "@/Types";
+import { ICommunityPost, IPostComment } from "@/Types";
 import { BACKEND_URL } from "@/constants";
 import { getToken } from "@/util";
 import axios, { AxiosResponse } from "axios";
@@ -13,11 +13,12 @@ export const dispatchPost = async(content: string) => {
     }
 }
 
-export const fetchCommunityPosts = async() => {
+export const fetchCommunityPosts = async(page) => {
     try{
         const token = getToken();
-        return await axios.get(`${BACKEND_URL}/community/fetchPosts`, { headers: {"Authorization" : `Bearer ${token}`} })
+        return await axios.get(`${BACKEND_URL}/community/fetchPosts?page=${page}`, { headers: {"Authorization" : `Bearer ${token}`} })
     } catch(e){
+        
         throw new Error('Getting Error while fetching posts');
     }   
 }
@@ -62,7 +63,7 @@ export const deletePost = async(postId:string) => {
     }
 }
 
-export const commentOnPost = async(postId:string, comment: string) => {
+export const commentOnPost = async(postId:string, comment: string):Promise<AxiosResponse<ICommunityPost>> => {
     try{
         const token = getToken();
     return await axios.put(`${BACKEND_URL}/community/commentOnPost`, {postId, comment}, { headers: {"Authorization" : `Bearer ${token}`} });
@@ -76,6 +77,16 @@ export const deleteComment = async(postId:string, commentId: string) => {
     try{
         const token = getToken();
     return await axios.put(`${BACKEND_URL}/community/deleteComment`, {postId, commentId}, { headers: {"Authorization" : `Bearer ${token}`} });
+    }
+    catch(e){
+        throw new Error('Getting Error while dislike this post');
+    }
+}
+
+export const editComment = async(postId:string, commentId: string, updatedContent:string) => {
+    try{
+        const token = getToken();
+    return await axios.put(`${BACKEND_URL}/community/editComment`, {postId, commentId, updatedContent}, { headers: {"Authorization" : `Bearer ${token}`} });
     }
     catch(e){
         throw new Error('Getting Error while dislike this post');

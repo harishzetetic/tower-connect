@@ -27,9 +27,15 @@ export const fetchPosts = async (request, response) => {
     try{
         const authHeader = request.headers['authorization'];
         const token = authHeader.substring(7, authHeader.length);
-        const {user, societyId} = jwtDecode(token)
-        const result = await CommunityModel.find({society: societyId}).populate(getSecureUserDetails('user')).populate('society').sort({updated_at: -1});
-        return response.status(200).json(result)
+        const {societyId} = jwtDecode(token);
+        const limit = 30;
+        const { page = 1} = request.query;
+        const result = await CommunityModel.find({society: societyId}).populate(getSecureUserDetails('user')).populate('society').sort({updated_at: -1}).limit(limit * 1)
+        .skip((page - 1) * limit)
+        .exec();
+        const totalPosts = await CommunityModel.countDocuments()
+        return response.status(200).json({result, totalPages: Math.ceil(totalPosts / limit),
+        currentPage: Number(page)})
     }catch(e){
         return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
     }
@@ -90,12 +96,19 @@ export const commentOnPost = async (request, response) => {
 
 export const deleteComment = async (request, response) => {
     try{
-        // const authHeader = request.headers['authorization'];
-       // const token = authHeader.substring(7, authHeader.length);
-       // const {user} = jwtDecode(token)
        const {postId, commentId} = request.body;
-       const updatedRecord = await CommunityModel.findOneAndUpdate({_id: postId}, {$pull: {comments: {_id: commentId}}}, { new: true }).populate(getSecureUserDetails('comments.user')).populate(getSecureUserDetails('user')).populate('society');
-       return response.status(200).json(updatedRecord)
+       const confirmation = await CommunityModel.updateOne({_id: postId}, {$pull: {comments: {_id: commentId}}}).populate(getSecureUserDetails('comments.user')).populate(getSecureUserDetails('user')).populate('society');
+       return response.status(200).json(confirmation)
+    }catch(e){
+        return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
+    }
+}
+
+export const editComment = async (request, response) => {
+    try{
+       const {postId, commentId, updatedContent} = request.body;
+       const confirmation = await CommunityModel.updateOne({ _id: postId, "comments._id": commentId }, { $set: { "comments.$.content": updatedContent } }).populate(getSecureUserDetails('comments.user')).populate(getSecureUserDetails('user')).populate('society');
+       return response.status(200).json(confirmation)
     }catch(e){
         return response.status(500).json({message: 'An error occured. Please try again later.', error: e})
     }

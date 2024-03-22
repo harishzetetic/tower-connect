@@ -182,7 +182,7 @@ const CommunityPost = (props: IPost) => {
                 </Button>
             </Box>
 
-            {showCommentSection && <CommentSection postId={post._id} setPost={setPost}/>}
+            {showCommentSection && <CommentSection postId={post._id}/>}
             <EditPostPopup open={openEditPostPopup} post={post} onClose={()=>{setOpenEditPostPopup(!openEditPostPopup)}} editPostMutation={editPostMutation}/>
     </Box>
 </FlexBox>
