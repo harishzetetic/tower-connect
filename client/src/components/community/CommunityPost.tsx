@@ -123,7 +123,7 @@ const CommunityPost = (props: IPost) => {
     <Box sx={{width: '100%'}}>
         <FlexBox>
         <Typography sx={{fontWeight: 'bold'}}>{post.user.firstName} {post.user.lastName} <Typography sx={{display: 'inline', fontStyle: 'italic', fontWeight: 100}}>from</Typography> {post.user.towerNumber} {post.user.flatNumber}</Typography> &nbsp; &nbsp;
-        <Typography sx={{flexGrow: 1, fontStyle: 'italic', fontWeight: 100}}>{dayjs(post.created_at).fromNow()}</Typography>
+        <Typography sx={{flexGrow: 1, fontStyle: 'italic', fontWeight: 100}}>posted {dayjs(post.created_at).fromNow()}</Typography>
         {(post.user._id === loggedInUser._id)  && <>
         <IconButton
             id="options-button"
