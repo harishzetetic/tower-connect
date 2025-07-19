@@ -3,9 +3,32 @@ import featuredLogo from '../../images/tower-connect-logo.png';
 import Image from "next/image";
 import { App } from "@/constants";
 import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 const Featured = () => {
     const router = useRouter();
+    const [displayText, setDisplayText] = useState('');
+    const fullText = "Your Society's Digital Marketplace";
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    useEffect(() => {
+        if (currentIndex < fullText.length) {
+            const timeout = setTimeout(() => {
+                setDisplayText(prev => prev + fullText[currentIndex]);
+                setCurrentIndex(prev => prev + 1);
+            }, 100); // Speed of typing
+
+            return () => clearTimeout(timeout);
+        } else {
+            // Restart animation after 4 seconds when typing is complete
+            const restartTimeout = setTimeout(() => {
+                setDisplayText('');
+                setCurrentIndex(0);
+            }, 4000);
+
+            return () => clearTimeout(restartTimeout);
+        }
+    }, [currentIndex, fullText]);
 
     const stats = [
         { number: "500+", label: "Active Societies" },
@@ -25,8 +48,13 @@ const Featured = () => {
                         <Typography align="center" gutterBottom sx={{ color: '#fff', fontSize: '1.1rem', fontWeight: 500 }}>
                             UNLEASH THE REACH OF RESIDENTIALS
                         </Typography>
-                        <Typography variant="h2" align="center" paragraph sx={{ color: '#fff', fontWeight: 700 }}>
-                            Your Society's Digital Marketplace
+                        <Typography variant="h2" align="center" paragraph sx={{ color: '#fff', fontWeight: 700, minHeight: '3rem' }}>
+                            {displayText}
+                            <span style={{ 
+                                animation: 'blink 1s infinite',
+                                borderRight: '2px solid #fff',
+                                marginLeft: '2px'
+                            }}></span>
                         </Typography>
                         <Typography variant="h4" align="center" paragraph sx={{ color: '#fff', fontWeight: 600 }}>
                             <span className='highlight' id="breathing-text">100% Broker Free</span>
@@ -87,6 +115,13 @@ const Featured = () => {
                     </Grid>
                 </Grid>
             </Container>
+            
+            <style jsx>{`
+                @keyframes blink {
+                    0%, 50% { opacity: 1; }
+                    51%, 100% { opacity: 0; }
+                }
+            `}</style>
         </Box>
     );
 };
