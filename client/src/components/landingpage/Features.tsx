@@ -10,37 +10,37 @@ import SecurityIcon from '@mui/icons-material/Security';
 const Features = () => {
     const features = [
         {
-            icon: <ShoppingCartIcon sx={{ fontSize: 50, color: App.DarkBlue }} />,
+            icon: <ShoppingCartIcon sx={{ fontSize: 50, color: App.White }} />,
             title: "Buy & Sell Marketplace",
             description: "List items for sale or find great deals from your neighbors. Furniture, electronics, books, and more - all verified and safe.",
             stats: "₹50L+ items sold"
         },
         {
-            icon: <HomeIcon sx={{ fontSize: 50, color: App.DarkBlue }} />,
+            icon: <HomeIcon sx={{ fontSize: 50, color: App.White }} />,
             title: "Property Rentals",
             description: "Find or list rental properties within your society. Direct owner-tenant communication with no brokerage fees.",
             stats: "1000+ properties listed"
         },
         {
-            icon: <ChatIcon sx={{ fontSize: 50, color: App.DarkBlue }} />,
+            icon: <ChatIcon sx={{ fontSize: 50, color: App.White }} />,
             title: "Community Chat",
             description: "Stay connected with your neighbors through secure messaging. Share updates, ask questions, and build relationships.",
             stats: "10K+ active chats"
         },
         {
-            icon: <BusinessIcon sx={{ fontSize: 50, color: App.DarkBlue }} />,
+            icon: <BusinessIcon sx={{ fontSize: 50, color: App.White }} />,
             title: "Business Listings",
             description: "Showcase your home-based business to your community. Perfect for home chefs, tutors, and service providers.",
             stats: "500+ businesses listed"
         },
         {
-            icon: <AnnouncementIcon sx={{ fontSize: 50, color: App.DarkBlue }} />,
+            icon: <AnnouncementIcon sx={{ fontSize: 50, color: App.White }} />,
             title: "Society Announcements",
             description: "Post and view important society announcements, maintenance updates, and community events in real-time.",
             stats: "24/7 communication"
         },
         {
-            icon: <SecurityIcon sx={{ fontSize: 50, color: App.DarkBlue }} />,
+            icon: <SecurityIcon sx={{ fontSize: 50, color: App.White }} />,
             title: "Verified Community",
             description: "All users are verified society residents. Safe, secure, and trusted transactions within your community.",
             stats: "100% verified users"

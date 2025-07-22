@@ -32,10 +32,10 @@ const Testimonials = () => {
     return (
         <Box sx={{ py: 8, backgroundColor: '#f8f9fa' }}>
             <Container maxWidth="lg">
-                <Typography variant="h3" align="center" gutterBottom sx={{ fontWeight: 700, mb: 1 }}>
+                <Typography variant="h3" align="center" gutterBottom sx={{ fontWeight: 700, mb: 1, color: App.DarkBlue }}>
                     What Our Residents Say
                 </Typography>
-                <Typography variant="h6" align="center" sx={{ color: 'text.secondary', mb: 6 }}>
+                <Typography variant="h6" align="center" sx={{ color: '#26304a', mb: 6 }}>
                     Join thousands of satisfied residents who trust Tower Connect
                 </Typography>
                 

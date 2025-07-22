@@ -95,52 +95,99 @@ const Listing = HOC(({ params }) => {
         return (<>
                     <LoadingBackDrop isLoading={isLoading} />
                     {!isLoading && listing && <>
-                        &nbsp;&nbsp;
-                        <Typography variant='h3' sx={{fontWeight: 'bold'}}><Button variant="text"><NextLink href={{ pathname: `/dashboard/` }}><ArrowBackIcon fontSize='large' /></NextLink></Button>  {listing.title} 
-                            {shouldMessageBtnDisplay() && <Button sx={{float: 'right'}} size="large" variant="contained" onClick={creatMessageThenRedirect}><MessageIcon /> &nbsp; Message to owner</Button>}
-                        </Typography>
-                        <Typography variant='h6'>{`By ${itemOwner?.firstName} ${itemOwner?.lastName} from ${itemOwner?.towerNumber}-${itemOwner?.flatNumber} on ${dayjs(listing?.created_at).fromNow()}`}  </Typography>
-                        <Box sx={{ display: 'inline-block', mt:2 }}>
-                            <ImageList sx={{ width: 'auto', height: 'auto' }} cols={4} rowHeight={164}>
-                                {
-                                    listing.images.map((item, index) => (
-                                        <ImageListItem key={index}>
-                                            <img
-                                                // srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                                                src={`${BACKEND_URL}${item?.slice(1)}`}
-                                                alt={`image${index + 1}`}
-                                                loading="lazy"
-                                            />
-                                        </ImageListItem>
-                                    ))
-                                }
-                            </ImageList>
+                        <Box sx={{
+                            background: 'rgba(30, 34, 44, 0.98)',
+                            borderRadius: 4,
+                            boxShadow: '0 4px 24px 0 rgba(20, 26, 31, 0.18)',
+                            p: { xs: 2, md: 4 },
+                            mb: 4,
+                            mt: 2,
+                            mx: { xs: 0, md: 2 },
+                        }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                                <Button variant="text" sx={{ minWidth: 0, p: 0, color: '#2196F3' }}>
+                                    <NextLink href={{ pathname: `/dashboard/` }}><ArrowBackIcon fontSize='large' /></NextLink>
+                                </Button>
+                                {shouldMessageBtnDisplay() && <Button size="large" variant="contained" onClick={creatMessageThenRedirect} sx={{
+                                    background: 'linear-gradient(90deg, #4CAF50 0%, #2196F3 100%)',
+                                    color: '#fff',
+                                    fontWeight: 700,
+                                    borderRadius: 2,
+                                    boxShadow: '0 2px 8px 0 rgba(33, 150, 243, 0.10)',
+                                    px: 4,
+                                    py: 1.2,
+                                    fontSize: 16,
+                                    letterSpacing: 0.5,
+                                    '&:hover': {
+                                        background: 'linear-gradient(90deg, #2196F3 0%, #4CAF50 100%)',
+                                    }
+                                }}><MessageIcon /> &nbsp; Message to owner</Button>}
+                            </Box>
+                            <Typography variant='h3' sx={{ fontWeight: 'bold', color: '#fff', mb: 1 }}>{listing.title}</Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                <Box sx={{
+                                    background: 'rgba(44, 52, 70, 0.85)',
+                                    borderRadius: 3,
+                                    boxShadow: '0 2px 12px 0 rgba(20, 26, 31, 0.10)',
+                                    p: 2,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    mr: 2
+                                }}>
+                                    <PersonIcon sx={{ color: '#4CAF50', fontSize: 32, mr: 1 }} />
+                                    <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 18 }}>{`${itemOwner?.firstName} ${itemOwner?.lastName}`}</Typography>
+                                    <Typography sx={{ color: '#b0b8c9', fontSize: 15, ml: 2 }}>{`${itemOwner?.towerNumber}-${itemOwner?.flatNumber}`}</Typography>
+                                    <Typography sx={{ color: '#b0b8c9', fontSize: 14, ml: 2 }}>{`• ${dayjs(listing?.created_at).fromNow()}`}</Typography>
+                                </Box>
+                            </Box>
+                            <Box sx={{ display: 'inline-block', mt: 2, width: '100%' }}>
+                                <ImageList sx={{ width: '100%', height: 'auto', borderRadius: 3, boxShadow: '0 2px 12px 0 rgba(20, 26, 31, 0.10)', background: 'rgba(44, 52, 70, 0.85)', p: 1 }} cols={4} rowHeight={164}>
+                                    {
+                                        listing.images.map((item, index) => (
+                                            <ImageListItem key={index} sx={{ borderRadius: 2, overflow: 'hidden', boxShadow: '0 2px 8px 0 rgba(20, 26, 31, 0.10)', m: 0.5 }}>
+                                                <img
+                                                    src={`${BACKEND_URL}${item?.slice(1)}`}
+                                                    alt={`image${index + 1}`}
+                                                    loading="lazy"
+                                                    style={{ borderRadius: 12, width: '100%', height: '100%', objectFit: 'cover', background: '#222' }}
+                                                />
+                                            </ImageListItem>
+                                        ))
+                                    }
+                                </ImageList>
+                            </Box>
+                            <Grid container spacing={2} sx={{ mt: 1 }}>
+                                <Grid item xs={12} md={4}>
+                                    <CardBox title="Price" value={listing.isSold ? 'SOLD' : parseInt(listing.price || '0').toFixed(2)} priceFormat={!!(!listing.isSold)} />
+                                </Grid>
+                                <Grid item xs={12} md={4}>
+                                    <CardBox title="Condition" value={listing.condition} showIcon />
+                                </Grid>
+                                <Grid item xs={12} md={4}>
+                                    <CardBox title="Category" value={listing.category} />
+                                </Grid>
+                            </Grid>
+                            <Box sx={{ mt: 3 }}>
+                                <Card sx={{
+                                    background: 'rgba(44, 52, 70, 0.85)',
+                                    borderRadius: 3,
+                                    boxShadow: '0 2px 12px 0 rgba(20, 26, 31, 0.10)',
+                                    p: 2,
+                                    color: '#fff',
+                                    border: '1px solid rgba(76,175,80,0.08)'
+                                }}>
+                                    <CardContent>
+                                        <Typography variant='h5' sx={{ color: '#fff', fontWeight: 700 }}><strong>Description</strong></Typography>
+                                        <Typography variant='h6' sx={{ color: '#b0b8c9', fontWeight: 400 }}>{` ${listing.description} `}</Typography>
+                                    </CardContent>
+                                </Card>
+                            </Box>
                         </Box>
-                        <Grid container spacing={2}>
-                            <Grid item xs={6} md={4}>
-                                <CardBox title="Price" value={listing.isSold ? 'SOLD' : parseInt(listing.price || '0').toFixed(2)}  priceFormat={!!(!listing.isSold)}/>
-                            </Grid>
-                            <Grid item xs={6} md={4}>
-                                <CardBox title="Condition" value={listing.condition} showIcon />
-                            </Grid>
-                            <Grid item xs={6} md={4}>
-                                <CardBox title="Category" value={listing.category} />
-                            </Grid>
-
-                        </Grid>
-                        <Paper sx={{mt:2, p:2}}>
-                        <Typography variant='h5'><strong>Description</strong></Typography>
-                        <Typography variant='h6'>{` ${listing.description} `}  </Typography>
-
-                        </Paper>
-                        
-                        <NextLink style={{display: 'none'}} href={{pathname: '/messaging',
-                            query: {activeChat: 'MUST_BE_FILL'}}}><Typography ref={forwardToMessagingRef}>Hidden</Typography></NextLink>
-
+                        <NextLink style={{display: 'none'}} href={{pathname: '/messaging', query: {activeChat: 'MUST_BE_FILL'}}}><Typography ref={forwardToMessagingRef}>Hidden</Typography></NextLink>
                     </>}
             <TCConfirm successBtnTitle='Show me the details' open={isContctConfirmOpen} handleClose={()=>{setIsContctConfirmOpen(false)}} handleConfirm={()=>{setIsContctConfirmOpen(false); setShowContactDetails(true)}} title={"Information"} description={"By this action we will let this product owner know that you have viewed the contact information for this product. Please confirm to view the contact details. "} />
             <TCConfirm successBtnTitle='Ok' hideCancel open={showContactDetails} handleClose={()=>{setShowContactDetails(false)}} handleConfirm={()=>{setShowContactDetails(false)}} title={"Contact Details"} description={<><strong>Phone Number:</strong> {itemOwner?.phone} <br/> <strong>Email:</strong> {itemOwner?.email}</>} />
-            </>
+        </>
        )
 
 
@@ -176,12 +223,20 @@ const CardBox = (props: ICardBox) => {
         }
         return <></>
     }
-    return <Card variant="outlined">
-    <CardContent>
-        <Typography variant='h5' gutterBottom>{title}</Typography>
-        <Typography variant='h4' sx={{ color: priceFormat ? 'green' : '' }}> <strong>{priceFormat ? <CurrencyRupeeIcon/> : '' } {getIcon()} {getValue(title, value)}</strong> </Typography>
-    </CardContent>
-</Card>
+    return <Card variant="outlined" sx={{
+        background: 'rgba(44, 52, 70, 0.85)',
+        borderRadius: 3,
+        boxShadow: '0 2px 12px 0 rgba(20, 26, 31, 0.10)',
+        color: '#fff',
+        border: '1px solid rgba(76,175,80,0.08)',
+        p: 1,
+        mb: 1
+    }}>
+        <CardContent>
+            <Typography variant='h5' gutterBottom sx={{ fontWeight: 700 }}>{title}</Typography>
+            <Typography variant='h4' sx={{ color: priceFormat ? '#4CAF50' : '#fff', fontWeight: 700, display: 'flex', alignItems: 'center' }}> <strong>{priceFormat ? <CurrencyRupeeIcon sx={{ color: '#4CAF50', fontSize: 28, mr: 0.5 }} /> : '' } {getIcon()} {getValue(title, value)}</strong> </Typography>
+        </CardContent>
+    </Card>
 }
 
 export default Listing

@@ -64,24 +64,49 @@ const OwnerLogin = () => {
   }
   return <ThemeProvider theme={APP_THEME}>
     <LoadingBackDrop isLoading={isLoginButtonDisabled}/>
-    <Box className='full_viewport_height' style={{ backgroundColor: App.DarkBlue }}>
-      <PublicHeader />
-      <Box
-      
-        sx={{ pt: 8, pb: 6}}
-      >
+    <Box className='full_viewport_height' sx={{
+      minHeight: '100vh',
+      background: 'radial-gradient(circle at 74.2% 50.9%, rgb(14, 72, 222) 5.2%, rgb(3, 22, 65) 75.3%)',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+    }}>
+      {/* <PublicHeader /> */}
+      <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', py: 6 }}>
         <Formik initialValues={initialValues} onSubmit={(formData) => {loginHandler(formData) }} enableReinitialize={true} validationSchema={OwnerLoginSchema}>
           {({ values, setFieldValue, errors, resetForm, submitForm }) => (
-            <Container maxWidth="xs">
-              <Box component="form" onSubmit={() => { }} noValidate sx={{ mt: 1 }}>
-                <Box className='center_items'>
-                  <Image src={owner} alt={"owner-logo"} height={100} width={100} />
+            <Container maxWidth="xs" sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              <Box sx={{
+                width: '100%',
+                background: 'rgba(30, 34, 44, 0.98)',
+                borderRadius: 4,
+                boxShadow: '0 4px 24px 0 rgba(20, 26, 31, 0.18)',
+                p: { xs: 3, md: 4 },
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                mb: 4,
+              }}>
+                <Box className='center_items' sx={{ mb: 2 }}>
+                  <Image src={owner} alt={"owner-logo"} height={90} width={90} style={{ filter: 'drop-shadow(0 2px 8px #2196F3)' }} />
                 </Box>
-                <Box className='center_items' sx={{ mt: 2 }}>
-                  <Typography align="center" variant="h6" noWrap component="a" href="/" sx={{ mr: 2, display: { xs: 'none', md: 'flex' }, fontWeight: 700, letterSpacing: '.3rem', textDecoration: 'none', }}>
-                    OWNER LOGIN
-                  </Typography>
-                </Box>
+                <Typography align="center" variant="h5" sx={{
+                  fontWeight: 900,
+                  letterSpacing: '.2rem',
+                  background: 'linear-gradient(90deg, #4CAF50 0%, #2196F3 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  mb: 2,
+                  textShadow: '0 2px 8px rgba(33,150,243,0.10)',
+                }}>
+                  OWNER LOGIN
+                </Typography>
                 <Autocomplete
                   disablePortal
                   id="society-select"
@@ -98,11 +123,20 @@ const OwnerLogin = () => {
                       setFieldValue("societyId", null)
                     }
                   }}
-                  renderInput={(params) => <TextField {...params} label="Society Name" name={"societyId"} error={!!errors.societyId} />}
+                  fullWidth
+                  renderInput={(params) => <TextField {...params} label="Society Name" name={"societyId"} error={!!errors.societyId} variant="outlined" fullWidth sx={{
+                    input: { color: '#fff' },
+                    label: { color: '#b0b8c9' },
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      background: 'rgba(44, 52, 70, 0.85)',
+                      color: '#fff',
+                    },
+                  }} />}
                 />
                 <FormHelperText sx={{ color: App.ErrorTextColor }}>{errors.societyId}</FormHelperText>
                 <TextField 
-                  color="error"
+                  color="primary"
                   variant="outlined" 
                   error={!!errors.towerNumber} 
                   helperText={errors.towerNumber} 
@@ -112,9 +146,26 @@ const OwnerLogin = () => {
                   margin="normal" 
                   fullWidth 
                   label="Tower Number" 
-                  autoFocus />
-                <TextField type="number" error={!!errors.flatNumber} helperText={errors.flatNumber} value={values.flatNumber} onChange={(e) => setFieldValue("flatNumber", e.target.value)} name="flatNumber" margin="normal" fullWidth label="Flat Number" autoFocus />
-
+                  autoFocus
+                  sx={{
+                    input: { color: '#fff' },
+                    label: { color: '#b0b8c9' },
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      background: 'rgba(44, 52, 70, 0.85)',
+                      color: '#fff',
+                    },
+                  }}
+                />
+                <TextField type="number" error={!!errors.flatNumber} helperText={errors.flatNumber} value={values.flatNumber} onChange={(e) => setFieldValue("flatNumber", e.target.value)} name="flatNumber" margin="normal" fullWidth label="Flat Number" autoFocus sx={{
+                  input: { color: '#fff' },
+                  label: { color: '#b0b8c9' },
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                    background: 'rgba(44, 52, 70, 0.85)',
+                    color: '#fff',
+                  },
+                }} />
                 <TextField
                   margin="normal"
                   required
@@ -127,36 +178,47 @@ const OwnerLogin = () => {
                   value={values.password} 
                   onChange={(e) => setFieldValue("password", e.target.value)}
                   autoComplete="current-password"
+                  sx={{
+                    input: { color: '#fff' },
+                    label: { color: '#b0b8c9' },
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                      background: 'rgba(44, 52, 70, 0.85)',
+                      color: '#fff',
+                    },
+                  }}
                 />
-
                 <TCButton
                   disabled={isLoginButtonDisabled}
                   type="submit"
                   fullWidth
                   variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
+                  sx={{
+                    mt: 3, mb: 2, py: 1.5, fontWeight: 700, fontSize: 18, borderRadius: 2,
+                    background: 'linear-gradient(90deg, #4CAF50 0%, #2196F3 100%)',
+                    boxShadow: '0 2px 8px 0 rgba(33, 150, 243, 0.10)',
+                    '&:hover': {
+                      background: 'linear-gradient(90deg, #2196F3 0%, #4CAF50 100%)',
+                    }
+                  }}
                   onClick={(e)=> {e.preventDefault(); submitForm(); }}
                 >
                   Sign In
                 </TCButton>
-                <Grid container>
+                <Grid container sx={{ mt: 1 }}>
                   <Grid item xs>
-                  <NextLink href={'../not-available'}>{"Forgot Password"}</NextLink>
+                    <NextLink href={'../not-available'} style={{ color: '#2196F3', textDecoration: 'underline', fontWeight: 500 }}>Forgot Password</NextLink>
                   </Grid>
                   <Grid item>
-                    <NextLink href={'../signup/owner'}>{"Don't have an account? Sign Up"}</NextLink>
+                    <NextLink href={'../signup/owner'} style={{ color: '#4CAF50', textDecoration: 'underline', fontWeight: 500 }}>Don't have an account? Sign Up</NextLink>
                   </Grid>
                 </Grid>
               </Box>
-
             </Container>
           )}
         </Formik>
-
-
       </Box>
       <PublicFooter />
-
     </Box>
   </ThemeProvider>
 }
