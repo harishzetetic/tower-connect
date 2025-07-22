@@ -114,79 +114,84 @@ const CommunityPost = (props: IPost) => {
 
 
     return <>
-    <FlexBox>
-    <Box>
-    <Avatar sx={{ bgcolor: red[500], m: 2 }} aria-label="recipe" src={`${BACKEND_URL}${post.user.imageUrl?.slice(1)}`}>
-                {post.user?.firstName?.charAt(0)} {post.user?.lastName?.charAt(0)}
-            </Avatar>
-    </Box>
-    <Box sx={{width: '100%'}}>
-        <FlexBox>
-        <Typography sx={{fontWeight: 'bold'}}>{post.user.firstName} {post.user.lastName} <Typography sx={{display: 'inline', fontStyle: 'italic', fontWeight: 100}}>from</Typography> {post.user.towerNumber} {post.user.flatNumber}</Typography> &nbsp; &nbsp;
-        <Typography sx={{flexGrow: 1, fontStyle: 'italic', fontWeight: 100}}>posted {dayjs(post.created_at).fromNow()}</Typography>
-        {(post.user._id === loggedInUser._id)  && <>
-        <IconButton
-            id="options-button"
-            aria-controls={open ? 'basic-menu' : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? 'true' : undefined}
-            onClick={handleClick}     
-      > <MoreVertIcon /></IconButton>
-        <Menu
-            id="basic-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            MenuListProps={{
-              'aria-labelledby': 'options-button',
-            }}
-      >
-        <MenuItem onClick={()=>{
-            handleClose()
-            Swal.fire({
-                title: `Hi ${loggedInUser.firstName}, Are you sure to delete this post?`,
-                showCancelButton: true,
-                confirmButtonText: "Yes",
-                icon: 'question'
-              }).then((result) => {
-                if (result.isConfirmed) {
-                    deletePostMutation.mutate()  
-                }
-              });
-            }}>Delete</MenuItem>
-        <MenuItem onClick={()=>{setOpenEditPostPopup(true)}}>Edit</MenuItem>
-      </Menu>
-        </>}
-        </FlexBox>
-        
-        <Typography sx={{mb: 2}}>
-        {post.content}
-        </Typography>
-            <Box sx={{display: 'flex', color: 'white', pb: 1, flexDirection: 'row'}}>
-            <Button onClick={()=>likeToggleMutation.mutate()}>
-            <Badge badgeContent={post.likes.length || 0} color="error">
-                {isPostLiked ? <FavoriteIcon sx={{color: 'red'}}/>: <FavoriteBorderIcon />}
-            </Badge>
-                
+    <Box sx={{
+        background: 'rgba(44, 52, 70, 0.95)',
+        borderRadius: 3,
+        boxShadow: '0 2px 12px 0 rgba(20, 26, 31, 0.10)',
+        p: 2,
+        mb: 3,
+        transition: 'box-shadow 0.2s',
+        '&:hover': {
+            boxShadow: '0 4px 24px 0 rgba(33, 150, 243, 0.18)',
+        },
+        display: 'flex',
+        gap: 2,
+    }}>
+        <Avatar sx={{ bgcolor: red[500], width: 48, height: 48, mt: 0.5 }} aria-label="recipe" src={`${BACKEND_URL}${post.user.imageUrl?.slice(1)}`}>{post.user?.firstName?.charAt(0)}{post.user?.lastName?.charAt(0)}</Avatar>
+        <Box sx={{width: '100%'}}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography sx={{fontWeight: 'bold', color: '#fff', fontSize: 16}}>{post.user.firstName} {post.user.lastName}</Typography>
+                <Typography sx={{ color: '#b0b8c9', fontSize: 14, fontWeight: 400 }}>@{post.user.towerNumber}{post.user.flatNumber}</Typography>
+                <Typography sx={{flexGrow: 1, color: '#b0b8c9', fontSize: 13, ml: 2}}>{dayjs(post.created_at).fromNow()}</Typography>
+                {(post.user._id === loggedInUser._id)  && <>
+                    <IconButton
+                        id="options-button"
+                        aria-controls={open ? 'basic-menu' : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? 'true' : undefined}
+                        onClick={handleClick}     
+                        sx={{ color: '#b0b8c9' }}
+                    > <MoreVertIcon /></IconButton>
+                    <Menu
+                        id="basic-menu"
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleClose}
+                        MenuListProps={{
+                        'aria-labelledby': 'options-button',
+                        }}
+                    >
+                        <MenuItem onClick={()=>{
+                            handleClose()
+                            Swal.fire({
+                                title: `Hi ${loggedInUser.firstName}, Are you sure to delete this post?`,
+                                showCancelButton: true,
+                                confirmButtonText: "Yes",
+                                icon: 'question'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    deletePostMutation.mutate()  
+                                }
+                            });
+                            }}>Delete</MenuItem>
+                        <MenuItem onClick={()=>{setOpenEditPostPopup(true)}}>Edit</MenuItem>
+                    </Menu>
+                </>}
+            </Box>
+            <Typography sx={{mb: 2, color: '#fff', fontSize: 17, lineHeight: 1.6}}>
+                {post.content}
+            </Typography>
+            <Box sx={{display: 'flex', color: '#b0b8c9', pb: 1, flexDirection: 'row', gap: 1}}>
+                <Button onClick={()=>likeToggleMutation.mutate()} sx={{ color: isPostLiked ? '#e0245e' : '#b0b8c9', minWidth: 0, px: 1 }}>
+                    <Badge badgeContent={post.likes.length || 0} color="error">
+                        {isPostLiked ? <FavoriteIcon sx={{color: '#e0245e'}}/>: <FavoriteBorderIcon />}
+                    </Badge>
                 </Button>
-            <Button onClick={()=>dislikeToggleMutation.mutate()}>
-            <Badge badgeContent={post.dislikes.length || 0} color="error">
-            {isPostDisLiked ? <ThumbDownAltIcon /> : <ThumbDownOffAltIcon />}
-            </Badge>
-                
+                <Button onClick={()=>dislikeToggleMutation.mutate()} sx={{ color: isPostDisLiked ? '#1da1f2' : '#b0b8c9', minWidth: 0, px: 1 }}>
+                    <Badge badgeContent={post.dislikes.length || 0} color="error">
+                        {isPostDisLiked ? <ThumbDownAltIcon sx={{ color: '#1da1f2' }} /> : <ThumbDownOffAltIcon />}
+                    </Badge>
                 </Button>
-             <Button onClick={toggleComment}>
-             <Badge badgeContent={post.comments.length || 0} color="error">
-                <CommentIcon />
-             </Badge>
+                <Button onClick={toggleComment} sx={{ color: '#b0b8c9', minWidth: 0, px: 1 }}>
+                    <Badge badgeContent={post.comments.length || 0} color="error">
+                        <CommentIcon />
+                    </Badge>
                 </Button>
             </Box>
-
             {showCommentSection && <CommentSection postId={post._id}/>}
             <EditPostPopup open={openEditPostPopup} post={post} onClose={()=>{setOpenEditPostPopup(!openEditPostPopup)}} editPostMutation={editPostMutation}/>
+        </Box>
     </Box>
-</FlexBox>
-<br/>
     </>
 }
 

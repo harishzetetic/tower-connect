@@ -77,49 +77,98 @@ const Community = HOC(({ params }) => {
     React.useEffect(() => {}, []);
 
         return (<>
-                    <LoadingBackDrop isLoading={isLoading}/>
-                    <Grid container>
-                        <Grid item xs={12} sm={12} md={2}></Grid>
-                        <Grid item xs={12} sm={12} md={8}>
-                            <TextField 
-                                placeholder={`Hi ${loggedInUser.firstName}, Type your message for your society...`}
+            <LoadingBackDrop isLoading={isLoading}/>
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                background: 'radial-gradient(circle at 74.2% 50.9%, rgb(14, 72, 222) 5.2%, rgb(3, 22, 65) 75.3%)',
+                minHeight: '100vh',
+                py: 4,
+            }}>
+                <Box sx={{
+                    width: '100%',
+                    background: 'rgba(30, 34, 44, 0.98)',
+                    borderRadius: 4,
+                    boxShadow: '0 4px 24px 0 rgba(20, 26, 31, 0.18)',
+                    p: { xs: 1, md: 3 },
+                    minHeight: '80vh',
+                }}>
+                    {/* Post Composer */}
+                    <Box sx={{
+                        background: 'rgba(44, 52, 70, 0.95)',
+                        borderRadius: 3,
+                        boxShadow: '0 2px 12px 0 rgba(20, 26, 31, 0.10)',
+                        p: 2,
+                        mb: 3,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 2,
+                    }}>
+                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                            <Avatar sx={{ bgcolor: red[500], width: 48, height: 48 }} aria-label="recipe" src={`${BACKEND_URL}${loggedInUser.imageUrl?.slice(1)}`}>{loggedInUser?.firstName?.charAt(0)}{loggedInUser?.lastName?.charAt(0)}</Avatar>
+                            <TextField
+                                placeholder={`What's happening?`}
                                 hiddenLabel
                                 multiline
                                 value={value}
                                 onChange={e=>setValue(e.target.value)}
-                                rows={4}
-                                InputProps={{
-                                    startAdornment: (
-                                      <InputAdornment position="start" sx={{alignItems: 'self-end'}}>
-                                        <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe" src={`${BACKEND_URL}${loggedInUser.imageUrl?.slice(1)}`}>
-                                                {loggedInUser?.firstName?.charAt(0)} {loggedInUser?.lastName?.charAt(0)}
-                                        </Avatar>
-                                      </InputAdornment>
-                                    ),
-                                  }}
-                            fullWidth/>
-                            <Box sx={{display: 'flex', justifyContent: 'space-between', mt: 2}}>
-                                <Typography sx={{color: isCharatersExceedFromLimit() ? 'red' : ''}}>0/{ALLOWED_CHARATERS_COMMUNITY - value.length} characters</Typography>
-                                <Button disabled={isCharatersExceedFromLimit()} variant="contained" onClick={()=>{dispatchPostMutation.mutate()}}>Post</Button>
-                            </Box>
-                            <Container>
-                                {posts && (posts as ICommunityPost[]).map(item => <CommunityPost post={item}/>)}
-                                {hasNextPage && (
+                                rows={3}
+                                variant="outlined"
+                                fullWidth
+                                sx={{
+                                    background: 'rgba(30, 34, 44, 0.98)',
+                                    borderRadius: 2,
+                                    '& .MuiOutlinedInput-root': {
+                                        color: '#fff',
+                                    },
+                                }}
+                            />
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
+                            <Typography sx={{ color: isCharatersExceedFromLimit() ? 'red' : '#b0b8c9', fontSize: 14 }}>{ALLOWED_CHARATERS_COMMUNITY - value.length} characters left</Typography>
+                            <Button disabled={isCharatersExceedFromLimit() || !value.trim()} variant="contained" onClick={()=>{dispatchPostMutation.mutate()}}
+                                sx={{
+                                    borderRadius: 2,
+                                    fontWeight: 700,
+                                    fontSize: 16,
+                                    px: 4,
+                                    py: 1,
+                                    background: 'linear-gradient(90deg, #4CAF50 0%, #2196F3 100%)',
+                                    boxShadow: '0 2px 8px 0 rgba(33, 150, 243, 0.10)',
+                                    '&:hover': {
+                                        background: 'linear-gradient(90deg, #2196F3 0%, #4CAF50 100%)',
+                                    },
+                                }}
+                            >Post</Button>
+                        </Box>
+                    </Box>
+                    {/* Feed */}
+                    <Box>
+                        {posts && (posts as ICommunityPost[]).map(item => <CommunityPost key={item._id} post={item}/>) }
+                        {hasNextPage && (
                             <Button
-                            onClick={() => fetchNextPage()}
-                            disabled={isFetchingNextPage}
+                                onClick={() => fetchNextPage()}
+                                disabled={isFetchingNextPage}
+                                sx={{
+                                    mt: 2,
+                                    borderRadius: 2,
+                                    fontWeight: 700,
+                                    fontSize: 16,
+                                    background: 'linear-gradient(90deg, #2196F3 0%, #4CAF50 100%)',
+                                    color: '#fff',
+                                    '&:hover': {
+                                        background: 'linear-gradient(90deg, #4CAF50 0%, #2196F3 100%)',
+                                    },
+                                }}
                             >
-                            {isFetchingNextPage ? 'Loading more...' : 'Load more Messages'}
+                                {isFetchingNextPage ? 'Loading more...' : 'Load more Messages'}
                             </Button>
                         )}
-                        {isLoading && !isFetchingNextPage && <p>Loading...</p>}
-                        {status === 'error' && <p>Error fetching data</p>}
-                            </Container>
-                        </Grid>
-                        <Grid item xs={12} sm={12} md={2}></Grid>
-                       
-                    </Grid>
-          
+                        {isLoading && !isFetchingNextPage && <Typography sx={{ color: '#b0b8c9', textAlign: 'center', mt: 2 }}>Loading...</Typography>}
+                        {status === 'error' && <Typography sx={{ color: 'red', textAlign: 'center', mt: 2 }}>Error fetching data</Typography>}
+                    </Box>
+                </Box>
+            </Box>
         </>   
         )
   
